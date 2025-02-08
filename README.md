@@ -30,11 +30,11 @@ NSBM community.
 
 
 
-git clone https://github.com/dushan6693/NSBMFindX.git
+git clone https://github.com/dushaDev/NSBMFindX.git
 
 
 
 Contact
 
 Email: dushanmadushankabeligala9@gmail.com
-GitHub: dushan6693
+GitHub: dushaDev
