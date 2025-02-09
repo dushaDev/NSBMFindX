@@ -9,6 +9,7 @@ class Notifications extends StatefulWidget {
 
 class _NotificationsState extends State<Notifications> {
   String _title = 'Notifications';
+  bool _isDoNotDisturbEnabled = false;
   final TextEditingController _searchController = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -20,7 +21,17 @@ class _NotificationsState extends State<Notifications> {
             children: [
               Text('$_title'),
             ],
+
           ),
+          actions: [
+            IconButton(
+              icon: Icon(
+                _isDoNotDisturbEnabled ? Icons.notifications_off_rounded : Icons.notifications_active_rounded,
+              ),
+              onPressed: _toggleDoNotDisturb,
+              tooltip: 'Toggle Do Not Disturb',
+            ),
+          ],
           centerTitle: true,
           foregroundColor: Theme.of(context).colorScheme.onSurface,
         ),
@@ -28,5 +39,21 @@ class _NotificationsState extends State<Notifications> {
           child:Text('Notification page here', style: TextStyle(fontSize: 18.0)),
 
         ));
+  }
+  void _toggleDoNotDisturb() {
+    setState(() {
+      _isDoNotDisturbEnabled = !_isDoNotDisturbEnabled;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          _isDoNotDisturbEnabled
+              ? 'Do Not Disturb Enabled'
+              : 'Do Not Disturb Disabled',
+        ),
+        duration: Duration(seconds: 1),
+      ),
+    );
   }
 }
