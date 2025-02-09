@@ -14,16 +14,9 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text('$_title'),
-            ],
-          ),
-          centerTitle: false,
+          title: Text('$_title'),
           foregroundColor: Theme.of(context).colorScheme.onSurface,
-          actions: <Widget>[
+          actions:[
             IconButton(
                 onPressed: () {
                   // Navigator.push(
