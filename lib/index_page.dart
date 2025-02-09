@@ -15,14 +15,19 @@ class _IndexPageState extends State<IndexPage> {
   int _selectedIndex = 0;
   final _tabs = [const Home(), const Search(), const Notifications()];
   final _label = [
-    'Home',
-    'Search',
-    'Notifications',
+    'home',
+    'search',
+    'notifications',
   ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        bottomNavigationBar: BottomNavigation(
+        extendBody: true,
+        body: Stack(children: [
+      _tabs[_selectedIndex],
+      Align(
+        alignment: Alignment.bottomCenter,
+        child: BottomNavigation(
           selectedIndex: _selectedIndex,
           onItemSelected: (int index) {
             setState(() {
@@ -31,6 +36,7 @@ class _IndexPageState extends State<IndexPage> {
           },
           labels: _label,
         ),
-        body: _tabs[_selectedIndex]);
+      ),
+    ]));
   }
 }

@@ -8,7 +8,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  String _title = 'Home';
+  String _title = 'Good morning User!';
   final TextEditingController _searchController = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class _HomeState extends State<Home> {
               Text('$_title'),
             ],
           ),
-          centerTitle: true,
+          centerTitle: false,
           foregroundColor: Theme.of(context).colorScheme.onSurface,
           actions: <Widget>[
             IconButton(
@@ -31,11 +31,12 @@ class _HomeState extends State<Home> {
                   //   MaterialPageRoute(builder: (context) => const Settings()),
                   // );
                 },
-                icon: const Icon(Icons.supervised_user_circle_outlined)),
+                icon: Icon(Icons.account_circle_outlined,color: Theme.of(context).colorScheme.onSurface,),iconSize: 35.0,),
           ],
         ),
         body: Center(
-          child: Text('Home page here'),
+         child:
+            Text('Home page here', style: TextStyle(fontSize: 18.0)),
         ));
   }
 }
