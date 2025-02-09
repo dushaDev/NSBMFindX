@@ -1,5 +1,8 @@
 #my added
 .env
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
 # Miscellaneous
 *.class
 *.log
