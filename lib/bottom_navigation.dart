@@ -16,6 +16,18 @@ class BottomNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(16.0),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.shadow.withAlpha(80),
+            blurRadius: 8.0,
+            spreadRadius: 1.0,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
       margin: EdgeInsets.only(top: 5.0, bottom: 10.0, left: 60.0, right: 60.0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16.0),
