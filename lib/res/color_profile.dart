@@ -19,8 +19,8 @@ class ColorProfile {
       error: Color(0xFFB00020),
       errorContainer: Color(0xFFFFCECE),
       onError: Color(0xFFFFFFFF),
-      outline: Color(0xFFB26D6D),
-      outlineVariant: Color(0xFFD0D0D0));
+      outline: Color(0xFFCDAB4F),
+      outlineVariant: Color(0xFFBDBDBD));
 
   // Dark theme color scheme
   static const dark = ColorScheme(
@@ -39,6 +39,6 @@ class ColorProfile {
       surfaceContainerHigh: Color(0xFF252525),
       error: Color(0xFFD30024),
       onError: Color(0xFFA25353),
-      outline: Color(0xFFB26D6D),
-      outlineVariant: Color(0xFF2C2C2C));
+      outline: Color(0xFF7E6423),
+      outlineVariant: Color(0xFF5A5A5A));
 }
