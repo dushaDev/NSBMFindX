@@ -1,3 +1,4 @@
+import 'package:find_x/lost_post.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -26,10 +27,10 @@ class _HomeState extends State<Home> {
           actions:[
             IconButton(
                 onPressed: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => const Settings()),
-                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LostPost()),
+                  );
                 },
                 icon: Icon(Icons.account_circle_outlined,color: Theme.of(context).colorScheme.secondary,),iconSize: 35.0,),
           ],
