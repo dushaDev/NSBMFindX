@@ -10,6 +10,7 @@ class ColorProfile {
       secondary: Color(0xFFF4B400),
       onSecondary: Color(0xFFFFFFFF),
       secondaryContainer: Color(0xFFFFEAB2),
+      onSecondaryContainer: Color(0xFF272727),
       surface: Color(0xFFF8F9FA),
       onSurface: Color(0xFF282828),
       onSurfaceVariant: Color(0xFF636363), //for highlight textFormFields
@@ -30,7 +31,8 @@ class ColorProfile {
       secondary: Color(0xFFF4B400),
       onSecondary: Color(0xFFFFFFFF),
       secondaryContainer: Color(0xFF5C4921),
-      surface: Color(0xFF181818),
+      onSecondaryContainer: Color(0xFFDDDDDD),
+      surface: Color(0xFF222222),
       onSurface: Color(0xFFFFFFFF),
       onSurfaceVariant: Color(0xFFA1A1A1), //for highlight textFormFields
       surfaceContainer: Color(0xFF1E1E1E),
