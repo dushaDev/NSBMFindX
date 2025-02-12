@@ -1,12 +1,8 @@
-
-import 'package:find_x/bottom_nav/home.dart';
 import 'package:find_x/index_page.dart';
 import 'package:find_x/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-
 import 'firebase/auth_service.dart';
 
 class Login extends StatefulWidget {
@@ -32,128 +28,56 @@ class _LoginState extends State<Login> {
       body: Stack(children: [
         SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.only(bottom: 8.0, left: 8.0, right: 8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  _buildHeadline('Login'),
                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Login",
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 36.0,
-                            fontWeight: FontWeight.normal),
-                      )
+                      _buildText('Email'),
+                      Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: _buildTextFormField(
+                            _emailController,
+                            'yourmail@email.com',
+                            (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Email is required.';
+                              }
+                              final emailRegex =
+                                  RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+                              if (!emailRegex.hasMatch(value)) {
+                                return 'Invalid email format.';
+                              }
+                              return null;
+                            },
+                          ))
                     ],
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      _buildText('Password'),
                       Padding(
-                        padding: const EdgeInsets.only(
-                            top: 20.0, bottom: 6.0, left: 8.0, right: 8.0),
-                        child: Text(
-                          "Email",
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 18.0),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextFormField(
-                          controller: _emailController,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                          decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .outlineVariant,
-                                    width: 2.0,
-                                    style: BorderStyle.solid)),
-                            focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                                    width: 2.0,
-                                    style: BorderStyle.solid)),
-                            hintText: "yourmail@email.com",
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Email is required.';
-                            }
-                            final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
-                            if (!emailRegex.hasMatch(value)) {
-                              return 'Invalid email format.';
-                            }
-                            return null;
-                          },
-                        ),
-                      )
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            top: 20.0, bottom: 6.0, left: 8.0, right: 8.0),
-                        child: Text(
-                          "Password",
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 18.0),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextFormField(
-                          controller: _passwordController,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                          decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .outlineVariant,
-                                    width: 2.0,
-                                    style: BorderStyle.solid)),
-                            focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: BorderSide(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                                    width: 2.0,
-                                    style: BorderStyle.solid)),
-                            hintText: "********",
-                          ),
-                          obscureText: true,
-                          obscuringCharacter: "*",
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Password is required.';
-                            }
-                            if (value.length < 8) {
-                              return 'Password must be at least 8 characters long.';
-                            }
-                            return null;
-                          },
-                        ),
-                      )
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: _buildTextFormField(
+                            _passwordController,
+                            '********',
+                            obscureText: true,
+                            (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Password is required.';
+                              }
+                              if (value.length < 8) {
+                                return 'Password must be at least 8 characters long.';
+                              }
+                              return null;
+                            },
+                          ))
                     ],
                   ),
                   Padding(
@@ -162,10 +86,9 @@ class _LoginState extends State<Login> {
                       children: [
                         FilledButton(
                           onPressed: () {
-
                             if (_formKey.currentState?.validate() == true) {
                               setState(() {
-                                _isSpinKitLoaded=true;
+                                _isSpinKitLoaded = true;
                               });
 
                               authService
@@ -230,18 +153,72 @@ class _LoginState extends State<Login> {
             ),
           ),
         ),
-        _isSpinKitLoaded?
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            margin: const EdgeInsets.only(top: 100.0),
-            child: SpinKitThreeBounce(
-              color: Theme.of(context).colorScheme.primary,
-              size: 25.0,
-            ),
-          ),
-        ):Container(),
+        _isSpinKitLoaded
+            ? Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  margin: const EdgeInsets.only(top: 100.0),
+                  child: SpinKitThreeBounce(
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 25.0,
+                  ),
+                ),
+              )
+            : Container(),
       ]),
+    );
+  }
+
+  Widget _buildTextFormField(TextEditingController textController, String hint,
+      FormFieldValidator validator,
+      {obscureText = false}) {
+    return TextFormField(
+      controller: textController,
+      style: TextStyle(
+        color: Theme.of(context).colorScheme.onSurface,
+      ),
+      decoration: InputDecoration(
+        enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.outlineVariant,
+                width: 2.0,
+                style: BorderStyle.solid)),
+        focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.outline,
+                width: 2.0,
+                style: BorderStyle.solid)),
+        hintText: hint,
+      ),
+      obscureText: obscureText,
+      obscuringCharacter: "*",
+      validator: validator,
+    );
+  }
+
+  Widget _buildHeadline(String text) {
+    return Text(
+      text,
+      style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
+          fontSize: 36.0,
+          fontWeight: FontWeight.normal),
+    );
+  }
+
+  Widget _buildText(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        top: 20.0,
+        bottom: 6.0,
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface, fontSize: 18.0),
+      ),
     );
   }
 
@@ -250,7 +227,7 @@ class _LoginState extends State<Login> {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => IndexPage()),
-            (Route<dynamic> route) => false, // Remove all routes
+        (Route<dynamic> route) => false, // Remove all routes
       );
     } else {
       showToast('Login failed. Email or password is wrong.');

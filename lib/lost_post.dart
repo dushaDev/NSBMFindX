@@ -251,22 +251,24 @@ class _LostPostState extends State<LostPost> {
               ],
             ),
           ),
-          SizedBox(height: 20),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 120.0),
-            child: ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                padding: EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Text("Post Now",
-                  style: TextStyle(
-                      fontSize: 18,
-                      color: Theme.of(context).colorScheme.onPrimary)),
+            padding: const EdgeInsets.all(50.0),
+            child: Column(
+              children: [
+                FilledButton(
+                  onPressed: () {},
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    textStyle: const TextStyle(fontSize: 18.0),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0)),
+                    padding: const EdgeInsets.only(
+                        left: 50.0, right: 50.0, top: 15.0, bottom: 15.0),
+                  ),
+                  child: const Text("Post Now"),
+                )
+              ],
             ),
           ),
           SizedBox(height: 20),
