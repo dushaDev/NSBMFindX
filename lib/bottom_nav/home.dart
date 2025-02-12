@@ -84,8 +84,11 @@ class _HomeState extends State<Home> {
                           'assets/images/communication.png', () => LostPost())),
                   SizedBox(width: 5),
                   Expanded(
-                      child: _buildReportCard('Found Report',
-                          Icons.person_search, 'assets/images/searching.png', () => LostPost())), //There should be a FoundPost page
+                      child: _buildReportCard(
+                          'Found Report',
+                          Icons.person_search,
+                          'assets/images/searching.png',
+                          () => LostPost())), //There should be a FoundPost page
                 ],
               ),
               SizedBox(height: 20),
@@ -102,7 +105,8 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _buildReportCard(String title, IconData icon, String image, Widget Function() myPageHere) {
+  Widget _buildReportCard(
+      String title, IconData icon, String image, Widget Function() myPageHere) {
     return Card(
         color: Theme.of(context).colorScheme.surfaceContainer,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
