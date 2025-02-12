@@ -28,7 +28,6 @@ class _LoginState extends State<Login> {
     return Scaffold(
       appBar: AppBar(),
       body: Stack(children: [
-
         SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.only(bottom: 8.0, left: 8.0, right: 8.0),

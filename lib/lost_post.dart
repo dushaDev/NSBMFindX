@@ -321,7 +321,7 @@ class _LostPostState extends State<LostPost> {
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
             side: BorderSide(
-              color: Theme.of(context).colorScheme.secondary,
+              color: Theme.of(context).colorScheme.outlineVariant,
             )),
       ),
     );

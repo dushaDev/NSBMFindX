@@ -35,7 +35,7 @@ class ColorProfile {
       surface: Color(0xFF222222),
       onSurface: Color(0xFFFFFFFF),
       onSurfaceVariant: Color(0xFFA1A1A1), //for highlight textFormFields
-      surfaceContainer: Color(0xFF1E1E1E),
+      surfaceContainer: Color(0xFF2C2C2C),
       surfaceContainerHigh: Color(0xFF252525),
       error: Color(0xFFD30024),
       onError: Color(0xFFA25353),

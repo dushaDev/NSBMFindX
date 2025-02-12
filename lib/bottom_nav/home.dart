@@ -91,7 +91,7 @@ class _HomeState extends State<Home> {
                           () => LostPost())), //There should be a FoundPost page
                 ],
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 10),
               Column(children: [
                 _buildUpdatesSection('Updates', updates),
                 SizedBox(height: 10),
@@ -131,7 +131,7 @@ class _HomeState extends State<Home> {
                 padding: const EdgeInsets.all(8.0),
                 child: Text(title,
                     style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        TextStyle(color: Theme.of(context).colorScheme.onSurface,fontSize: 18, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -148,7 +148,7 @@ class _HomeState extends State<Home> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(title,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface,fontSize: 18, fontWeight: FontWeight.bold)),
             SizedBox(height: 5),
             Container(
               height: 250,
@@ -171,8 +171,8 @@ class _HomeState extends State<Home> {
                         minVerticalPadding: 5,
                         leading: Container(
                           alignment: Alignment.center,
-                          width: 40,
-                          height: 20,
+                          width: 38,
+                          height: 18,
                           padding:
                               EdgeInsets.symmetric(horizontal: 1, vertical: 1),
                           decoration: BoxDecoration(
@@ -187,7 +187,7 @@ class _HomeState extends State<Home> {
                                       Theme.of(context).colorScheme.onPrimary)),
                         ),
                         title: Text(item['item']!,
-                            style: TextStyle(fontWeight: FontWeight.bold)),
+                            style: TextStyle(fontWeight: FontWeight.normal)),
                         subtitle: Text(
                           item['desc']!,
                           style: TextStyle(overflow: TextOverflow.ellipsis),
