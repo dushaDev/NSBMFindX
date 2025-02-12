@@ -1,10 +1,8 @@
-import 'package:find_x/bottom_nav/home.dart';
 import 'package:find_x/index_page.dart';
 import 'package:find_x/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-
 import 'firebase/auth_service.dart';
 
 class Login extends StatefulWidget {
