@@ -1,4 +1,6 @@
 
+import 'package:find_x/bottom_nav/home.dart';
+import 'package:find_x/index_page.dart';
 import 'package:find_x/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -245,7 +247,11 @@ class _LoginState extends State<Login> {
 
   void navigate(User? user) {
     if (user != null) {
-      Navigator.of(context).pop();
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => IndexPage()),
+            (Route<dynamic> route) => false, // Remove all routes
+      );
     } else {
       showToast('Login failed. Email or password is wrong.');
     }
