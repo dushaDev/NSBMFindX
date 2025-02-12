@@ -1,3 +1,4 @@
+import 'package:find_x/bottom_nav/home.dart';
 import 'package:find_x/res/color_profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -38,7 +39,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorScheme: ColorProfile.dark),
       themeMode: ThemeMode.system,
-      home:  _loadingPage()
+      home:  Login(),
     );
   }
   Widget _loadingPage() {
