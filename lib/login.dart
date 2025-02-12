@@ -24,131 +24,155 @@ class _LoginState extends State<Login> {
     AuthService authService = AuthService();
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: const Text('Login'),
+        centerTitle: true,
+      ),
       body: Stack(children: [
         SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _buildHeadline('Login'),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildText('Email'),
-                      Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: _buildTextFormField(
-                            _emailController,
-                            'yourmail@email.com',
-                            (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Email is required.';
-                              }
-                              final emailRegex =
-                                  RegExp(r'^[^@]+@[^@]+\.[^@]+$');
-                              if (!emailRegex.hasMatch(value)) {
-                                return 'Invalid email format.';
-                              }
-                              return null;
-                            },
-                          ))
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildText('Password'),
-                      Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: _buildTextFormField(
-                            _passwordController,
-                            '********',
-                            obscureText: true,
-                            (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Password is required.';
-                              }
-                              if (value.length < 8) {
-                                return 'Password must be at least 8 characters long.';
-                              }
-                              return null;
-                            },
-                          ))
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(50.0),
-                    child: Column(
+          child: Card(
+            margin: EdgeInsets.all(20.0),
+            shape: RoundedRectangleBorder(
+              side: BorderSide(
+                  color: Theme.of(context).colorScheme.primary, width: 1.0),
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    //_buildHeadline('Login'),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        FilledButton(
-                          onPressed: () {
-                            if (_formKey.currentState?.validate() == true) {
-                              setState(() {
-                                _isSpinKitLoaded = true;
-                              });
-
-                              authService
-                                  .signInWithEmailPassword(
-                                      _emailController.text,
-                                      _passwordController.text)
-                                  .whenComplete(() async {
-                                User? user = await authService.getSignedUser();
-                                setState(() {
-                                  _isSpinKitLoaded = false;
-                                });
-                                navigate(user);
-                              });
-                            }
-                          },
-                          style: FilledButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primary,
-                            foregroundColor:
-                                Theme.of(context).colorScheme.onPrimary,
-                            textStyle: const TextStyle(fontSize: 18.0),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0)),
-                            padding: const EdgeInsets.only(
-                                left: 50.0,
-                                right: 50.0,
-                                top: 15.0,
-                                bottom: 15.0),
-                          ),
-                          child: const Text("Log in"),
-                        )
+                        _buildText('Email'),
+                        Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: _buildTextFormField(
+                              _emailController,
+                              'yourmail@email.com',
+                              (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Email is required.';
+                                }
+                                final emailRegex =
+                                    RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+                                if (!emailRegex.hasMatch(value)) {
+                                  return 'Invalid email format.';
+                                }
+                                return null;
+                              },
+                            ))
                       ],
                     ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Don’t have an account? ",
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 15.0),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildText('Password'),
+                        Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: _buildTextFormField(
+                              _passwordController,
+                              '********',
+                              obscureText: true,
+                              (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Password is required.';
+                                }
+                                if (value.length < 8) {
+                                  return 'Password must be at least 8 characters long.';
+                                }
+                                return null;
+                              },
+                            ))
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 50.0,bottom: 70.0),
+                      child: FilledButton(
+                        onPressed: () {
+                          if (_formKey.currentState?.validate() == true) {
+                            setState(() {
+                              _isSpinKitLoaded = true;
+                            });
+
+                            authService
+                                .signInWithEmailPassword(
+                                    _emailController.text,
+                                    _passwordController.text)
+                                .whenComplete(() async {
+                              User? user = await authService.getSignedUser();
+                              setState(() {
+                                _isSpinKitLoaded = false;
+                              });
+                              navigate(user);
+                            });
+                          }
+                        },
+                        style: FilledButton.styleFrom(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          foregroundColor:
+                              Theme.of(context).colorScheme.onPrimary,
+                          textStyle: const TextStyle(fontSize: 18.0),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0)),
+                          padding: const EdgeInsets.only(
+                              left: 50.0,
+                              right: 50.0,
+                              top: 15.0,
+                              bottom: 15.0),
+                        ),
+                        child: const Text("Log in"),
                       ),
-                      InkWell(
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: InkWell(
                           onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const Signup()));
+                           showToast('Coming soon, Please contact the administrator');
                           },
                           child: Text(
-                            "Sign Up",
+                            "Forgot password?",
                             style: TextStyle(
                                 color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 15.0,
                                 fontWeight: FontWeight.w800),
-                          ))
-                    ],
-                  ),
-                ],
+                          )),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Don’t have an account? ",
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontSize: 15.0),
+                          ),
+                          InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const Signup()));
+                              },
+                              child: Text(
+                                "Sign Up",
+                                style: TextStyle(
+                                    color: Theme.of(context).colorScheme.onSurface,
+                                    fontSize: 15.0,
+                                    fontWeight: FontWeight.w800),
+                              ))
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -203,7 +227,7 @@ class _LoginState extends State<Login> {
       text,
       style: TextStyle(
           color: Theme.of(context).colorScheme.onSurface,
-          fontSize: 36.0,
+          fontSize: 24.0,
           fontWeight: FontWeight.normal),
     );
   }
