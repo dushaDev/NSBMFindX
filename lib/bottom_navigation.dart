@@ -5,19 +5,31 @@ class BottomNavigation extends StatelessWidget {
   final Function(int) _onItemSelected;
   const BottomNavigation(
       {super.key,
-      required int selectedIndex,
-      required dynamic Function(int) onItemSelected,})
+        required int selectedIndex,
+        required dynamic Function(int) onItemSelected,})
       : _onItemSelected = onItemSelected,
         _selectedIndex = selectedIndex;
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(16.0),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.shadow.withAlpha(80),
+            blurRadius: 8.0,
+            spreadRadius: 1.0,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
       width: MediaQuery.of(context).size.width*0.66,
-     // margin: EdgeInsets.only(top: 5.0, bottom: 10.0, left: 60.0, right: 60.0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16.0),
         child: NavigationBar(
+          elevation: 2.0,
           shadowColor: Theme.of(context).colorScheme.shadow,
           onDestinationSelected: _onItemSelected,
           indicatorColor: Colors.transparent,
