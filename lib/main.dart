@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorScheme: ColorProfile.dark),
       themeMode: ThemeMode.system,
-      home:  Login(),
+      home:  _loadingPage(),
     );
   }
   Widget _loadingPage() {

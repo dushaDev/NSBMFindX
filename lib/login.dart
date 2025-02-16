@@ -113,6 +113,8 @@ class _LoginState extends State<Login> {
                           }
                         },
                         style: FilledButton.styleFrom(
+                          minimumSize: const Size(150.0, 50.0),
+                          maximumSize: const Size(200.0, 50.0),
                           backgroundColor:
                               Theme.of(context).colorScheme.primary,
                           foregroundColor:

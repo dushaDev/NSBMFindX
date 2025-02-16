@@ -258,6 +258,8 @@ class _LostPostState extends State<LostPost> {
                 FilledButton(
                   onPressed: () {},
                   style: FilledButton.styleFrom(
+                    minimumSize: const Size(150.0, 50.0),
+                    maximumSize: const Size(200.0, 50.0),
                     backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     textStyle: const TextStyle(fontSize: 18.0),
