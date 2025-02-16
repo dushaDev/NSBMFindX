@@ -13,7 +13,7 @@ class BottomNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainer,
+        color: Theme.of(context).colorScheme.primary.withAlpha(220),
         borderRadius: BorderRadius.circular(16.0),
         boxShadow: [
           BoxShadow(
@@ -24,7 +24,7 @@ class BottomNavigation extends StatelessWidget {
           ),
         ],
       ),
-      margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+      margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
       width: MediaQuery.of(context).size.width*0.66,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16.0),
@@ -33,25 +33,31 @@ class BottomNavigation extends StatelessWidget {
           shadowColor: Theme.of(context).colorScheme.shadow,
           onDestinationSelected: _onItemSelected,
           indicatorColor: Colors.transparent,
-          backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+          backgroundColor: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(230),
           animationDuration: const Duration(milliseconds: 300),
-          height: 30.0,
+          height: 35.0,
           selectedIndex: _selectedIndex,
           destinations: [
             Expanded(
               flex: 1,
               child: NavigationDestination(
                 tooltip: 'home',
-                selectedIcon: Icon(
-                  Icons.home_rounded,
-                  size: 32.0,
-                  color: Theme.of(context).colorScheme.primary,
+                selectedIcon: Padding(
+                  padding: const EdgeInsets.only(bottom: 5.0),
+                  child: Icon(
+                    Icons.home_rounded,
+                    size: 34.0,
+                    color: Theme.of(context).colorScheme.primary,
 
+                  ),
                 ),
-                icon: Icon(
-                  Icons.home_rounded,
-                  size: 32.0,
-                  color: Theme.of(context).colorScheme.onSurface.withAlpha(70),
+                icon: Padding(
+                  padding: const EdgeInsets.only(bottom: 5.0),
+                  child: Icon(
+                    Icons.home_rounded,
+                    size: 34.0,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
                 ),
                 label: '',
               ),
@@ -60,15 +66,21 @@ class BottomNavigation extends StatelessWidget {
               flex: 1,
               child: NavigationDestination(
                 tooltip: 'search',
-                selectedIcon: Icon(
-                  Icons.search_rounded,
-                  size: 32.0,
-                  color: Theme.of(context).colorScheme.primary,
+                selectedIcon: Padding(
+                  padding: const EdgeInsets.only(bottom: 5.0),
+                  child: Icon(
+                    Icons.search_rounded,
+                    size: 34.0,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
-                icon: Icon(
-                  Icons.search_rounded,
-                  size: 32.0,
-                  color: Theme.of(context).colorScheme.onSurface.withAlpha(70),
+                icon: Padding(
+                  padding: const EdgeInsets.only(bottom: 5.0),
+                  child: Icon(
+                    Icons.search_rounded,
+                    size: 34.0,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
                 ),
                 label: '',
               ),
@@ -77,19 +89,25 @@ class BottomNavigation extends StatelessWidget {
               flex: 1,
               child: NavigationDestination(
                 tooltip: 'notifications',
-                selectedIcon: Icon(
-                  Icons.notifications_rounded,
-                  size: 32.0,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                icon: Badge(
-                  smallSize: 7.0,
-                  isLabelVisible: true,
-                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                selectedIcon: Padding(
+                  padding: const EdgeInsets.only(bottom:5.0),
                   child: Icon(
                     Icons.notifications_rounded,
-                    size: 32.0,
-                    color: Theme.of(context).colorScheme.onSurface.withAlpha(70),
+                    size: 34.0,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                icon: Padding(
+                  padding: const EdgeInsets.only(bottom: 5.0),
+                  child: Badge(
+                    smallSize: 7.0,
+                    isLabelVisible: true,
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                    child: Icon(
+                      Icons.notifications_rounded,
+                      size: 34.0,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
                   ),
                 ),
                 label: '',

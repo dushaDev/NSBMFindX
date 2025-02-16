@@ -4,7 +4,7 @@ class ColorProfile {
   // Light theme color scheme
   static const light = ColorScheme(
       brightness: Brightness.light,
-      primary: Color(0xFF2C9E4B),
+      primary: Color(0xFF2FAA50),
       onPrimary: Color(0xFFFFFFFF),
       primaryContainer: Color(0xFFB7FFCA),
       secondary: Color(0xFFF4B400),
@@ -25,7 +25,7 @@ class ColorProfile {
   // Dark theme color scheme
   static const dark = ColorScheme(
       brightness: Brightness.dark,
-      primary: Color(0xFF26873D),
+      primary: Color(0xFF1D8F36),
       onPrimary: Color(0xFFFFFFFF),
       primaryContainer: Color(0xFF254330),
       secondary: Color(0xFFF4B400),
