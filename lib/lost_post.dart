@@ -1,3 +1,4 @@
+import 'package:find_x/res/font_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -262,7 +263,7 @@ class _LostPostState extends State<LostPost> {
                     maximumSize: const Size(200.0, 50.0),
                     backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    textStyle: const TextStyle(fontSize: 18.0),
+                    textStyle: const TextStyle( fontSize: FontProfile.medium,),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0)),
                     padding: const EdgeInsets.only(
@@ -285,7 +286,7 @@ class _LostPostState extends State<LostPost> {
       child: Text(
         text,
         style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface, fontSize: 18.0),
+            color: Theme.of(context).colorScheme.onSurface,  fontSize: FontProfile.medium,),
       ),
     );
   }
@@ -320,7 +321,7 @@ class _LostPostState extends State<LostPost> {
       child: Chip(
         label: Text(
           label,
-          style: TextStyle(fontSize: 12.0),
+          style: TextStyle( fontSize: FontProfile.small,),
         ),
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../res/font_profile.dart';
+
 class Notifications extends StatefulWidget {
   const Notifications({super.key});
 
@@ -36,7 +38,7 @@ class _NotificationsState extends State<Notifications> {
           foregroundColor: Theme.of(context).colorScheme.onSurface,
         ),
         body: Center(
-          child:Text('Notification page here', style: TextStyle(fontSize: 18.0)),
+          child:Text('Notification page here', style: TextStyle( fontSize: FontProfile.medium,)),
 
         ));
   }
