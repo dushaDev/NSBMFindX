@@ -1,10 +1,8 @@
 import 'package:find_x/bottom_nav/notifications.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'bottom_nav/search.dart';
 import 'bottom_nav/home.dart';
 import 'bottom_navigation.dart';
-import 'login.dart';
 
 class IndexPage extends StatefulWidget {
   const IndexPage({super.key});
