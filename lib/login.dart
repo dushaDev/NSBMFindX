@@ -31,12 +31,12 @@ class _LoginState extends State<Login> {
       ),
       body: Stack(children: [
         SingleChildScrollView(
-          child: Card(
+          child: Container(
             margin: EdgeInsets.all(20.0),
-            shape: RoundedRectangleBorder(
-              side: BorderSide(
-                  color: Theme.of(context).colorScheme.primary, width: 1.0),
+            padding: EdgeInsets.all(5.0),
+            decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8.0),
+              border: Border.all(color: Theme.of(context).colorScheme.primary.withAlpha(95),width: 2,)
             ),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
