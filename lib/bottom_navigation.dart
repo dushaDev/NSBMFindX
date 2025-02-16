@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class BottomNavigation extends StatelessWidget {
   final int _selectedIndex;
   final Function(int) _onItemSelected;
-
   const BottomNavigation(
       {super.key,
       required int selectedIndex,

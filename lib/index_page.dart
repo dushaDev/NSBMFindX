@@ -22,7 +22,7 @@ class _IndexPageState extends State<IndexPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        extendBody: true,
+        resizeToAvoidBottomInset: false,
         body: Stack(children: [
       _tabs[_selectedIndex],
       Align(
@@ -37,5 +37,6 @@ class _IndexPageState extends State<IndexPage> {
         ),
       ),
     ]));
+
   }
 }

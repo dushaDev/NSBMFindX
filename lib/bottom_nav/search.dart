@@ -13,42 +13,46 @@ class _SearchState extends State<Search> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  onEditingComplete: () {
-                    setState(() {
-                      //requestData(_searchController.text, true);
-                    });
-                  },
-                  controller: _searchController,
-                  maxLines: 1,
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.onSurface),
-                  decoration: const InputDecoration(
-                    hintText: 'Search here',
-                    border: InputBorder.none,
-                  ),
-                ),
-              ),
-              IconButton(
-                icon: Icon(
-                  Icons.search,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-                onPressed: () {
+      appBar: AppBar(
+        title: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                onEditingComplete: () {
                   setState(() {
-                    // requestData(_searchController.text, true);
+                    //requestData(_searchController.text, true);
                   });
                 },
+                controller: _searchController,
+                maxLines: 1,
+                style:
+                    TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                decoration: InputDecoration(
+                  hintText: 'Search here',
+                  hintStyle: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  border: InputBorder.none,
+                ),
               ),
-            ],
-          ),
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.search,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+              onPressed: () {
+                setState(() {
+                  // requestData(_searchController.text, true);
+                });
+              },
+            ),
+          ],
         ),
-        body: Center(
-          child:Text('Search page here', style: TextStyle(fontSize: 18.0)),        ));
+      ),
+      body: Center(
+        child: Text('Search page here', style: TextStyle(fontSize: 18.0)),
+      ),
+    );
   }
 
   @override
