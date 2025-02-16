@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../res/font_profile.dart';
+
 class Search extends StatefulWidget {
   const Search({super.key});
 
@@ -50,7 +52,7 @@ class _SearchState extends State<Search> {
         ),
       ),
       body: Center(
-        child: Text('Search page here', style: TextStyle(fontSize: 18.0)),
+        child: Text('Search page here', style: TextStyle( fontSize: FontProfile.medium,)),
       ),
     );
   }

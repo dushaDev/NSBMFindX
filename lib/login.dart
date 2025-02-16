@@ -1,4 +1,5 @@
 import 'package:find_x/index_page.dart';
+import 'package:find_x/res/font_profile.dart';
 import 'package:find_x/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -119,7 +120,7 @@ class _LoginState extends State<Login> {
                               Theme.of(context).colorScheme.primary,
                           foregroundColor:
                               Theme.of(context).colorScheme.onPrimary,
-                          textStyle: const TextStyle(fontSize: 18.0),
+                          textStyle: TextStyle(fontSize: FontProfile.medium),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0)),
                           padding: const EdgeInsets.only(
@@ -141,8 +142,8 @@ class _LoginState extends State<Login> {
                             "Forgot password?",
                             style: TextStyle(
                                 color: Theme.of(context).colorScheme.onSurface,
-                                fontSize: 15.0,
-                                fontWeight: FontWeight.w800),
+                                fontSize: FontProfile.small,
+                                fontWeight: FontWeight.normal),
                           )),
                     ),
                     Padding(
@@ -154,7 +155,7 @@ class _LoginState extends State<Login> {
                             "Don’t have an account? ",
                             style: TextStyle(
                                 color: Theme.of(context).colorScheme.onSurface,
-                                fontSize: 15.0),
+                              fontSize: FontProfile.small,),
                           ),
                           InkWell(
                               onTap: () {
@@ -167,7 +168,7 @@ class _LoginState extends State<Login> {
                                 "Sign Up",
                                 style: TextStyle(
                                     color: Theme.of(context).colorScheme.onSurface,
-                                    fontSize: 15.0,
+                                    fontSize: FontProfile.small,
                                     fontWeight: FontWeight.w800),
                               ))
                         ],
@@ -224,15 +225,6 @@ class _LoginState extends State<Login> {
     );
   }
 
-  Widget _buildHeadline(String text) {
-    return Text(
-      text,
-      style: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface,
-          fontSize: 24.0,
-          fontWeight: FontWeight.normal),
-    );
-  }
 
   Widget _buildText(String text) {
     return Padding(
@@ -243,7 +235,7 @@ class _LoginState extends State<Login> {
       child: Text(
         text,
         style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface, fontSize: 18.0),
+            color: Theme.of(context).colorScheme.onSurface, fontSize: FontProfile.medium,),
       ),
     );
   }

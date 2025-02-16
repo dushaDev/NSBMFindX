@@ -1,4 +1,5 @@
 import 'package:find_x/lost_post.dart';
+import 'package:find_x/res/font_profile.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -131,7 +132,7 @@ class _HomeState extends State<Home> {
                 padding: const EdgeInsets.all(8.0),
                 child: Text(title,
                     style:
-                        TextStyle(color: Theme.of(context).colorScheme.onSurface,fontSize: 18, fontWeight: FontWeight.bold)),
+                        TextStyle(color: Theme.of(context).colorScheme.onSurface,fontSize: FontProfile.medium, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -148,7 +149,7 @@ class _HomeState extends State<Home> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(title,
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurface,fontSize: 18, fontWeight: FontWeight.bold)),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface,fontSize: FontProfile.medium, fontWeight: FontWeight.bold)),
             SizedBox(height: 5),
             Container(
               height: 250,

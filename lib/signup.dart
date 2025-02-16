@@ -1,4 +1,5 @@
 
+import 'package:find_x/res/font_profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +46,7 @@ class _SignupState extends State<Signup> {
                         "Sign Up",
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 36.0,
+                            fontSize: FontProfile.extraLarge,
                             fontWeight: FontWeight.normal),
                       )
                     ],
@@ -60,7 +61,7 @@ class _SignupState extends State<Signup> {
                           "Name",
                           style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 18.0),
+                            fontSize: FontProfile.medium),
                         ),
                       ),
                       Padding(
@@ -112,7 +113,7 @@ class _SignupState extends State<Signup> {
                           "Email",
                           style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 18.0),
+                            fontSize: FontProfile.medium,),
                         ),
                       ),
                       Padding(
@@ -165,7 +166,7 @@ class _SignupState extends State<Signup> {
                           "Create a password",
                           style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 18.0),
+                            fontSize: FontProfile.medium,),
                         ),
                       ),
                       Padding(
@@ -222,7 +223,7 @@ class _SignupState extends State<Signup> {
                           "Repeat password",
                           style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 18.0),
+                            fontSize: FontProfile.medium,),
                         ),
                       ),
                       Padding(
@@ -279,7 +280,7 @@ class _SignupState extends State<Signup> {
                                       color: Theme.of(context)
                                           .colorScheme
                                           .onSurface,
-                                      fontSize: 13.0),
+                                    fontSize: FontProfile.extraSmall,),
                                   "password must contain minimum 8 characters with numbers,a special character and one uppercase letter"),
                             ),
                           ],
@@ -333,7 +334,7 @@ class _SignupState extends State<Signup> {
                                 Theme.of(context).colorScheme.primary,
                             foregroundColor:
                                 Theme.of(context).colorScheme.onPrimary,
-                            textStyle: const TextStyle(fontSize: 18.0),
+                            textStyle: const TextStyle( fontSize: FontProfile.medium,),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0)),
                             padding: const EdgeInsets.only(
