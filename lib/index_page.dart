@@ -34,7 +34,6 @@ class _IndexPageState extends State<IndexPage> {
               _selectedIndex = index;
             });
           },
-          labels: _label,
         ),
       ),
     ]));
