@@ -49,6 +49,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       appBar: AppBar(
         title: Text(
           '$_title',
@@ -64,7 +65,7 @@ class _HomeState extends State<Home> {
               // );
             },
             icon: Icon(
-              Icons.account_circle_outlined,
+              Icons.manage_accounts_outlined,
               color: Theme.of(context).colorScheme.onSecondaryContainer,
             ),
             iconSize: 32.0,

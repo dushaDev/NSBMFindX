@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-
 class BottomNavigation extends StatelessWidget {
   final int _selectedIndex;
   final Function(int) _onItemSelected;
-  const BottomNavigation(
-      {super.key,
-        required int selectedIndex,
-        required dynamic Function(int) onItemSelected,})
-      : _onItemSelected = onItemSelected,
+  const BottomNavigation({
+    super.key,
+    required int selectedIndex,
+    required dynamic Function(int) onItemSelected,
+  })  : _onItemSelected = onItemSelected,
         _selectedIndex = selectedIndex;
   @override
   Widget build(BuildContext context) {
@@ -24,8 +23,8 @@ class BottomNavigation extends StatelessWidget {
           ),
         ],
       ),
-      margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-      width: MediaQuery.of(context).size.width*0.66,
+      margin: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+      width: MediaQuery.of(context).size.width * 0.66,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16.0),
         child: NavigationBar(
@@ -33,9 +32,10 @@ class BottomNavigation extends StatelessWidget {
           shadowColor: Theme.of(context).colorScheme.shadow,
           onDestinationSelected: _onItemSelected,
           indicatorColor: Colors.transparent,
-          backgroundColor: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(230),
+          backgroundColor: Theme.of(context).colorScheme.onSurfaceVariant.withAlpha(
+              230), // for create that light green mix behind black or white navigation bar
           animationDuration: const Duration(milliseconds: 300),
-          height: 35.0,
+          height: 38.0,
           selectedIndex: _selectedIndex,
           destinations: [
             Expanded(
@@ -43,16 +43,16 @@ class BottomNavigation extends StatelessWidget {
               child: NavigationDestination(
                 tooltip: 'home',
                 selectedIcon: Padding(
-                  padding: const EdgeInsets.only(bottom: 5.0),
+                  // icon padding helps to create the icon's bottom space more.
+                  padding: const EdgeInsets.only(bottom: 8.0),
                   child: Icon(
                     Icons.home_rounded,
                     size: 34.0,
                     color: Theme.of(context).colorScheme.primary,
-
                   ),
                 ),
                 icon: Padding(
-                  padding: const EdgeInsets.only(bottom: 5.0),
+                  padding: const EdgeInsets.only(bottom: 8.0),
                   child: Icon(
                     Icons.home_rounded,
                     size: 34.0,
@@ -67,7 +67,7 @@ class BottomNavigation extends StatelessWidget {
               child: NavigationDestination(
                 tooltip: 'search',
                 selectedIcon: Padding(
-                  padding: const EdgeInsets.only(bottom: 5.0),
+                  padding: const EdgeInsets.only(bottom: 8.0),
                   child: Icon(
                     Icons.search_rounded,
                     size: 34.0,
@@ -75,7 +75,7 @@ class BottomNavigation extends StatelessWidget {
                   ),
                 ),
                 icon: Padding(
-                  padding: const EdgeInsets.only(bottom: 5.0),
+                  padding: const EdgeInsets.only(bottom: 8.0),
                   child: Icon(
                     Icons.search_rounded,
                     size: 34.0,
@@ -90,7 +90,7 @@ class BottomNavigation extends StatelessWidget {
               child: NavigationDestination(
                 tooltip: 'notifications',
                 selectedIcon: Padding(
-                  padding: const EdgeInsets.only(bottom:5.0),
+                  padding: const EdgeInsets.only(bottom: 8.0),
                   child: Icon(
                     Icons.notifications_rounded,
                     size: 34.0,
@@ -98,7 +98,7 @@ class BottomNavigation extends StatelessWidget {
                   ),
                 ),
                 icon: Padding(
-                  padding: const EdgeInsets.only(bottom: 5.0),
+                  padding: const EdgeInsets.only(bottom: 8.0),
                   child: Badge(
                     smallSize: 7.0,
                     isLabelVisible: true,
