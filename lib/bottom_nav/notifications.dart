@@ -38,7 +38,10 @@ class _NotificationsState extends State<Notifications> {
           foregroundColor: Theme.of(context).colorScheme.onSurface,
         ),
         body: Center(
-          child:Text('Notification page here', style: TextStyle( fontSize: FontProfile.medium,)),
+          child:Text('Notification page here',  style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontSize: FontProfile.medium,
+          ),),
 
         ));
   }

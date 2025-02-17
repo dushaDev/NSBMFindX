@@ -52,7 +52,10 @@ class _SearchState extends State<Search> {
         ),
       ),
       body: Center(
-        child: Text('Search page here', style: TextStyle( fontSize: FontProfile.medium,)),
+        child: Text('Search page here',   style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
+          fontSize: FontProfile.medium,
+        ),),
       ),
     );
   }
