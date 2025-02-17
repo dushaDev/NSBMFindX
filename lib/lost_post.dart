@@ -13,7 +13,7 @@ class LostPost extends StatefulWidget {
 
 class _LostPostState extends State<LostPost> {
   String _title = 'Lost Post';
-  bool _useOwnNumber = false;
+  bool _useOwnNumber = true;
   bool _agreeTerms = false;
   bool _selectDate = true;
   double _wholePadding = 10.0;
@@ -22,6 +22,8 @@ class _LostPostState extends State<LostPost> {
 
   late Future<TimeOfDay?> selectedTime;
   String _time = "-";
+  int _hour24 = 0;
+  int _minute = 0;
   String _amPm = '';
 
   final TextEditingController _lostTextController = TextEditingController();
@@ -61,13 +63,13 @@ class _LostPostState extends State<LostPost> {
                     Row(
                       children: [
                         Radio(
-                          value: true,
+                          value: false,
                           groupValue: _selectDate,
                           onChanged: (value) =>
-                              setState(() => _selectDate = true),
+                              setState(() => _selectDate = false),
                         ),
                         Text(
-                          "Select Date",
+                          "Select Date & Time",
                           style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface),
                         ),
@@ -85,14 +87,17 @@ class _LostPostState extends State<LostPost> {
                                     .colorScheme
                                     .surfaceContainer,
                               ),
-                              onPressed: () {
+                              onPressed:_selectDate?null: () {
                                 showDialogPicker(context);
                               },
-                              child: Text(_date == '-' ? '-- --' : '$_date',
-                                  style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  )),
+                              child:
+                                  Text(_date == '-' ? 'Select Date' : '$_date',
+                                      style: TextStyle(
+                                        color: _selectDate?Theme.of(context).colorScheme.onSurface.withAlpha(60):
+                                        Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      )),
                             ),
                             SizedBox(width: 10),
                             FilledButton(
@@ -105,13 +110,20 @@ class _LostPostState extends State<LostPost> {
                                     .colorScheme
                                     .surfaceContainer,
                               ),
-                              onPressed: () {
-                                showDialogTimePicker(context);
-                              },
-                              child: Text(_time == "-" ? "--" : '$_time $_amPm',
+                              onPressed: _selectDate
+                                  ? null
+                                  : () {
+                                      showDialogTimePicker(context);
+                                    },
+                              child: Text(
+                                  _time == "-"
+                                      ? "Select Time"
+                                      : '${get12Hour(_hour24)}:$_minute $_amPm',
                                   style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
+                                    color: _selectDate?Theme.of(context).colorScheme.onSurface.withAlpha(60):
+                                    Theme.of(context)
+                                        .colorScheme
+                                        .primary,
                                   )),
                             ),
                           ],
@@ -121,10 +133,10 @@ class _LostPostState extends State<LostPost> {
                     Row(
                       children: [
                         Radio(
-                          value: false,
+                          value: true,
                           groupValue: _selectDate,
                           onChanged: (value) =>
-                              setState(() => _selectDate = false),
+                              setState(() => _selectDate = true),
                         ),
                         Text(
                           "Now",
@@ -161,6 +173,8 @@ class _LostPostState extends State<LostPost> {
                   _buildChip('Hostel Canteen'),
                   _buildChip('Library'),
                   _buildChip('Computing Faculty'),
+                  _buildChip('Engineering Faculty'),
+                  _buildChip('Business Faculty'),
                 ],
               )),
           SizedBox(height: 20),
@@ -174,11 +188,11 @@ class _LostPostState extends State<LostPost> {
                   children: [
                     Expanded(
                       child: _buildTextField(
-                          _contactTextController, '07*******5',
+                          _contactTextController, _useOwnNumber?'076*****05':'Enter Number',
                           inputFormatters: [
                             LengthLimitingTextInputFormatter(10),
                             FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                          ]),
+                          ],enabled: _useOwnNumber?false:true),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -281,22 +295,28 @@ class _LostPostState extends State<LostPost> {
             padding: const EdgeInsets.all(50.0),
             child: Column(
               children: [
-                FilledButton(
-                  onPressed: () {},
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size(150.0, 50.0),
-                    maximumSize: const Size(200.0, 50.0),
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    textStyle: const TextStyle(
-                      fontSize: FontProfile.medium,
+                GestureDetector(
+                  onTap: _agreeTerms?null:
+                      (){
+                    showToast('Agree to T&C');
+                  },
+                  child: FilledButton(
+                    onPressed: _agreeTerms?() {showToast('Button Working');}:null,
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size(150.0, 50.0),
+                      maximumSize: const Size(200.0, 50.0),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      textStyle: const TextStyle(
+                        fontSize: FontProfile.medium,
+                      ),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0)),
+                      padding: const EdgeInsets.only(
+                          left: 50.0, right: 50.0, top: 15.0, bottom: 15.0),
                     ),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0)),
-                    padding: const EdgeInsets.only(
-                        left: 50.0, right: 50.0, top: 15.0, bottom: 15.0),
+                    child: const Text("Post Now"),
                   ),
-                  child: const Text("Post Now"),
                 )
               ],
             ),
@@ -321,9 +341,11 @@ class _LostPostState extends State<LostPost> {
   }
 
   Widget _buildTextField(TextEditingController textController, String hint,
-      {List<TextInputFormatter>? inputFormatters, int? maxLines = 1}) {
+      {List<TextInputFormatter>? inputFormatters, int? maxLines = 1,bool enabled = true}) {
     return TextField(
+      enabled: enabled,
       maxLines: maxLines,
+      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       inputFormatters: inputFormatters,
       controller: textController,
       decoration: InputDecoration(
@@ -331,6 +353,12 @@ class _LostPostState extends State<LostPost> {
             borderRadius: BorderRadius.circular(8.0),
             borderSide: BorderSide(
                 color: Theme.of(context).colorScheme.outlineVariant,
+                width: 2.0,
+                style: BorderStyle.solid)),
+        disabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.outlineVariant.withAlpha(90),
                 width: 2.0,
                 style: BorderStyle.solid)),
         focusedBorder: OutlineInputBorder(
@@ -348,10 +376,20 @@ class _LostPostState extends State<LostPost> {
     return Padding(
       padding: const EdgeInsets.all(2.0),
       child: Chip(
+        deleteIcon: Icon(Icons.north_west_rounded),
+        onDeleted: (){
+          if(_locationTextController.text.isEmpty){
+            _locationTextController.text=label;
+          }else{
+            _locationTextController.text='${_locationTextController.text}, $label';
+          }
+
+        },
         label: Text(
           label,
           style: TextStyle(
-            fontSize: FontProfile.small,
+            fontSize: FontProfile.extraSmall,
+            color: Theme.of(context).colorScheme.onSurface.withAlpha(90),
           ),
         ),
         shape: RoundedRectangleBorder(
@@ -367,8 +405,8 @@ class _LostPostState extends State<LostPost> {
     selectedDate = showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2050),
+      firstDate: DateTime(DateTime.now().year - 1),
+      lastDate: DateTime.now(),
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
@@ -378,8 +416,8 @@ class _LostPostState extends State<LostPost> {
               surface: Theme.of(context).colorScheme.surface,
               onSurface: Theme.of(context).colorScheme.onSurface,
               secondary: Theme.of(context).colorScheme.secondary,
-              onPrimaryContainer: Theme.of(context).colorScheme.onPrimaryContainer,
-
+              onPrimaryContainer:
+                  Theme.of(context).colorScheme.onPrimaryContainer,
             ),
           ),
           child: child!,
@@ -411,8 +449,8 @@ class _LostPostState extends State<LostPost> {
               surface: Theme.of(context).colorScheme.surface,
               onSurface: Theme.of(context).colorScheme.onSurface,
               secondary: Theme.of(context).colorScheme.secondary,
-              onPrimaryContainer: Theme.of(context).colorScheme.onPrimaryContainer,
-
+              onPrimaryContainer:
+                  Theme.of(context).colorScheme.onPrimaryContainer,
             ),
           ),
           child: child!,
@@ -423,7 +461,9 @@ class _LostPostState extends State<LostPost> {
       setState(() {
         if (value == null) return;
         _time = "${value.hour} : ${value.minute}";
+        _hour24 = value.hour;
         _amPm = getAmPm(value.hour);
+        _minute = value.minute;
       });
     }, onError: (error) {
       if (kDebugMode) {
@@ -438,5 +478,20 @@ class _LostPostState extends State<LostPost> {
     } else {
       return 'AM';
     }
+  }
+
+  int get12Hour(int hour24) {
+    if (hour24 > 12) {
+      return hour24 - 12;
+    }
+    return hour24;
+  }
+
+  void showToast(String msg) {
+    final snackBar = SnackBar(
+      content: Text(msg),
+      duration: const Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
