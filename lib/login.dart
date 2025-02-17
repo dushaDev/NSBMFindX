@@ -35,9 +35,11 @@ class _LoginState extends State<Login> {
             margin: EdgeInsets.all(20.0),
             padding: EdgeInsets.all(5.0),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-              border: Border.all(color: Theme.of(context).colorScheme.primary.withAlpha(95),width: 2,)
-            ),
+                borderRadius: BorderRadius.circular(8.0),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.primary.withAlpha(95),
+                  width: 2,
+                )),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Form(
@@ -92,7 +94,7 @@ class _LoginState extends State<Login> {
                       ],
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(top: 50.0,bottom: 70.0),
+                      padding: const EdgeInsets.only(top: 50.0, bottom: 70.0),
                       child: FilledButton(
                         onPressed: () {
                           if (_formKey.currentState?.validate() == true) {
@@ -101,8 +103,7 @@ class _LoginState extends State<Login> {
                             });
 
                             authService
-                                .signInWithEmailPassword(
-                                    _emailController.text,
+                                .signInWithEmailPassword(_emailController.text,
                                     _passwordController.text)
                                 .whenComplete(() async {
                               User? user = await authService.getSignedUser();
@@ -124,10 +125,7 @@ class _LoginState extends State<Login> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0)),
                           padding: const EdgeInsets.only(
-                              left: 50.0,
-                              right: 50.0,
-                              top: 15.0,
-                              bottom: 15.0),
+                              left: 50.0, right: 50.0, top: 15.0, bottom: 15.0),
                         ),
                         child: const Text("Log in"),
                       ),
@@ -136,7 +134,8 @@ class _LoginState extends State<Login> {
                       padding: const EdgeInsets.all(5.0),
                       child: InkWell(
                           onTap: () {
-                           showToast('Coming soon, Please contact the administrator');
+                            showToast(
+                                'Coming soon, Please contact the administrator');
                           },
                           child: Text(
                             "Forgot password?",
@@ -154,8 +153,9 @@ class _LoginState extends State<Login> {
                           Text(
                             "Don’t have an account? ",
                             style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: FontProfile.small,),
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: FontProfile.small,
+                            ),
                           ),
                           InkWell(
                               onTap: () {
@@ -167,7 +167,8 @@ class _LoginState extends State<Login> {
                               child: Text(
                                 "Sign Up",
                                 style: TextStyle(
-                                    color: Theme.of(context).colorScheme.onSurface,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     fontSize: FontProfile.small,
                                     fontWeight: FontWeight.w800),
                               ))
@@ -225,7 +226,6 @@ class _LoginState extends State<Login> {
     );
   }
 
-
   Widget _buildText(String text) {
     return Padding(
       padding: const EdgeInsets.only(
@@ -235,7 +235,9 @@ class _LoginState extends State<Login> {
       child: Text(
         text,
         style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface, fontSize: FontProfile.medium,),
+          color: Theme.of(context).colorScheme.onSurface,
+          fontSize: FontProfile.medium,
+        ),
       ),
     );
   }
