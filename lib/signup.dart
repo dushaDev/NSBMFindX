@@ -1,4 +1,3 @@
-
 import 'package:find_x/res/font_profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -60,7 +59,7 @@ class _SignupState extends State<Signup> {
                           "Name",
                           style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: FontProfile.medium),
+                              fontSize: FontProfile.medium),
                         ),
                       ),
                       Padding(
@@ -111,8 +110,9 @@ class _SignupState extends State<Signup> {
                         child: Text(
                           "Email",
                           style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: FontProfile.medium,),
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: FontProfile.medium,
+                          ),
                         ),
                       ),
                       Padding(
@@ -164,8 +164,9 @@ class _SignupState extends State<Signup> {
                         child: Text(
                           "Create a password",
                           style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: FontProfile.medium,),
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: FontProfile.medium,
+                          ),
                         ),
                       ),
                       Padding(
@@ -221,8 +222,9 @@ class _SignupState extends State<Signup> {
                         child: Text(
                           "Repeat password",
                           style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: FontProfile.medium,),
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: FontProfile.medium,
+                          ),
                         ),
                       ),
                       Padding(
@@ -276,10 +278,10 @@ class _SignupState extends State<Signup> {
                             Flexible(
                               child: Text(
                                   style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                    fontSize: FontProfile.extraSmall,),
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                    fontSize: FontProfile.extraSmall,
+                                  ),
                                   "password must contain minimum 8 characters with numbers,a special character and one uppercase letter"),
                             ),
                           ],
@@ -297,33 +299,42 @@ class _SignupState extends State<Signup> {
                               setState(() {
                                 _isSpinKitLoaded = true;
                               });
-                              await authService.signUpWithEmailPassword(
-                                  _emailController.text,
-                                  _passwordController.text).whenComplete(() async {
+                              await authService
+                                  .signUpWithEmailPassword(
+                                      _emailController.text,
+                                      _passwordController.text)
+                                  .whenComplete(() async {
                                 User? user = await authService.getSignedUser();
-                                if(user==null){
+                                if (user == null) {
                                   setState(() {
                                     _isSpinKitLoaded = false;
                                   });
-                                  showToast('Email already in use.Try another one');
-                                }else{
+                                  showToast(
+                                      'Email already in use.Try another one');
+                                } else {
                                   await firestoreService
-                                      .register(_emailController.text,
-                                      _nameController.text)
+                                      .registerStudent(
+                                          '28232',
+                                          _nameController.text,
+                                          _emailController.text,
+                                          'student',
+                                          'f1',
+                                          'd1',
+                                          'about here')
                                       .whenComplete(() async {
-                                    User? user = await authService.getSignedUser();
+                                    User? user =
+                                        await authService.getSignedUser();
                                     setState(() {
                                       _isSpinKitLoaded = false;
                                     });
-                                    authService.signOut().whenComplete((){
-                                      showToast('Registration successfully. use Login');
+                                    authService.signOut().whenComplete(() {
+                                      showToast(
+                                          'Registration successfully. use Login');
                                       navigate(user);
                                     });
-
                                   });
                                 }
                               });
-
                             }
                           },
                           style: FilledButton.styleFrom(
@@ -333,7 +344,9 @@ class _SignupState extends State<Signup> {
                                 Theme.of(context).colorScheme.primary,
                             foregroundColor:
                                 Theme.of(context).colorScheme.onPrimary,
-                            textStyle: const TextStyle( fontSize: FontProfile.medium,),
+                            textStyle: const TextStyle(
+                              fontSize: FontProfile.medium,
+                            ),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0)),
                             padding: const EdgeInsets.only(
