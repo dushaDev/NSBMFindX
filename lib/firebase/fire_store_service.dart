@@ -5,6 +5,8 @@ import 'models/Faculty.dart';
 import 'models/Student.dart';
 import 'models/admin.dart';
 import 'models/degree_program.dart';
+import 'models/found_item.dart';
+import 'models/lost_item.dart';
 import 'models/staff.dart';
 import 'models/user.dart';
 
@@ -110,6 +112,17 @@ class FireStoreService {
         .set(program.toFirestore());
   }
 
+  Future<void> addLostItem(LostItem lostItem) async {
+    await _fireStore
+        .collection('lostItems')
+        .doc(lostItem.id)
+        .set(lostItem.toFirestore());
+  }
+  Future<void> addFoundItem(FoundItem foundItem) async {
+    await _fireStore.collection('foundItems').doc(foundItem.id).set(foundItem.toFirestore());
+  }
+
+
   // Method to retrieve a user from Firestore
 
   Future<User?> getUser(String userId) async {
@@ -199,6 +212,34 @@ class FireStoreService {
       return null;
     } catch (e) {
       print("Error fetching degree program: $e");
+      return null;
+    }
+  }
+
+  // Method to retrieve a lost item from Firestore
+  Future<LostItem?> getLostItem(String lostItemId) async {
+    try {
+      DocumentSnapshot doc =
+          await _fireStore.collection('lostItems').doc(lostItemId).get();
+      if (doc.exists) {
+        return LostItem.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id);
+      }
+      return null;
+    } catch (e) {
+      print("Error fetching lost item: $e");
+      return null;
+    }
+  }
+  Future<FoundItem?> getFoundItem(String foundItemId) async {
+    try {
+      DocumentSnapshot doc = await _fireStore.collection('foundItems').doc(foundItemId).get();
+      if (doc.exists) {
+        return FoundItem.fromFirestore(doc.data() as Map<String, dynamic>, doc.id);
+      }
+      return null;
+    } catch (e) {
+      print("Error fetching found item: $e");
       return null;
     }
   }
