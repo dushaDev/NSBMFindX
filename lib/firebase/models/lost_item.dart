@@ -1,9 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class LostItem {
   String id; // Unique ID to identify the post
   String itemName;
-  DateTime lostTime;
+  String lostTime; //yyyy/mm/dd/hh/mm
+  String postedTime; //yyyy/mm/dd/hh/mm
   String lastKnownLocation;
   String contactNumber;
   String description;
@@ -16,6 +15,7 @@ class LostItem {
     required this.id,
     required this.itemName,
     required this.lostTime,
+    required this.postedTime,
     required this.lastKnownLocation,
     required this.contactNumber,
     required this.description,
@@ -30,7 +30,8 @@ class LostItem {
     return LostItem(
       id: id,
       itemName: json['itemName'],
-      lostTime: (json['lostTime'] as Timestamp).toDate(),
+      lostTime: json['lostTime'],
+      postedTime: json['postedTime'],
       lastKnownLocation: json['lastKnownLocation'],
       contactNumber: json['contactNumber'],
       description: json['description'],
@@ -45,7 +46,8 @@ class LostItem {
   Map<String, dynamic> toFirestore() {
     return {
       'itemName': itemName,
-      'lostTime': Timestamp.fromDate(lostTime),
+      'lostTime': lostTime,
+      'postedTime': postedTime,
       'lastKnownLocation': lastKnownLocation,
       'contactNumber': contactNumber,
       'description': description,

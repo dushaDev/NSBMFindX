@@ -1,3 +1,6 @@
+import 'package:find_x/firebase/fire_store_service.dart';
+import 'package:find_x/firebase/models/lost_item.dart';
+import 'package:find_x/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
 import 'package:find_x/res/utils.dart';
 import 'package:flutter/foundation.dart';
@@ -18,14 +21,17 @@ class _LostPostState extends State<LostPost> {
   bool _selectDate = true;
   double _wholePadding = 10.0;
   late Future<DateTime?> selectedDate;
-  String _date = "-";
-
   late Future<TimeOfDay?> selectedTime;
-  String _time = "-";
+  String _displayDate = "-";
+  String _date = '-';
+  String _displayTime = "-";
+  String _lostTime = "-";
+  String _postedTime = "-";
+  String _amPm = '';
   int _hour24 = 0;
   int _minute = 0;
-  String _amPm = '';
-
+  String _contactNumber = '0767771005';
+  FireStoreService _fireStoreService = FireStoreService();
   final TextEditingController _lostTextController = TextEditingController();
   final TextEditingController _descriptionTextController =
       TextEditingController();
@@ -87,17 +93,23 @@ class _LostPostState extends State<LostPost> {
                                     .colorScheme
                                     .surfaceContainer,
                               ),
-                              onPressed:_selectDate?null: () {
-                                showDialogPicker(context);
-                              },
-                              child:
-                                  Text(_date == '-' ? 'Select Date' : '$_date',
-                                      style: TextStyle(
-                                        color: _selectDate?Theme.of(context).colorScheme.onSurface.withAlpha(60):
-                                        Theme.of(context)
+                              onPressed: _selectDate
+                                  ? null
+                                  : () {
+                                      showDialogPicker(context);
+                                    },
+                              child: Text(
+                                  _displayDate == '-'
+                                      ? 'Select Date'
+                                      : '$_displayDate',
+                                  style: TextStyle(
+                                    color: _selectDate
+                                        ? Theme.of(context)
                                             .colorScheme
-                                            .primary,
-                                      )),
+                                            .onSurface
+                                            .withAlpha(60)
+                                        : Theme.of(context).colorScheme.primary,
+                                  )),
                             ),
                             SizedBox(width: 10),
                             FilledButton(
@@ -116,14 +128,16 @@ class _LostPostState extends State<LostPost> {
                                       showDialogTimePicker(context);
                                     },
                               child: Text(
-                                  _time == "-"
+                                  _displayTime == "-"
                                       ? "Select Time"
                                       : '${get12Hour(_hour24)}:$_minute $_amPm',
                                   style: TextStyle(
-                                    color: _selectDate?Theme.of(context).colorScheme.onSurface.withAlpha(60):
-                                    Theme.of(context)
-                                        .colorScheme
-                                        .primary,
+                                    color: _selectDate
+                                        ? Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
+                                            .withAlpha(60)
+                                        : Theme.of(context).colorScheme.primary,
                                   )),
                             ),
                           ],
@@ -187,12 +201,13 @@ class _LostPostState extends State<LostPost> {
                 Row(
                   children: [
                     Expanded(
-                      child: _buildTextField(
-                          _contactTextController, _useOwnNumber?'076*****05':'Enter Number',
+                      child: _buildTextField(_contactTextController,
+                          _useOwnNumber ? _contactNumber : 'Enter Number',
                           inputFormatters: [
                             LengthLimitingTextInputFormatter(10),
                             FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                          ],enabled: _useOwnNumber?false:true),
+                          ],
+                          enabled: _useOwnNumber ? false : true),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -200,7 +215,10 @@ class _LostPostState extends State<LostPost> {
                         Checkbox(
                           value: _useOwnNumber,
                           onChanged: (value) =>
-                              setState(() => _useOwnNumber = value!),
+                              setState((){
+                                _useOwnNumber = value!;
+                                     _contactTextController.clear();
+                                } ),
                         ),
                         Text(
                           "Use Own",
@@ -296,12 +314,37 @@ class _LostPostState extends State<LostPost> {
             child: Column(
               children: [
                 GestureDetector(
-                  onTap: _agreeTerms?null:
-                      (){
-                    showToast('Agree to T&C');
-                  },
+                  onTap: _agreeTerms
+                      ? null
+                      : () {
+                          showToast('Agree to T&C');
+                        },
                   child: FilledButton(
-                    onPressed: _agreeTerms?() {showToast('Button Working');}:null,
+                    onPressed: _agreeTerms
+                        ? () async {
+                            _selectDate
+                                ?  _lostTime = ReadDate().getDateNow()
+                                :_lostTime = '$_date$_displayTime';
+
+                            await _fireStoreService.addLostItem(LostItem(
+                                id: '28232',
+                                itemName: _lostTextController.text,
+                                lostTime: _lostTime,
+                                postedTime: ReadDate().getDateNow(),
+                                lastKnownLocation: _locationTextController.text,
+                                contactNumber: _useOwnNumber?_contactNumber: _contactTextController.text,
+                                description: _descriptionTextController.text,
+                                images: [
+                                  'path/to/image1.jpg',
+                                  'path/to/image2.jpg'
+                                ],
+                                agreedToTerms: _agreeTerms,
+                                userId: '28232',
+                                isCompleted: false));
+
+                            //showToast('Button Working');
+                          }
+                        : null,
                     style: FilledButton.styleFrom(
                       minimumSize: const Size(150.0, 50.0),
                       maximumSize: const Size(200.0, 50.0),
@@ -341,7 +384,9 @@ class _LostPostState extends State<LostPost> {
   }
 
   Widget _buildTextField(TextEditingController textController, String hint,
-      {List<TextInputFormatter>? inputFormatters, int? maxLines = 1,bool enabled = true}) {
+      {List<TextInputFormatter>? inputFormatters,
+      int? maxLines = 1,
+      bool enabled = true}) {
     return TextField(
       enabled: enabled,
       maxLines: maxLines,
@@ -358,7 +403,8 @@ class _LostPostState extends State<LostPost> {
         disabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
             borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.outlineVariant.withAlpha(90),
+                color:
+                    Theme.of(context).colorScheme.outlineVariant.withAlpha(90),
                 width: 2.0,
                 style: BorderStyle.solid)),
         focusedBorder: OutlineInputBorder(
@@ -377,13 +423,13 @@ class _LostPostState extends State<LostPost> {
       padding: const EdgeInsets.all(2.0),
       child: Chip(
         deleteIcon: Icon(Icons.north_west_rounded),
-        onDeleted: (){
-          if(_locationTextController.text.isEmpty){
-            _locationTextController.text=label;
-          }else{
-            _locationTextController.text='${_locationTextController.text}, $label';
+        onDeleted: () {
+          if (_locationTextController.text.isEmpty) {
+            _locationTextController.text = label;
+          } else {
+            _locationTextController.text =
+                '${_locationTextController.text}, $label';
           }
-
         },
         label: Text(
           label,
@@ -427,6 +473,9 @@ class _LostPostState extends State<LostPost> {
     selectedDate.then((value) {
       setState(() {
         if (value == null) return;
+        _displayDate = Utils.getFormattedDateSimple(
+            value.millisecondsSinceEpoch,
+            dateFormat: "MMMM dd, yyyy");
         _date = Utils.getFormattedDateSimple(value.millisecondsSinceEpoch);
       });
     }, onError: (error) {
@@ -460,7 +509,7 @@ class _LostPostState extends State<LostPost> {
     selectedTime.then((value) {
       setState(() {
         if (value == null) return;
-        _time = "${value.hour} : ${value.minute}";
+        _displayTime = "/${value.hour}/${value.minute}";
         _hour24 = value.hour;
         _amPm = getAmPm(value.hour);
         _minute = value.minute;

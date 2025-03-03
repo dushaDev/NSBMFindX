@@ -1,9 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class FoundItem {
   String id; // Unique ID to identify the post
   String itemName;
-  DateTime foundTime;
+  String foundTime;
+  String postedTime;
   String contactNumber;
   String description;
   String currentLocation; // Where the item is now
@@ -20,6 +19,7 @@ class FoundItem {
     required this.id,
     required this.itemName,
     required this.foundTime,
+    required this.postedTime,
     required this.contactNumber,
     required this.description,
     required this.currentLocation,
@@ -38,7 +38,8 @@ class FoundItem {
     return FoundItem(
       id: id,
       itemName: json['itemName'],
-      foundTime: (json['foundTime'] as Timestamp).toDate(),
+      foundTime: json['foundTime'],
+      postedTime: json['postedTime'],
       contactNumber: json['contactNumber'],
       description: json['description'],
       currentLocation: json['currentLocation'],
@@ -57,7 +58,8 @@ class FoundItem {
   Map<String, dynamic> toFirestore() {
     return {
       'itemName': itemName,
-      'foundTime': Timestamp.fromDate(foundTime),
+      'foundTime': foundTime,
+      'postedTime': postedTime,
       'contactNumber': contactNumber,
       'description': description,
       'currentLocation': currentLocation,
