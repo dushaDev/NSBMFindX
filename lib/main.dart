@@ -8,17 +8,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'index_page.dart';
 import 'login.dart';
 
-
 void main() async {
   await dotenv.load();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
       options: FirebaseOptions(
-        apiKey: dotenv.env['FIREBASE_API_KEY']!,
-        appId: dotenv.env['FIREBASE_APP_ID']!,
-        messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID']!,
-        projectId: dotenv.env['FIREBASE_PROJECT_ID']!,
-      ));
+    apiKey: dotenv.env['FIREBASE_API_KEY']!,
+    appId: dotenv.env['FIREBASE_APP_ID']!,
+    messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID']!,
+    projectId: dotenv.env['FIREBASE_PROJECT_ID']!,
+  ));
   runApp(const MyApp());
 }
 
@@ -29,7 +28,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
-        systemNavigationBarColor: Colors.transparent, // Transparent navigation bar
+        systemNavigationBarColor:
+            Colors.transparent, // Transparent navigation bar
       ),
     );
     return MaterialApp(
@@ -44,9 +44,10 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorScheme: ColorProfile.dark),
       themeMode: ThemeMode.system,
-      home:  _loadingPage(),
+      home: _loadingPage(),
     );
   }
+
   Widget _loadingPage() {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
