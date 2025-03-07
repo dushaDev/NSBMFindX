@@ -470,6 +470,18 @@ class _SignupState extends State<Signup> {
                 color: Theme.of(context).colorScheme.outline,
                 width: 2.0,
                 style: BorderStyle.solid)),
+        errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.outlineVariant,
+                width: 2.0,
+                style: BorderStyle.solid)),
+        focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.outlineVariant,
+                width: 2.0,
+                style: BorderStyle.solid)),
         hintText: hint,
       ),
       obscureText: obscureText,
