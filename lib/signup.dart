@@ -3,7 +3,6 @@ import 'package:find_x/res/font_profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-
 import 'firebase/auth_service.dart';
 import 'firebase/fire_store_service.dart';
 
@@ -83,13 +82,13 @@ class _SignupState extends State<Signup> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildText('Name'),
-                        _buildTextFormField(_nameController, 'sdnPerera',
+                        _buildText('Name on ID'),
+                        _buildTextFormField(_nameController, 'SDN Perera',
                             (value) {
                           if (value == null || value.isEmpty) {
                             return 'Name is required.';
-                          } else if (value.length < 10) {
-                            return 'Name must be at least 10 characters.';
+                          } else if (value.length < 8) {
+                            return 'Name must be at least 8 characters.';
                           }
                           return '';
                         })
@@ -99,7 +98,7 @@ class _SignupState extends State<Signup> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildText('ID Number'),
-                        _buildTextFormField(_idController, '28356', (value) {
+                        _buildTextFormField(_idController, '24356', (value) {
                           if (value == null || value.isEmpty) {
                             return 'ID Number is required.';
                           }
@@ -139,21 +138,33 @@ class _SignupState extends State<Signup> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildText('Contact Number'),
-                        _buildTextFormField(_idController, '28356', (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'ID Number is required.';
-                          }
-                          return '';
-                        })
+                        _buildTextFormField(
+                          _contactNumberController,
+                          '0712345678',
+                          (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Contact Number is required.';
+                            } else if (value.length != 10) {
+                              return 'Contact Number must be 10 digits.';
+                            }
+                            return '';
+                          },
+                          keyboardType: TextInputType.number,
+                        ),
                       ],
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildText('Email'),
-                        _buildTextFormField(_idController, '28356', (value) {
+                        _buildTextFormField(
+                            _emailController, 'samplemaail@email.com', (value) {
                           if (value == null || value.isEmpty) {
-                            return 'ID Number is required.';
+                            return 'Email is required.';
+                          }
+                          final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+                          if (!emailRegex.hasMatch(value)) {
+                            return 'Invalid email format.';
                           }
                           return '';
                         })
@@ -163,24 +174,42 @@ class _SignupState extends State<Signup> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildText('Password'),
-                        _buildTextFormField(_idController, '28356', (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'ID Number is required.';
-                          }
-                          return '';
-                        })
+                        _buildTextFormField(
+                          _passwordController,
+                          '********',
+                          (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Password is required.';
+                            }
+                            final passwordRegex = RegExp(
+                                r'^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$');
+                            if (!passwordRegex.hasMatch(value)) {
+                              return 'Password must be at least 8 characters long, '
+                                  'contain an uppercase letter, a number, and a special character.';
+                            }
+                            return '';
+                          },
+                          obscureText: true,
+                        ),
                       ],
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildText('Repeat password'),
-                        _buildTextFormField(_idController, '28356', (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'ID Number is required.';
-                          }
-                          return '';
-                        }),
+                        _buildTextFormField(
+                          _repeatPasswordController,
+                          '********',
+                          (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Repeat Password is required.';
+                            } else if (value != _passwordController.text) {
+                              return 'Passwords do not match.';
+                            }
+                            return '';
+                          },
+                          obscureText: true,
+                        ),
                         Padding(
                           padding: const EdgeInsets.only(left: 8.0),
                           child: Row(
@@ -207,7 +236,12 @@ class _SignupState extends State<Signup> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildText('Bio'),
-                            _buildBioField("Enter your bio"),
+                            _buildBioField('Enter your bio', (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Bio is required.';
+                              }
+                              return '';
+                            }),
                           ],
                         ),
                       ],
@@ -417,7 +451,7 @@ class _SignupState extends State<Signup> {
 
   Widget _buildTextFormField(TextEditingController textController, String hint,
       FormFieldValidator validator,
-      {obscureText = false}) {
+      {obscureText = false, TextInputType keyboardType = TextInputType.text}) {
     return TextFormField(
       controller: textController,
       style: TextStyle(
@@ -441,10 +475,11 @@ class _SignupState extends State<Signup> {
       obscureText: obscureText,
       obscuringCharacter: "*",
       validator: validator,
+      keyboardType: keyboardType,
     );
   }
 
-  Widget _buildBioField(String text) {
+  Widget _buildBioField(String text, FormFieldValidator validator) {
     return Padding(
         padding: const EdgeInsets.all(8.0),
         child: TextFormField(
@@ -469,58 +504,6 @@ class _SignupState extends State<Signup> {
                       style: BorderStyle.solid)),
               hintText: text,
             ),
-            validator: (value) {
-              return HelperValidator.bioValidate(value);
-            }));
-  }
-}
-
-class HelperValidator {
-  static String emailValidate(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Email is required.';
-    }
-    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
-    if (!emailRegex.hasMatch(value)) {
-      return 'Invalid email format.';
-    }
-    return '';
-  }
-
-  static String passwordValidate(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Password is required.';
-    }
-    final passwordRegex = RegExp(r'^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$');
-    if (!passwordRegex.hasMatch(value)) {
-      return 'Password must be at least 8 characters long, '
-          'contain an uppercase letter, a number, and a special character.';
-    }
-    return '';
-  }
-
-  static String confirmPasswordValidate(String? value, String password) {
-    if (value == null || value.isEmpty) {
-      return 'Repeat Password is required.';
-    } else if (value != password) {
-      return 'Passwords do not match.';
-    }
-    return '';
-  }
-
-  static String idValidate(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'ID Number is required.';
-    }
-    return '';
-  }
-
-  static String contactNumberValidate(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Contact Number is required.';
-    } else if (value.length != 10) {
-      return 'Contact Number must be 10 digits.';
-    }
-    return '';
+            validator: validator));
   }
 }
