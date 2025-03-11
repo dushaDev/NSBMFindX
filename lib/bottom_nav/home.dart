@@ -1,3 +1,4 @@
+import 'package:find_x/found_post.dart';
 import 'package:find_x/lost_post.dart';
 import 'package:find_x/res/font_profile.dart';
 import 'package:flutter/material.dart';
@@ -90,7 +91,7 @@ class _HomeState extends State<Home> {
                           'Found Report',
                           Icons.person_search,
                           'assets/images/searching.png',
-                          () => LostPost())), //There should be a FoundPost page
+                          () => FoundPost())), //There should be a FoundPost page
                 ],
               ),
               SizedBox(height: 10),
