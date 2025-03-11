@@ -78,7 +78,7 @@ class _FoundPostState extends State<FoundPost> {
                 Padding(
                   padding: const EdgeInsets.only(left: 20.0),
                   child: Text(
-                    "Upload maximum 20mb images",
+                    "Upload maximum 20MB images",
                     style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurfaceVariant),
                   ),
