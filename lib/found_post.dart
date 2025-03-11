@@ -33,7 +33,7 @@ class _FoundPostState extends State<FoundPost> {
   int _minute = 0;
   String _contactNumber = '0767771005';
 
-  String? _selectedPrivacy;
+  String? _selectedPrivacy='Public';
   String? _selectedFaculty;
   String? _selectedDegree;
   final List<String> _privacy_list = ['Public', 'Restricted', 'Private'];
