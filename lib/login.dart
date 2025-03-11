@@ -199,7 +199,7 @@ class _LoginState extends State<Login> {
 
   Widget _buildTextFormField(TextEditingController textController, String hint,
       FormFieldValidator validator,
-      {obscureText = false}) {
+      {obscureText = false, TextInputType keyboardType = TextInputType.text}) {
     return TextFormField(
       controller: textController,
       style: TextStyle(
@@ -218,11 +218,24 @@ class _LoginState extends State<Login> {
                 color: Theme.of(context).colorScheme.outline,
                 width: 2.0,
                 style: BorderStyle.solid)),
+        errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.outlineVariant,
+                width: 2.0,
+                style: BorderStyle.solid)),
+        focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.outlineVariant,
+                width: 2.0,
+                style: BorderStyle.solid)),
         hintText: hint,
       ),
       obscureText: obscureText,
       obscuringCharacter: "*",
       validator: validator,
+      keyboardType: keyboardType,
     );
   }
 

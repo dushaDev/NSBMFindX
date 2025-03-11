@@ -20,13 +20,12 @@ class _LostPostState extends State<LostPost> {
   bool _agreeTerms = false;
   bool _selectDate = true;
   double _wholePadding = 10.0;
-  late Future<DateTime?> selectedDate;
-  late Future<TimeOfDay?> selectedTime;
+  late Future<DateTime?> _selectedDate;
+  late Future<TimeOfDay?> _selectedTime;
   String _displayDate = "-";
   String _date = '-';
   String _displayTime = "-";
   String _lostTime = "-";
-  String _postedTime = "-";
   String _amPm = '';
   int _hour24 = 0;
   int _minute = 0;
@@ -448,7 +447,7 @@ class _LostPostState extends State<LostPost> {
   }
 
   void showDialogPicker(BuildContext context) {
-    selectedDate = showDatePicker(
+    _selectedDate = showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(DateTime.now().year - 1),
@@ -470,7 +469,7 @@ class _LostPostState extends State<LostPost> {
         );
       },
     );
-    selectedDate.then((value) {
+    _selectedDate.then((value) {
       setState(() {
         if (value == null) return;
         _displayDate = Utils.getFormattedDateSimple(
@@ -486,7 +485,7 @@ class _LostPostState extends State<LostPost> {
   }
 
   void showDialogTimePicker(BuildContext context) {
-    selectedTime = showTimePicker(
+    _selectedTime = showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
       builder: (BuildContext context, Widget? child) {
@@ -506,7 +505,7 @@ class _LostPostState extends State<LostPost> {
         );
       },
     );
-    selectedTime.then((value) {
+    _selectedTime.then((value) {
       setState(() {
         if (value == null) return;
         _displayTime = "/${value.hour}/${value.minute}";

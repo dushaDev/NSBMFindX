@@ -427,10 +427,22 @@ class _SignupState extends State<Signup> {
                 style: BorderStyle.solid,
               ),
             ),
+            errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                    width: 2.0,
+                    style: BorderStyle.solid)),
+            focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                    width: 2.0,
+                    style: BorderStyle.solid)),
           ),
           hint: Text(text),
           items: items.map((String item) {
-            return DropdownMenuItem<String>(
+            return DropdownMenuItem(
               value: item,
               child: Text(
                 item,
@@ -512,6 +524,18 @@ class _SignupState extends State<Signup> {
                   borderRadius: BorderRadius.circular(8.0),
                   borderSide: BorderSide(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      width: 2.0,
+                      style: BorderStyle.solid)),
+              errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                      width: 2.0,
+                      style: BorderStyle.solid)),
+              focusedErrorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.outlineVariant,
                       width: 2.0,
                       style: BorderStyle.solid)),
               hintText: text,
