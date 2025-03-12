@@ -138,6 +138,27 @@ class FireStoreService {
       return null;
     }
   }
+  Future<User?> getUserByEmail(String email) async {
+    try {
+      // Query the users collection for the document with the matching email
+      QuerySnapshot querySnapshot = await _fireStore
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Convert the first matching document to a User object
+        return User.fromFirestore(
+            querySnapshot.docs.first.data() as Map<String, dynamic>,
+            querySnapshot.docs.first.id);
+      }
+      return null;
+    } catch (e) {
+      print("Error fetching user by email: $e");
+      return null;
+    }
+  }
 
   Future<Admin?> getAdmin(String adminId) async {
     try {
