@@ -8,7 +8,7 @@ import 'models/degree_program.dart';
 import 'models/found_item.dart';
 import 'models/lost_item.dart';
 import 'models/staff.dart';
-import 'models/user.dart';
+import 'models/user_m.dart';
 
 //this changes for testing purposes //2025-03-01
 class FireStoreService {
@@ -27,7 +27,7 @@ class FireStoreService {
   ) async {
     List<String> words = _random.splitName(name);
 
-    await addUser(User(
+    await addUser(UserM(
             id: id,
             name: name,
             displayName: words[0],
@@ -49,7 +49,7 @@ class FireStoreService {
       String department, String position, String accessLevel) async {
     List<String> words = _random.splitName(name);
 
-    await addUser(User(
+    await addUser(UserM(
             id: id,
             name: name,
             displayName: words[0],
@@ -65,7 +65,7 @@ class FireStoreService {
       String department, String accessLevel) async {
     List<String> words = _random.splitName(name);
 
-    await addUser(User(
+    await addUser(UserM(
             id: id,
             name: name,
             displayName: words[0],
@@ -79,7 +79,7 @@ class FireStoreService {
   }
 
   // Methods to add a data to Firestore
-  Future<void> addUser(User user) async {
+  Future<void> addUser(UserM user) async {
     await _fireStore.collection('users').doc(user.id).set(user.toFirestore());
   }
 
@@ -125,12 +125,12 @@ class FireStoreService {
 
   // Method to retrieve a user from Firestore
 
-  Future<User?> getUser(String userId) async {
+  Future<UserM?> getUser(String userId) async {
     try {
       DocumentSnapshot doc =
           await _fireStore.collection('users').doc(userId).get();
       if (doc.exists) {
-        return User.fromFirestore(doc.data() as Map<String, dynamic>, doc.id);
+        return UserM.fromFirestore(doc.data() as Map<String, dynamic>, doc.id);
       }
       return null;
     } catch (e) {
@@ -138,7 +138,7 @@ class FireStoreService {
       return null;
     }
   }
-  Future<User?> getUserByEmail(String email) async {
+  Future<UserM?> getUserByEmail(String email) async {
     try {
       // Query the users collection for the document with the matching email
       QuerySnapshot querySnapshot = await _fireStore
@@ -149,7 +149,7 @@ class FireStoreService {
 
       if (querySnapshot.docs.isNotEmpty) {
         // Convert the first matching document to a User object
-        return User.fromFirestore(
+        return UserM.fromFirestore(
             querySnapshot.docs.first.data() as Map<String, dynamic>,
             querySnapshot.docs.first.id);
       }
