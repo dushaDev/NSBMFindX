@@ -8,7 +8,7 @@ import 'models/degree_program.dart';
 import 'models/found_item.dart';
 import 'models/lost_item.dart';
 import 'models/staff.dart';
-import 'models/user.dart';
+import 'models/user_m.dart';
 
 //this changes for testing purposes //2025-03-01
 class FireStoreService {
@@ -27,7 +27,7 @@ class FireStoreService {
   ) async {
     List<String> words = _random.splitName(name);
 
-    await addUser(User(
+    await addUser(UserM(
             id: id,
             name: name,
             displayName: words[0],
@@ -49,7 +49,7 @@ class FireStoreService {
       String department, String position, String accessLevel) async {
     List<String> words = _random.splitName(name);
 
-    await addUser(User(
+    await addUser(UserM(
             id: id,
             name: name,
             displayName: words[0],
@@ -65,7 +65,7 @@ class FireStoreService {
       String department, String accessLevel) async {
     List<String> words = _random.splitName(name);
 
-    await addUser(User(
+    await addUser(UserM(
             id: id,
             name: name,
             displayName: words[0],
@@ -79,7 +79,7 @@ class FireStoreService {
   }
 
   // Methods to add a data to Firestore
-  Future<void> addUser(User user) async {
+  Future<void> addUser(UserM user) async {
     await _fireStore.collection('users').doc(user.id).set(user.toFirestore());
   }
 
@@ -137,12 +137,12 @@ class FireStoreService {
 
   // Method to retrieve a user from Firestore
 
-  Future<User?> getUser(String userId) async {
+  Future<UserM?> getUser(String userId) async {
     try {
       DocumentSnapshot doc =
           await _fireStore.collection('users').doc(userId).get();
       if (doc.exists) {
-        return User.fromFirestore(doc.data() as Map<String, dynamic>, doc.id);
+        return UserM.fromFirestore(doc.data() as Map<String, dynamic>, doc.id);
       }
       return null;
     } catch (e) {
@@ -150,8 +150,7 @@ class FireStoreService {
       return null;
     }
   }
-
-  Future<User?> getUserByEmail(String email) async {
+  Future<UserM?> getUserByEmail(String email) async {
     try {
       // Query the users collection for the document with the matching email
       QuerySnapshot querySnapshot = await _fireStore
@@ -162,7 +161,7 @@ class FireStoreService {
 
       if (querySnapshot.docs.isNotEmpty) {
         // Convert the first matching document to a User object
-        return User.fromFirestore(
+        return UserM.fromFirestore(
             querySnapshot.docs.first.data() as Map<String, dynamic>,
             querySnapshot.docs.first.id);
       }
@@ -265,55 +264,16 @@ class FireStoreService {
       return null;
     }
   }
-
-  Future<List<LostItem>> getLostItemsByUserId(String userId) async {
-    try {
-      // Query the lostItems collection for documents with the matching userId
-      QuerySnapshot querySnapshot = await _fireStore
-          .collection('lostItems')
-          .where('userId', isEqualTo: userId)
-          .get();
-
-      // Convert the query results to a list of LostItem objects
-      return querySnapshot.docs.map((doc) {
-        return LostItem.fromFirestore(
-            doc.data() as Map<String, dynamic>, doc.id);
-      }).toList();
-    } catch (e) {
-      print("Error fetching lost items by user ID: $e");
-      return [];
-    }
-  }
-
   Future<FoundItem?> getFoundItem(String foundItemId) async {
     try {
-      DocumentSnapshot doc =
-          await _fireStore.collection('foundItems').doc(foundItemId).get();
+      DocumentSnapshot doc = await _fireStore.collection('foundItems').doc(foundItemId).get();
       if (doc.exists) {
-        return FoundItem.fromFirestore(
-            doc.data() as Map<String, dynamic>, doc.id);
+        return FoundItem.fromFirestore(doc.data() as Map<String, dynamic>, doc.id);
       }
       return null;
     } catch (e) {
       print("Error fetching found item: $e");
       return null;
-    }
-  }
-  Future<List<FoundItem>> getFoundItemsByUserId(String userId) async {
-    try {
-      // Query the foundItems collection for documents with the matching userId
-      QuerySnapshot querySnapshot = await _fireStore
-          .collection('foundItems')
-          .where('userId', isEqualTo: userId)
-          .get();
-
-      // Convert the query results to a list of FoundItem objects
-      return querySnapshot.docs.map((doc) {
-        return FoundItem.fromFirestore(doc.data() as Map<String, dynamic>, doc.id);
-      }).toList();
-    } catch (e) {
-      print("Error fetching found items by user ID: $e");
-      return [];
     }
   }
 }

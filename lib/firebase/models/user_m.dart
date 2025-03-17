@@ -1,4 +1,4 @@
-class User {
+class UserM {
   String id;
   String name;
   String email;
@@ -6,7 +6,7 @@ class User {
   String reference;
   String displayName;
 
-  User({
+  UserM({
     required this.id,
     required this.name,
     required this.email,
@@ -15,14 +15,14 @@ class User {
     required this.reference,
   });
 
-  factory User.fromFirestore(Map<String, dynamic> json, String id) {
-    return User(
+  factory UserM.fromFirestore(Map<String, dynamic> json, String id) {
+    return UserM(
       id: id,
       name: json['name'],
       email: json['email'],
-      role: 'role',
-      displayName: 'displayName',
-      reference: 'reference',
+      role: json['role'],
+      displayName: json['displayName'],
+      reference: json['reference'],
     );
   }
 
