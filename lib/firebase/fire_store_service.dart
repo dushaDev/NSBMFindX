@@ -150,6 +150,7 @@ class FireStoreService {
       return null;
     }
   }
+
   Future<UserM?> getUserByEmail(String email) async {
     try {
       // Query the users collection for the document with the matching email
@@ -264,16 +265,123 @@ class FireStoreService {
       return null;
     }
   }
+
   Future<FoundItem?> getFoundItem(String foundItemId) async {
     try {
-      DocumentSnapshot doc = await _fireStore.collection('foundItems').doc(foundItemId).get();
+      DocumentSnapshot doc =
+          await _fireStore.collection('foundItems').doc(foundItemId).get();
       if (doc.exists) {
-        return FoundItem.fromFirestore(doc.data() as Map<String, dynamic>, doc.id);
+        return FoundItem.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id);
       }
       return null;
     } catch (e) {
       print("Error fetching found item: $e");
       return null;
     }
+  }
+
+  // Method to retrieve all lost and found items sorted by date
+  Future<List<dynamic>> getLostAndFoundItems() async {
+    try {
+      QuerySnapshot lostItemsSnapshot =
+          await _fireStore.collection('lostItems').get();
+      QuerySnapshot foundItemsSnapshot =
+          await _fireStore.collection('foundItems').get();
+
+      List<LostItem> lostItems = lostItemsSnapshot.docs.map((doc) {
+        return LostItem.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id);
+      }).toList();
+
+      List<FoundItem> foundItems = foundItemsSnapshot.docs.map((doc) {
+        return FoundItem.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id);
+      }).toList();
+
+      // Combine the lists and sort by postedTime
+      List<dynamic> allItems = [...lostItems, ...foundItems];
+      allItems.sort((a, b) {
+        DateTime dateA = _parseCustomDate(a.postedTime);
+        DateTime dateB = _parseCustomDate(b.postedTime);
+        return dateB.compareTo(dateA); // Sort in descending order
+      });
+
+      return allItems;
+    } catch (e) {
+      print("Error fetching lost and found items: $e");
+      return [];
+    }
+  }
+
+  // Method to retrieve all lost and found items sorted by date with limit
+  Future<List<dynamic>> getLostAndFoundItemsWithLimit(int limit) async {
+    try {
+      QuerySnapshot lostItemsSnapshot =
+          await _fireStore.collection('lostItems').limit(limit).get();
+      QuerySnapshot foundItemsSnapshot =
+          await _fireStore.collection('foundItems').limit(limit).get();
+
+      List<LostItem> lostItems = lostItemsSnapshot.docs.map((doc) {
+        return LostItem.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id);
+      }).toList();
+
+      List<FoundItem> foundItems = foundItemsSnapshot.docs.map((doc) {
+        return FoundItem.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id);
+      }).toList();
+
+      // Combine the lists and sort by postedTime
+      List<dynamic> allItems = [...lostItems, ...foundItems];
+      allItems.sort((a, b) {
+        DateTime dateA = _parseCustomDate(a.postedTime);
+        DateTime dateB = _parseCustomDate(b.postedTime);
+        return dateB.compareTo(dateA); // Sort in descending order
+      });
+
+      return allItems;
+    } catch (e) {
+      print("Error fetching lost and found items: $e");
+      return [];
+    }
+  }
+  Future<List<dynamic>> getLostAndFoundItemsById(String userId, int limit) async {
+    try {
+      QuerySnapshot lostItemsSnapshot =
+      await _fireStore.collection('lostItems').where('userId', isEqualTo: userId).limit(limit).get();
+      QuerySnapshot foundItemsSnapshot =
+      await _fireStore.collection('foundItems').where('userId', isEqualTo: userId).limit(limit).get();
+
+      List<LostItem> lostItems = lostItemsSnapshot.docs.map((doc) {
+        return LostItem.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id);
+      }).toList();
+
+      List<FoundItem> foundItems = foundItemsSnapshot.docs.map((doc) {
+        return FoundItem.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id);
+      }).toList();
+
+      // Combine the lists and sort by postedTime
+      List<dynamic> allItems = [...lostItems, ...foundItems];
+      allItems.sort((a, b) {
+        DateTime dateA = _parseCustomDate(a.postedTime);
+        DateTime dateB = _parseCustomDate(b.postedTime);
+        return dateB.compareTo(dateA); // Sort in descending order
+      });
+
+      return allItems;
+    } catch (e) {
+      print("Error fetching lost and found items: $e");
+      return [];
+    }
+  }
+
+  // Helper method to parse the custom date format
+  DateTime _parseCustomDate(String dateString) {
+    List<int> dateParts = dateString.split('/').map(int.parse).toList();
+    return DateTime(
+        dateParts[0], dateParts[1], dateParts[2], dateParts[3], dateParts[4]);
   }
 }

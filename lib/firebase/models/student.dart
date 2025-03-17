@@ -25,6 +25,7 @@ class Student {
 
   Map<String, dynamic> toFirestore() {
     return {
+      'id': id,
       'imageUrl': imageUrl,
       'facultyId': facultyId,
       'degreeProgramId': degreeProgramId,

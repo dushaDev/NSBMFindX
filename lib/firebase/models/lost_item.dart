@@ -1,6 +1,7 @@
 class LostItem {
   String id; // Unique ID to identify the post
   String itemName;
+  bool type;//type for found item-1,lost item-0
   String lostTime; //yyyy/mm/dd/hh/mm
   String postedTime; //yyyy/mm/dd/hh/mm
   String lastKnownLocation;
@@ -14,6 +15,7 @@ class LostItem {
   LostItem({
     required this.id,
     required this.itemName,
+    required this.type,
     required this.lostTime,
     required this.postedTime,
     required this.lastKnownLocation,
@@ -31,6 +33,7 @@ class LostItem {
       id: id,
       itemName: json['itemName'],
       lostTime: json['lostTime'],
+      type: json['type'],
       postedTime: json['postedTime'],
       lastKnownLocation: json['lastKnownLocation'],
       contactNumber: json['contactNumber'],
@@ -47,6 +50,7 @@ class LostItem {
     return {
       'itemName': itemName,
       'lostTime': lostTime,
+      'type': type,
       'postedTime': postedTime,
       'lastKnownLocation': lastKnownLocation,
       'contactNumber': contactNumber,

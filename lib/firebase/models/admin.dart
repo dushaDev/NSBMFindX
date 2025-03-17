@@ -19,6 +19,7 @@ class Admin {
 
   Map<String, dynamic> toFirestore() {
     return {
+      'id': id,
       'department': department,
       'accessLevel': accessLevel,
     };

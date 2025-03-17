@@ -19,6 +19,7 @@ class Staff {
 
   Map<String, dynamic> toFirestore() {
     return {
+      'id': id,
       'department': department,
       'position': position,
     };

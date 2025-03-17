@@ -538,6 +538,7 @@ class _FoundPostState extends State<FoundPost> {
                             await _fireStoreService.addLostItem(LostItem(
                                 id: '28232',
                                 itemName: _foundTextController.text,
+                                type: true,
                                 lostTime: _lostTime,
                                 postedTime: ReadDate().getDateNow(),
                                 lastKnownLocation: _locationTextController.text,

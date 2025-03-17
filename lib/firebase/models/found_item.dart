@@ -1,6 +1,7 @@
 class FoundItem {
   String id; // Unique ID to identify the post
   String itemName;
+  bool type;//type for found item-1,lost item-0
   String foundTime;
   String postedTime;
   String contactNumber;
@@ -18,6 +19,7 @@ class FoundItem {
   FoundItem({
     required this.id,
     required this.itemName,
+    required this.type,
     required this.foundTime,
     required this.postedTime,
     required this.contactNumber,
@@ -38,6 +40,7 @@ class FoundItem {
     return FoundItem(
       id: id,
       itemName: json['itemName'],
+      type: json['type'],
       foundTime: json['foundTime'],
       postedTime: json['postedTime'],
       contactNumber: json['contactNumber'],
@@ -59,6 +62,7 @@ class FoundItem {
     return {
       'itemName': itemName,
       'foundTime': foundTime,
+      'type': type,
       'postedTime': postedTime,
       'contactNumber': contactNumber,
       'description': description,

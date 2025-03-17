@@ -27,7 +27,6 @@ class _IndexPageState extends State<IndexPage> {
   Future<String?> _userRole = Future.value('student');
   final _admin_tabs = [Dashboard(),Users(),Posts(),AdminSearch(),AdminNotifications()];
   AuthService _authService = AuthService();
-  FireStoreService _fireStoreService = FireStoreService();
   @override
   Widget build(BuildContext context) {
     _authService.getSignedUser();

@@ -1,7 +1,15 @@
+import 'package:card_loading/card_loading.dart';
+import 'package:find_x/firebase/auth_service.dart';
+import 'package:find_x/firebase/fire_store_service.dart';
 import 'package:find_x/found_post.dart';
 import 'package:find_x/lost_post.dart';
+import 'package:find_x/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
+
+import '../firebase/models/found_item.dart';
+import '../firebase/models/lost_item.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -11,100 +19,130 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final List<Map<String, String>> updates = [
-    {
-      'status': 'lost',
-      'item': 'Laptop',
-      'desc':
-          'A silver MacBook Pro (2021 model) with a 14-inch display, an Apple logo sticker on the back, and slight scratches on the right corner.',
-      'time': '2m'
-    },
-    {
-      'status': 'lost',
-      'item': 'ID',
-      'desc': 'My ID Stolen at the edge canteen',
-      'time': '1h'
-    },
-    {
-      'status': 'found',
-      'item': 'I phone',
-      'desc':
-          ' A black iPhone 14 Pro Max with a cracked back cover and no SIM card inside.',
-      'time': '9h'
-    },
-    {
-      'status': 'found',
-      'item': 'Wallet',
-      'desc': 'A black leather wallet containing an ID',
-      'time': '2d'
-    },
-    {
-      'status': 'lost',
-      'item': 'Wallet',
-      'desc': 'A brown leather wallet with a metal clip',
-      'time': '2d'
-    },
-  ];
-
-  String _title = 'Good morning User!';
+  FireStoreService _fireStoreService = FireStoreService();
+  AuthService _authService = AuthService();
+  ReadDate _readDate = ReadDate();
+  String _title = 'Hello!';
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBody: true,
-      appBar: AppBar(
-        title: Text(
-          '$_title',
-          style: TextStyle(color: Theme.of(context).colorScheme.primary),
-        ),
-        foregroundColor: Theme.of(context).colorScheme.onSurface,
-        actions: [
-          IconButton(
-            onPressed: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => const LostPost()),
-              // );
-            },
-            icon: Icon(
-              Icons.manage_accounts_outlined,
-              color: Theme.of(context).colorScheme.onSecondaryContainer,
-            ),
-            iconSize: 32.0,
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                      child: _buildReportCard('Lost Report', Icons.report,
-                          'assets/images/communication.png', () => LostPost())),
-                  SizedBox(width: 5),
-                  Expanded(
-                      child: _buildReportCard(
-                          'Found Report',
-                          Icons.person_search,
-                          'assets/images/searching.png',
-                          () => FoundPost())), //There should be a FoundPost page
-                ],
+    return FutureBuilder(
+      future: _getIdName(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return _buildShimmerLoading();
+        } else if (snapshot.hasError) {
+          return Center(child: Text('error: ${snapshot.error}'));
+        } else if (snapshot.hasData) {
+          Map<String, String?> _getId = snapshot.data as Map<String, String?>;
+          _title = '${_readDate.getWishStatement()}, ${_getId['name']}!';
+          return Scaffold(
+            extendBody: true,
+            appBar: AppBar(
+              title: Text(
+                '$_title',
+                style: TextStyle(color: Theme.of(context).colorScheme.primary),
               ),
-              SizedBox(height: 10),
-              Column(children: [
-                _buildUpdatesSection('Updates', updates),
-                SizedBox(height: 10),
-                _buildUpdatesSection('Your history', updates),
-              ]),
-              SizedBox(height: 80),
-            ],
-          ),
-        ),
-      ),
+              foregroundColor: Theme.of(context).colorScheme.onSurface,
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(builder: (context) => const LostPost()),
+                    // );
+                  },
+                  icon: Icon(
+                    Icons.manage_accounts_outlined,
+                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                  ),
+                  iconSize: 32.0,
+                ),
+              ],
+            ),
+            body: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                            child: _buildReportCard('Lost Report', Icons.report,
+                                'assets/images/communication.png', () => LostPost())),
+                        SizedBox(width: 5),
+                        Expanded(
+                            child: _buildReportCard(
+                                'Found Report',
+                                Icons.person_search,
+                                'assets/images/searching.png',
+                                    () =>
+                                    FoundPost())), //There should be a FoundPost page
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Column(children: [
+                      FutureBuilder(
+                          future: _fireStoreService.getLostAndFoundItemsWithLimit(7),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(child: Text('error: ${snapshot.error}'));
+                            } else if (snapshot.hasData) {
+                              List? allItemsList = snapshot.data;
+                              final List<Map<String, dynamic>> finalList = [];
+                              for (var item in allItemsList!) {
+                                if (item is LostItem) {
+                                  finalList.add(item.toFirestore());
+                                } else if (item is FoundItem) {
+                                  finalList.add(item.toFirestore());
+                                }
+                              }
+
+                              return _buildUpdatesSection('Updates', finalList);
+                            } else {
+                              return Center(child: Text('No data found'));
+                            }
+                          }),
+                      SizedBox(height: 10),
+                      FutureBuilder(
+                          future:
+                          _fireStoreService.getLostAndFoundItemsById(_getId['id']!, 7),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(child: Text('error: ${snapshot.error}'));
+                            } else if (snapshot.hasData) {
+                              List? allItemsList = snapshot.data;
+                              final List<Map<String, dynamic>> finalList = [];
+                              for (var item in allItemsList!) {
+                                if (item is LostItem) {
+                                  finalList.add(item.toFirestore());
+                                } else if (item is FoundItem) {
+                                  finalList.add(item.toFirestore());
+                                }
+                              }
+
+                              return _buildUpdatesSection('Your history', finalList);
+                            } else {
+                              return Center(child: Text('No data found'));
+                            }
+                          }),
+                    ]),
+                    SizedBox(height: 80),
+                  ],
+                ),
+              ),
+            ),
+          );
+        } else {
+          return Center(child: Text('No data found'));
+        }
+
+      }
     );
   }
 
@@ -133,15 +171,17 @@ class _HomeState extends State<Home> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(title,
-                    style:
-                        TextStyle(color: Theme.of(context).colorScheme.onSurface,fontSize: FontProfile.medium, fontWeight: FontWeight.bold)),
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: FontProfile.medium,
+                        fontWeight: FontWeight.bold)),
               ),
             ],
           ),
         ));
   }
 
-  Widget _buildUpdatesSection(String title, List<Map<String, String>> items) {
+  Widget _buildUpdatesSection(String title, List<Map<String, dynamic>> items) {
     return Card(
       color: Theme.of(context).colorScheme.surfaceContainer,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -151,7 +191,10 @@ class _HomeState extends State<Home> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(title,
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurface,fontSize: FontProfile.medium, fontWeight: FontWeight.bold)),
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: FontProfile.medium,
+                    fontWeight: FontWeight.bold)),
             SizedBox(height: 5),
             Container(
               height: 250,
@@ -179,23 +222,24 @@ class _HomeState extends State<Home> {
                           padding:
                               EdgeInsets.symmetric(horizontal: 1, vertical: 1),
                           decoration: BoxDecoration(
-                            color: item['status'] == 'lost'
-                                ? Theme.of(context).colorScheme.secondary
-                                : Theme.of(context).colorScheme.primary,
+                            color: item['type']
+                                ? Theme.of(context).colorScheme.primary
+                                : Theme.of(context).colorScheme.secondary,
                             borderRadius: BorderRadius.circular(2),
                           ),
-                          child: Text(item['status']!,
+                          child: Text(item['type'] ? 'found' : 'lost',
                               style: TextStyle(
                                   color:
                                       Theme.of(context).colorScheme.onPrimary)),
                         ),
-                        title: Text(item['item']!,
+                        title: Text(item['itemName']!,
                             style: TextStyle(fontWeight: FontWeight.normal)),
                         subtitle: Text(
-                          item['desc']!,
+                          item['description']!,
                           style: TextStyle(overflow: TextOverflow.ellipsis),
                         ),
-                        trailing: Text(item['time']!,
+                        trailing: Text(
+                            _readDate.getDuration(item['postedTime']),
                             style: TextStyle(color: Colors.grey)),
                       ),
                       Divider(
@@ -214,4 +258,95 @@ class _HomeState extends State<Home> {
       ),
     );
   }
+  Future<Map<String, String?>> _getIdName() async {
+
+    String? id = await _authService.getUserId();
+    String? name = await _authService.getUserDisplayName();
+    return {'id':id,'name':name};
+
+  }
+  Widget _buildShimmerLoading() {
+    return Shimmer.fromColors(
+      baseColor: Theme.of(context).colorScheme.surface,
+      highlightColor: Theme.of(context).colorScheme.onSurface.withAlpha(1),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Shimmering placeholder for an image
+            Container(
+              width: double.infinity,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            SizedBox(height: 20),
+            // Shimmering placeholder for text
+            Container(
+              width: double.infinity,
+              height: 20,
+              color: Colors.white,
+            ),
+            SizedBox(height: 10),
+            // Shimmering placeholder for text
+            Container(
+              width: 200,
+              height: 20,
+              color: Colors.white,
+            ),
+            SizedBox(height: 20),
+            // Shimmering placeholder for a list
+            Expanded(
+              child: ListView.builder(
+                itemCount: 5,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Shimmering placeholder for a list item image
+                        Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        // Shimmering placeholder for list item text
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                height: 20,
+                                color: Colors.white,
+                              ),
+                              SizedBox(height: 10),
+                              Container(
+                                width: 100,
+                                height: 20,
+                                color: Colors.white,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
+
