@@ -112,16 +112,28 @@ class FireStoreService {
         .set(program.toFirestore());
   }
 
+  // Future<void> addLostItem(LostItem lostItem) async {
+  //   await _fireStore
+  //       .collection('lostItems')
+  //       .doc(lostItem.id)
+  //       .set(lostItem.toFirestore());
+  // }
   Future<void> addLostItem(LostItem lostItem) async {
-    await _fireStore
-        .collection('lostItems')
-        .doc(lostItem.id)
-        .set(lostItem.toFirestore());
-  }
-  Future<void> addFoundItem(FoundItem foundItem) async {
-    await _fireStore.collection('foundItems').doc(foundItem.id).set(foundItem.toFirestore());
+    DocumentReference docRef =
+        await _fireStore.collection('lostItems').add(lostItem.toFirestore());
+    // update the lostItem object with the generated ID
+    lostItem.id = docRef.id;
   }
 
+  // Future<void> addFoundItem(FoundItem foundItem) async {
+  //   await _fireStore.collection('foundItems').doc(foundItem.id).set(foundItem.toFirestore());
+  // }
+  Future<void> addFoundItem(FoundItem foundItem) async {
+    DocumentReference docRef =
+        await _fireStore.collection('foundItems').add(foundItem.toFirestore());
+    // update the foundItem object with the generated ID
+    foundItem.id = docRef.id;
+  }
 
   // Method to retrieve a user from Firestore
 
@@ -138,6 +150,7 @@ class FireStoreService {
       return null;
     }
   }
+
   Future<User?> getUserByEmail(String email) async {
     try {
       // Query the users collection for the document with the matching email
@@ -252,16 +265,55 @@ class FireStoreService {
       return null;
     }
   }
+
+  Future<List<LostItem>> getLostItemsByUserId(String userId) async {
+    try {
+      // Query the lostItems collection for documents with the matching userId
+      QuerySnapshot querySnapshot = await _fireStore
+          .collection('lostItems')
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      // Convert the query results to a list of LostItem objects
+      return querySnapshot.docs.map((doc) {
+        return LostItem.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id);
+      }).toList();
+    } catch (e) {
+      print("Error fetching lost items by user ID: $e");
+      return [];
+    }
+  }
+
   Future<FoundItem?> getFoundItem(String foundItemId) async {
     try {
-      DocumentSnapshot doc = await _fireStore.collection('foundItems').doc(foundItemId).get();
+      DocumentSnapshot doc =
+          await _fireStore.collection('foundItems').doc(foundItemId).get();
       if (doc.exists) {
-        return FoundItem.fromFirestore(doc.data() as Map<String, dynamic>, doc.id);
+        return FoundItem.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id);
       }
       return null;
     } catch (e) {
       print("Error fetching found item: $e");
       return null;
+    }
+  }
+  Future<List<FoundItem>> getFoundItemsByUserId(String userId) async {
+    try {
+      // Query the foundItems collection for documents with the matching userId
+      QuerySnapshot querySnapshot = await _fireStore
+          .collection('foundItems')
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      // Convert the query results to a list of FoundItem objects
+      return querySnapshot.docs.map((doc) {
+        return FoundItem.fromFirestore(doc.data() as Map<String, dynamic>, doc.id);
+      }).toList();
+    } catch (e) {
+      print("Error fetching found items by user ID: $e");
+      return [];
     }
   }
 }
