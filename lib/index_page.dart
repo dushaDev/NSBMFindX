@@ -5,14 +5,11 @@ import 'package:find_x/admin_bottom_nav/users.dart';
 import 'package:find_x/admin_bottom_navigation.dart';
 import 'package:find_x/bottom_nav/notifications.dart';
 import 'package:find_x/firebase/auth_service.dart';
-import 'package:find_x/firebase/fire_store_service.dart';
 import 'package:flutter/material.dart';
 import 'admin_bottom_nav/dashboard.dart';
 import 'bottom_nav/search.dart';
 import 'bottom_nav/home.dart';
 import 'bottom_navigation.dart';
-import 'firebase/models/user_m.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class IndexPage extends StatefulWidget {
   const IndexPage({super.key});
@@ -25,7 +22,13 @@ class _IndexPageState extends State<IndexPage> {
   int _selectedIndex = 0;
   final _tabs = [const Home(), const Search(), const Notifications()];
   Future<String?> _userRole = Future.value('student');
-  final _admin_tabs = [Dashboard(),Users(),Posts(),AdminSearch(),AdminNotifications()];
+  final _admin_tabs = [
+    Dashboard(),
+    Users(),
+    Posts(),
+    AdminSearch(),
+    AdminNotifications()
+  ];
   AuthService _authService = AuthService();
   @override
   Widget build(BuildContext context) {
@@ -91,6 +94,4 @@ class _IndexPageState extends State<IndexPage> {
     super.initState();
     _userRole = _authService.getUserRole();
   }
-
-
 }

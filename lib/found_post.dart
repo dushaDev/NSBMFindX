@@ -1,11 +1,9 @@
 import 'package:find_x/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
 import 'package:find_x/res/utils.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'firebase/fire_store_service.dart';
 import 'firebase/models/lost_item.dart';
 
@@ -33,7 +31,7 @@ class _FoundPostState extends State<FoundPost> {
   int _minute = 0;
   String _contactNumber = '0767771005';
 
-  String? _selectedPrivacy='Public';
+  String? _selectedPrivacy = 'Public';
   String? _selectedFaculty;
   String? _selectedDegree;
   final List<String> _privacy_list = ['Public', 'Restricted', 'Private'];
