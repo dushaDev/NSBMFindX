@@ -2,14 +2,14 @@ import 'package:find_x/res/font_profile.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-class LostFoundMonth extends StatelessWidget {
+class LostFoundWeek extends StatelessWidget {
   final Color foundItemsColor;
   final Color lostItemsColor;
   final List<FlSpot> lostItemsData;
   final List<FlSpot> foundItemsData;
   final int yAxisMax;
 
-  LostFoundMonth({
+  LostFoundWeek({
     super.key,
     this.foundItemsColor = Colors.black26,
     this.lostItemsColor = Colors.black12,
@@ -18,30 +18,25 @@ class LostFoundMonth extends StatelessWidget {
     required this.yAxisMax,
   });
 
-
-
   // Helper method to get the last 7 days as day numbers
   List<int> getLast7DaysAsDayNumbers() {
     List<int> last7Days = [];
     DateTime now = DateTime.now();
-
     // Iterate over the last 7 days
     for (int i = 0; i < 7; i++) {
       // Calculate the date for each day
       DateTime date = now.subtract(Duration(days: i));
-
       // Extract the day part of the date
       int day = date.day;
-
       // Add the day to the list
       last7Days.add(day);
     }
-
     // Reverse the list to have the oldest day first
     return last7Days.reversed.toList();
   }
 
-  Widget bottomTitleWidgets(double value, TitleMeta meta, BuildContext context ) {
+  Widget bottomTitleWidgets(
+      double value, TitleMeta meta, BuildContext context) {
     TextStyle style = TextStyle(
       fontSize: FontProfile.small,
       fontWeight: FontWeight.normal,
@@ -64,10 +59,12 @@ class LostFoundMonth extends StatelessWidget {
     return Container();
   }
 
-  Widget leftTitleWidgets(double value, TitleMeta meta,  BuildContext context ) {
-    TextStyle style = TextStyle(  fontSize: FontProfile.small,
+  Widget leftTitleWidgets(double value, TitleMeta meta, BuildContext context) {
+    TextStyle style = TextStyle(
+      fontSize: FontProfile.small,
       fontWeight: FontWeight.normal,
-      color: Theme.of(context).colorScheme.onSurface,);
+      color: Theme.of(context).colorScheme.onSurface,
+    );
     return SideTitleWidget(
       meta: meta,
       space: 4,
@@ -144,11 +141,11 @@ class LostFoundMonth extends StatelessWidget {
                   show: true,
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
-
                       showTitles: true,
                       reservedSize: 30,
                       interval: 1,
-                      getTitlesWidget: (value, meta) => bottomTitleWidgets(value, meta, context),
+                      getTitlesWidget: (value, meta) =>
+                          bottomTitleWidgets(value, meta, context),
                     ),
                   ),
                   leftTitles: AxisTitles(
@@ -156,7 +153,8 @@ class LostFoundMonth extends StatelessWidget {
                       showTitles: true,
                       interval: 2,
                       reservedSize: 36,
-                      getTitlesWidget: (value, meta) => leftTitleWidgets(value, meta, context),
+                      getTitlesWidget: (value, meta) =>
+                          leftTitleWidgets(value, meta, context),
                     ),
                   ),
                   topTitles: const AxisTitles(
@@ -181,25 +179,23 @@ class LostFoundMonth extends StatelessWidget {
                   },
                 ),
                 borderData: FlBorderData(
-                  show: true,
-                  border: Border(
-                    bottom: BorderSide(
+                    show: true,
+                    border: Border(
+                      bottom: BorderSide(
                         color: Theme.of(context)
                             .colorScheme
                             .onSurfaceVariant
                             .withAlpha(100),
-                      width: 1,
-                    ),
-                    left: BorderSide(
+                        width: 1,
+                      ),
+                      left: BorderSide(
                         color: Theme.of(context)
                             .colorScheme
                             .onSurfaceVariant
                             .withAlpha(100),
-                      width: 1,
-                    ),
-                  )
-
-                ),
+                        width: 1,
+                      ),
+                    )),
               ),
             ),
           ),
@@ -219,7 +215,8 @@ class LostFoundMonth extends StatelessWidget {
   }
 
   // Helper method to build legend items
-  Widget _buildLegendItem(Color color, String text, {required BuildContext context}) {
+  Widget _buildLegendItem(Color color, String text,
+      {required BuildContext context}) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [

@@ -1,4 +1,4 @@
-import 'package:find_x/res/charts/lost_found_month.dart';
+import 'package:find_x/res/charts/lost_found_week.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -415,7 +415,7 @@ class _DashboardState extends State<Dashboard> {
               ],
             ),
             SizedBox(height: 5),
-            LostFoundMonth(
+            LostFoundWeek(
                 foundItemsColor: Theme.of(context).colorScheme.primary,
                 lostItemsColor: Theme.of(context).colorScheme.secondary,
                 lostItemsData: lostItemsData,
@@ -535,7 +535,7 @@ class _DashboardState extends State<Dashboard> {
     return {'id': id, 'name': name};
   }
 
-// This method counts the number of dates in the last 7 days
+// This method counts the number of items in the last 7 days
   List<int> _countDatesInLast7Days(List<String> dateStrings) {
     DateTime now = DateTime.now();
     List<int> last7DaysCounts = List<int>.filled(7, 0); // Initialize with zeros
