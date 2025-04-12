@@ -1,4 +1,3 @@
-import 'package:card_loading/card_loading.dart';
 import 'package:find_x/firebase/auth_service.dart';
 import 'package:find_x/firebase/fire_store_service.dart';
 import 'package:find_x/found_post.dart';

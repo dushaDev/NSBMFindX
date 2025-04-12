@@ -20,7 +20,7 @@ class AdminBottomNavigation extends StatelessWidget {
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Theme.of(context).colorScheme.primary, // Selected item color
         unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,// Unselected item color
-        backgroundColor:  Theme.of(context).colorScheme.surfaceContainer, // Background color
+        backgroundColor:  Theme.of(context).colorScheme.surfaceContainerHigh, // Background color
         iconSize: 32.0,
         selectedFontSize: 14.0,
         unselectedFontSize: 12.0,

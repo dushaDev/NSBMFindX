@@ -1,10 +1,14 @@
+import 'package:find_x/res/charts/lost_found_month.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../firebase/auth_service.dart';
 import '../firebase/fire_store_service.dart';
 import '../firebase/models/found_item.dart';
 import '../firebase/models/lost_item.dart';
+import '../firebase/models/user_m.dart';
 import '../found_post.dart';
 import '../lost_post.dart';
 import '../read_date.dart';
@@ -32,7 +36,6 @@ class _DashboardState extends State<Dashboard> {
           } else if (snapshot.hasError) {
             return Center(child: Text('error: ${snapshot.error}'));
           } else if (snapshot.hasData) {
-            Map<String, String?> _getId = snapshot.data as Map<String, String?>;
             // _title = '${_readDate.getWishStatement()}, ${_getId['name']}!';
             return Scaffold(
               extendBody: true,
@@ -90,36 +93,35 @@ class _DashboardState extends State<Dashboard> {
                       ),
                       SizedBox(height: 10),
                       Column(children: [
+                        //pending verifications
                         FutureBuilder(
-                            future: _fireStoreService
-                                .getLostAndFoundItemsWithLimit(7),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Center(
-                                    child: CircularProgressIndicator());
-                              } else if (snapshot.hasError) {
-                                return Center(
-                                    child: Text('error: ${snapshot.error}'));
-                              } else if (snapshot.hasData) {
-                                List? allItemsList = snapshot.data;
-                                final List<Map<String, dynamic>> finalList = [];
-                                for (var item in allItemsList!) {
-                                  if (item is LostItem) {
-                                    finalList.add(item.toFirestore());
-                                  } else if (item is FoundItem) {
-                                    finalList.add(item.toFirestore());
-                                  }
-                                }
+                          future:
+                              _fireStoreService.getUsersNotApprovedWithLimit(5),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return _showEmptyCard('error: ${snapshot.error}');
+                            } else if (snapshot.hasData) {
+                              List<UserM>? usersNotApproved = snapshot.data;
 
-                                return _buildPendingVerificationSection(
-                                    'Pending Verifications', finalList);
-                              } else {
-                                return Center(child: Text('No data found'));
+                              if (usersNotApproved == null ||
+                                  usersNotApproved.isEmpty) {
+                                return _showEmptyCard('No new pending users');
                               }
-                            }),
+
+                              // Build the UI with the list of users not approved
+                              return _buildPendingVerificationSection(
+                                  'Pending Verifications', usersNotApproved);
+                            } else {
+                              return _showEmptyCard('Data not found');
+                            }
+                          },
+                        ),
                         SizedBox(height: 10),
                         FutureBuilder(
+                            //recent updates
                             future: _fireStoreService
                                 .getLostAndFoundItemsWithLimit(7),
                             builder: (context, snapshot) {
@@ -128,8 +130,8 @@ class _DashboardState extends State<Dashboard> {
                                 return Center(
                                     child: CircularProgressIndicator());
                               } else if (snapshot.hasError) {
-                                return Center(
-                                    child: Text('error: ${snapshot.error}'));
+                                return _showEmptyCard(
+                                    'error: ${snapshot.error}');
                               } else if (snapshot.hasData) {
                                 List? allItemsList = snapshot.data;
                                 final List<Map<String, dynamic>> finalList = [];
@@ -144,11 +146,62 @@ class _DashboardState extends State<Dashboard> {
                                 return _buildUpdatesSection(
                                     'Updates', finalList);
                               } else {
-                                return Center(child: Text('No data found'));
+                                return _showEmptyCard('No new updates');
                               }
                             }),
-
                       ]),
+                      SizedBox(height: 10),
+                      FutureBuilder(
+                          future: _fireStoreService.getPostedTimes(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            } else if (snapshot.hasError) {
+                              return Center(
+                                  child: Text('error: ${snapshot.error}'));
+                            } else if (snapshot.hasData) {
+                              int yAxisMax = 4;
+                              Map<String, List<String>>? postedTimes =
+                                  snapshot.data;
+
+                              List<int> foundCountData = _countDatesInLast7Days(
+                                  postedTimes!['found']!);
+                              List<int> lostCountData =
+                                  _countDatesInLast7Days(postedTimes['lost']!);
+
+                              // Generate found items data with loop
+                              final foundItemsData = List.generate(7, (index) {
+                                yAxisMax <= foundCountData[index]
+                                    ? yAxisMax = foundCountData[index]
+                                    : null;
+                                return FlSpot(
+                                  (index + 1).toDouble(), // Day number (1-7)
+                                  foundCountData[index]
+                                      .toDouble(), // Count value
+                                );
+                              });
+
+                              // Generate lost items data with loop
+                              final lostItemsData = List.generate(7, (index) {
+                                yAxisMax <= lostCountData[index]
+                                    ? yAxisMax = lostCountData[index]
+                                    : null;
+                                return FlSpot(
+                                  (index + 1).toDouble(), // Day number (1-7)
+                                  lostCountData[index]
+                                      .toDouble(), // Count value
+                                );
+                              });
+                              return _buildLostFoundMonth(
+                                  'Last Week Chart (Count/Date)',
+                                  lostItemsData,
+                                  foundItemsData,
+                                  yAxisMax + 1);
+                            } else {
+                              return _showEmptyCard('No data to show');
+                            }
+                          }),
                       SizedBox(height: 80),
                     ],
                   ),
@@ -156,13 +209,13 @@ class _DashboardState extends State<Dashboard> {
               ),
             );
           } else {
-            return Center(child: Text('No data found'));
+            return _showEmptyCard('Data not found');
           }
         });
   }
 
-  Widget _buildReportCard(
-      String title, String count,String pres, IconData icon, String image, Widget Function() myPageHere) {
+  Widget _buildReportCard(String title, String count, String pres,
+      IconData icon, String image, Widget Function() myPageHere) {
     return Card(
         color: Theme.of(context).colorScheme.surfaceContainer,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -214,8 +267,6 @@ class _DashboardState extends State<Dashboard> {
                   ),
                 ],
               ),
-
-
             ],
           ),
         ));
@@ -238,11 +289,24 @@ class _DashboardState extends State<Dashboard> {
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: FontProfile.medium,
                         fontWeight: FontWeight.bold)),
-              TextButton(onPressed: (){}, child:    Text('View All',
-                  style: TextStyle(
+                TextButton(
+                  onPressed: () {},
+                  style: TextButton.styleFrom(
+                    splashFactory: NoSplash
+                        .splashFactory, // This completely removes the splash effect
+                    // Alternatively, you can use:
+                    // splashColor: Colors.transparent,
+                    // highlightColor: Colors.transparent,
+                  ),
+                  child: Text(
+                    'View All',
+                    style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: FontProfile.medium,
-                      fontWeight: FontWeight.normal)), )
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                )
               ],
             ),
             SizedBox(height: 5),
@@ -290,7 +354,10 @@ class _DashboardState extends State<Dashboard> {
                         ),
                         trailing: Text(
                             _readDate.getDuration(item['postedTime']),
-                            style: TextStyle(color: Colors.grey)),
+                            style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant)),
                       ),
                       Divider(
                         height: 0,
@@ -309,7 +376,8 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget _buildPendingVerificationSection(String title, List<Map<String, dynamic>> items) {
+  Widget _buildLostFoundMonth(String title, List<FlSpot> lostItemsData,
+      List<FlSpot> foundItemsData, int yAxisMax) {
     return Card(
       color: Theme.of(context).colorScheme.surfaceContainer,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -326,16 +394,69 @@ class _DashboardState extends State<Dashboard> {
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: FontProfile.medium,
                         fontWeight: FontWeight.bold)),
-                TextButton(onPressed: (){}, child:    Text('View All',
+                TextButton(
+                  onPressed: () {},
+                  style: TextButton.styleFrom(
+                    splashFactory: NoSplash
+                        .splashFactory, // This completely removes the splash effect
+                    // Alternatively, you can use:
+                    // splashColor: Colors.transparent,
+                    // highlightColor: Colors.transparent,
+                  ),
+                  child: Text(
+                    'View All',
                     style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: FontProfile.medium,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                )
+              ],
+            ),
+            SizedBox(height: 5),
+            LostFoundMonth(
+                foundItemsColor: Theme.of(context).colorScheme.primary,
+                lostItemsColor: Theme.of(context).colorScheme.secondary,
+                lostItemsData: lostItemsData,
+                foundItemsData: foundItemsData,
+                yAxisMax: yAxisMax)
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPendingVerificationSection(String title, List<UserM> items) {
+    return Card(
+      color: Theme.of(context).colorScheme.surfaceContainer,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: Padding(
+        padding: const EdgeInsets.all(5.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(title,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: FontProfile.medium,
-                        fontWeight: FontWeight.normal)), )
+                        fontWeight: FontWeight.bold)),
+                TextButton(
+                  onPressed: () {},
+                  child: Text('View All',
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontSize: FontProfile.medium,
+                          fontWeight: FontWeight.normal)),
+                )
               ],
             ),
             SizedBox(height: 5),
             Container(
-              height: 250,
+              height: 180,
               child: ListView.builder(
                 itemCount: items.length,
                 itemBuilder: (context, index) {
@@ -344,7 +465,7 @@ class _DashboardState extends State<Dashboard> {
                     children: [
                       ListTile(
                         tileColor:
-                        Theme.of(context).colorScheme.surfaceContainer,
+                            Theme.of(context).colorScheme.surfaceContainer,
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: 3,
                         ),
@@ -358,23 +479,20 @@ class _DashboardState extends State<Dashboard> {
                           width: 45,
                           height: 20,
                           padding:
-                          EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+                              EdgeInsets.symmetric(horizontal: 1, vertical: 1),
                           decoration: BoxDecoration(
-                            color: item['type']
+                            color: item.role == 'student'
                                 ? Theme.of(context).colorScheme.primary
                                 : Theme.of(context).colorScheme.secondary,
                             borderRadius: BorderRadius.circular(2),
                           ),
-                          child: Text(item['type'] ? 'student' : 'staff',
+                          child: Text(item.role,
                               style: TextStyle(
                                   color:
-                                  Theme.of(context).colorScheme.onPrimary)),
+                                      Theme.of(context).colorScheme.onPrimary)),
                         ),
-                        title: Text(item['itemName']!,
+                        title: Text(item.displayName,
                             style: TextStyle(fontWeight: FontWeight.normal)),
-                        trailing: Text(
-                            _readDate.getDuration(item['postedTime']),
-                            style: TextStyle(color: Colors.grey)),
                       ),
                       Divider(
                         height: 0,
@@ -393,11 +511,53 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
+  Widget _showEmptyCard(String message) {
+    return Card(
+        color: Theme.of(context).colorScheme.surfaceContainer,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        child: Container(
+            width: double.infinity,
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(message,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontSize: FontProfile.medium,
+                        fontWeight: FontWeight.normal)),
+              ),
+            )));
+  }
 
   Future<Map<String, String?>> _getIdName() async {
     String? id = await _authService.getUserId();
     String? name = await _authService.getUserDisplayName();
     return {'id': id, 'name': name};
+  }
+
+// This method counts the number of dates in the last 7 days
+  List<int> _countDatesInLast7Days(List<String> dateStrings) {
+    DateTime now = DateTime.now();
+    List<int> last7DaysCounts = List<int>.filled(7, 0); // Initialize with zeros
+
+    List<String> last7Days = [];
+    for (int i = 0; i < 7; i++) {
+      DateTime date = now.subtract(Duration(days: i));
+      String datePart = DateFormat('yyyy/M/d').format(date);
+      last7Days.add(datePart);
+    }
+    last7Days = last7Days.reversed.toList(); // Reverse to have oldest day first
+
+    for (String dateString in dateStrings) {
+      String datePart = dateString.split('/').sublist(0, 3).join('/');
+      // Check if the date is within the last 7 days
+      if (last7Days.contains(datePart)) {
+        int index = last7Days.indexOf(datePart);
+        last7DaysCounts[index]++;
+      }
+    }
+
+    return last7DaysCounts;
   }
 
   Widget _buildShimmerLoading() {
