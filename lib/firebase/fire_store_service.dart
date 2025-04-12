@@ -21,6 +21,7 @@ class FireStoreService {
     String name,
     String email,
     String role,
+      bool isApproved,
     String facultyId,
     String degreeProgramId,
     String about,
@@ -33,7 +34,7 @@ class FireStoreService {
             displayName: words[0],
             email: email,
             role: role,
-            reference: 'students/$id'))
+            reference: 'students/$id',isApproved: isApproved))
         .whenComplete(() async {
       await addStudent(Student(
         id: id,
@@ -45,7 +46,7 @@ class FireStoreService {
     });
   }
 
-  Future<void> registerStaff(String id, String name, String email, String role,
+  Future<void> registerStaff(String id, String name, String email, String role,bool isApproved,
       String department, String position, String accessLevel) async {
     List<String> words = _random.splitName(name);
 
@@ -55,7 +56,7 @@ class FireStoreService {
             displayName: words[0],
             email: email,
             role: role,
-            reference: 'staff/$id'))
+            reference: 'staff/$id',isApproved: isApproved))
         .whenComplete(() async {
       await addStaff(Staff(id: id, department: department, position: position));
     });
@@ -71,7 +72,7 @@ class FireStoreService {
             displayName: words[0],
             email: email,
             role: role,
-            reference: 'admin/$id'))
+            reference: 'admin/$id',isApproved: true))
         .whenComplete(() async {
       await addAdmin(
           Admin(id: id, department: department, accessLevel: accessLevel));
@@ -377,7 +378,60 @@ class FireStoreService {
       return [];
     }
   }
+  // Method to retrieve all users not approved
+  Future<List<UserM>> getUsersNotApprovedWithLimit(int limit) async {
+    try {
+      // Query the users collection for documents where isApproved is false
+      QuerySnapshot querySnapshot = await _fireStore
+          .collection('users')
+          .where('isApproved', isEqualTo: false)
+          .limit(limit)
+          .get();
 
+      // Convert the query results to a list of User objects
+      List<UserM> users = querySnapshot.docs.map((doc) {
+        return UserM.fromFirestore(doc.data() as Map<String, dynamic>, doc.id);
+      }).toList();
+
+      return users;
+    } catch (e) {
+      print("Error fetching users: $e");
+      return [];
+    }
+  }
+  // Method to retrieve posted times from lost and found items. this use for the chart
+  Future<Map<String, List<String>>> getPostedTimes() async {
+    try {
+      // Query the lostItems collection
+      QuerySnapshot lostItemsSnapshot = await _fireStore.collection('lostItems').get();
+      // Query the foundItems collection
+      QuerySnapshot foundItemsSnapshot = await _fireStore.collection('foundItems').get();
+
+      // Extract postedTime from lostItems
+      List<String> lostItemsPostedTimes = lostItemsSnapshot.docs.map((doc) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        return data['postedTime'] as String;
+      }).toList();
+
+      // Extract postedTime from foundItems
+      List<String> foundItemsPostedTimes = foundItemsSnapshot.docs.map((doc) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        return data['postedTime'] as String;
+      }).toList();
+
+      // Return a map with separate lists for lost and found items posted times
+      return {
+        'lost': lostItemsPostedTimes,
+        'found': foundItemsPostedTimes,
+      };
+    } catch (e) {
+      print("Error fetching posted times: $e");
+      return {
+        'lost': [],
+        'found': [],
+      };
+    }
+  }
   // Helper method to parse the custom date format
   DateTime _parseCustomDate(String dateString) {
     List<int> dateParts = dateString.split('/').map(int.parse).toList();

@@ -5,6 +5,7 @@ class UserM {
   String role;
   String reference;
   String displayName;
+  bool isApproved;
 
   UserM({
     required this.id,
@@ -13,6 +14,7 @@ class UserM {
     required this.role,
     required this.displayName,
     required this.reference,
+    required this.isApproved,
   });
 
   factory UserM.fromFirestore(Map<String, dynamic> json, String id) {
@@ -23,6 +25,7 @@ class UserM {
       role: json['role'],
       displayName: json['displayName'],
       reference: json['reference'],
+      isApproved: json['isApproved'] ?? false,
     );
   }
 
@@ -34,6 +37,7 @@ class UserM {
       'role': role,
       'displayName': displayName,
       'reference': reference,
+      'isApproved': isApproved,
     };
   }
 }

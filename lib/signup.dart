@@ -50,7 +50,7 @@ class _SignupState extends State<Signup> {
     FireStoreService firestoreService = FireStoreService();
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text(
           "Sign Up",
           style: TextStyle(
@@ -276,6 +276,7 @@ class _SignupState extends State<Signup> {
                                             _nameController.text,
                                             _emailController.text,
                                             'student',
+                                            false,
                                             'f1',
                                             'd1',
                                             'about here')
