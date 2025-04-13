@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class ItemUserProfile extends StatefulWidget {
+class ItemUser extends StatefulWidget {
   final String name;
   final String role;
   final bool isApproved;
   final bool isRestricted;
 
-  const ItemUserProfile({
+  const ItemUser({
     super.key,
     required this.name,
     required this.role,
@@ -15,10 +15,10 @@ class ItemUserProfile extends StatefulWidget {
   });
 
   @override
-  State<ItemUserProfile> createState() => _ItemUserProfileState();
+  State<ItemUser> createState() => _ItemUserState();
 }
 
-class _ItemUserProfileState extends State<ItemUserProfile> {
+class _ItemUserState extends State<ItemUser> {
   @override
   Widget build(BuildContext context) {
     return Column(
