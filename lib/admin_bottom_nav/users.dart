@@ -1,6 +1,6 @@
 import 'package:find_x/firebase/fire_store_service.dart';
 import 'package:find_x/res/items/build_shimmer_loading.dart';
-import 'package:find_x/res/items/item_user_profile.dart';
+import 'package:find_x/res/items/item_user.dart';
 import 'package:flutter/material.dart';
 
 class Users extends StatefulWidget {
@@ -99,7 +99,7 @@ class _UsersState extends State<Users> {
                       itemCount: filteredModels.length,
                       itemBuilder: (context, index) {
                         final uModel = filteredModels[index];
-                        return ItemUserProfile(
+                        return ItemUser(
                           name: uModel.name,
                           role: uModel.role,
                           isApproved: uModel.isApproved,
