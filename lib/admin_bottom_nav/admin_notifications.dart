@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AdminNotifications extends StatefulWidget {
@@ -18,21 +17,6 @@ class _AdminNotificationsState extends State<AdminNotifications> {
         style: TextStyle(color: Theme.of(context).colorScheme.primary),
       ),
       foregroundColor: Theme.of(context).colorScheme.onSurface,
-      actions: [
-        IconButton(
-          onPressed: () {
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => const LostPost()),
-            // );
-          },
-          icon: Icon(
-            Icons.manage_accounts_outlined,
-            color: Theme.of(context).colorScheme.onSecondaryContainer,
-          ),
-          iconSize: 32.0,
-        ),
-      ],
     ),
         body:  Center(child: Text('Notifications',style: TextStyle(color: Theme.of(context).colorScheme.onSurface),),));
   }
