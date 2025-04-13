@@ -1,8 +1,8 @@
 import 'package:find_x/res/charts/lost_found_week.dart';
+import 'package:find_x/res/items/build_shimmer_loading.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:shimmer/shimmer.dart';
 
 import '../firebase/auth_service.dart';
 import '../firebase/fire_store_service.dart';
@@ -32,7 +32,7 @@ class _DashboardState extends State<Dashboard> {
         future: _getIdName(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return _buildShimmerLoading();
+            return BuildShimmerLoading();
           } else if (snapshot.hasError) {
             return Center(child: Text('error: ${snapshot.error}'));
           } else if (snapshot.hasData) {
@@ -560,87 +560,4 @@ class _DashboardState extends State<Dashboard> {
     return last7DaysCounts;
   }
 
-  Widget _buildShimmerLoading() {
-    return Shimmer.fromColors(
-      baseColor: Theme.of(context).colorScheme.surface,
-      highlightColor: Theme.of(context).colorScheme.onSurface.withAlpha(1),
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Shimmering placeholder for an image
-            Container(
-              width: double.infinity,
-              height: 200,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            SizedBox(height: 20),
-            // Shimmering placeholder for text
-            Container(
-              width: double.infinity,
-              height: 20,
-              color: Colors.white,
-            ),
-            SizedBox(height: 10),
-            // Shimmering placeholder for text
-            Container(
-              width: 200,
-              height: 20,
-              color: Colors.white,
-            ),
-            SizedBox(height: 20),
-            // Shimmering placeholder for a list
-            Expanded(
-              child: ListView.builder(
-                itemCount: 5,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Shimmering placeholder for a list item image
-                        Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        // Shimmering placeholder for list item text
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: double.infinity,
-                                height: 20,
-                                color: Colors.white,
-                              ),
-                              SizedBox(height: 10),
-                              Container(
-                                width: 100,
-                                height: 20,
-                                color: Colors.white,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
