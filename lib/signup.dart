@@ -1,4 +1,5 @@
 import 'package:find_x/login.dart';
+import 'package:find_x/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -47,6 +48,7 @@ class _SignupState extends State<Signup> {
   @override
   Widget build(BuildContext context) {
     AuthService authService = AuthService();
+    ReadDate _readDate = ReadDate();
     FireStoreService firestoreService = FireStoreService();
     return Scaffold(
       appBar: AppBar(
@@ -274,6 +276,7 @@ class _SignupState extends State<Signup> {
                                         .registerStudent(
                                             '28232',
                                             _nameController.text,
+                                            _readDate.getDateNow(),
                                             _emailController.text,
                                             'student',
                                             'f1',

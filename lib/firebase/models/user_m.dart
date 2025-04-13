@@ -5,6 +5,7 @@ class UserM {
   String role;
   String reference;
   String displayName;
+  String joinDate;
   bool isApproved;
   bool isRestricted;
 
@@ -14,6 +15,7 @@ class UserM {
     required this.email,
     required this.role,
     required this.displayName,
+    required this.joinDate,
     required this.reference,
     this.isApproved = false,
     this.isRestricted = false,
@@ -26,6 +28,7 @@ class UserM {
       email: json['email'],
       role: json['role'],
       displayName: json['displayName'],
+      joinDate: json['joinDate'] ?? '',
       reference: json['reference'],
       isApproved: json['isApproved'] ?? false,
       isRestricted: json['isRestricted'] ?? false,
@@ -39,6 +42,7 @@ class UserM {
       'email': email,
       'role': role,
       'displayName': displayName,
+      'joinDate': joinDate,
       'reference': reference,
       'isApproved': isApproved,
       'isRestricted': isRestricted,

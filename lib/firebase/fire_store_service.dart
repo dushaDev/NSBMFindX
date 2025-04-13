@@ -19,6 +19,7 @@ class FireStoreService {
   Future<void> registerStudent(
     String id,
     String name,
+    String joinDate,
     String email,
     String role,
     String facultyId,
@@ -31,6 +32,7 @@ class FireStoreService {
             id: id,
             name: name,
             displayName: words[0],
+            joinDate: joinDate,
             email: email,
             role: role,
             reference: 'students/$id'))
@@ -48,6 +50,7 @@ class FireStoreService {
   Future<void> registerStaff(
       String id,
       String name,
+      String joinDate,
       String email,
       String role,
       bool isApproved,
@@ -60,6 +63,7 @@ class FireStoreService {
             id: id,
             name: name,
             displayName: words[0],
+            joinDate: joinDate,
             email: email,
             role: role,
             reference: 'staff/$id',
@@ -69,7 +73,7 @@ class FireStoreService {
     });
   }
 
-  Future<void> registerAdmin(String id, String name, String email, String role,
+  Future<void> registerAdmin(String id, String name, String joinDate, String email, String role,
       String department, String accessLevel) async {
     List<String> words = _random.splitName(name);
 
@@ -77,6 +81,7 @@ class FireStoreService {
             id: id,
             name: name,
             displayName: words[0],
+            joinDate: joinDate,
             email: email,
             role: role,
             reference: 'admin/$id',
@@ -121,12 +126,6 @@ class FireStoreService {
         .set(program.toFirestore());
   }
 
-  // Future<void> addLostItem(LostItem lostItem) async {
-  //   await _fireStore
-  //       .collection('lostItems')
-  //       .doc(lostItem.id)
-  //       .set(lostItem.toFirestore());
-  // }
   Future<void> addLostItem(LostItem lostItem) async {
     DocumentReference docRef =
         await _fireStore.collection('lostItems').add(lostItem.toFirestore());
@@ -134,9 +133,6 @@ class FireStoreService {
     lostItem.id = docRef.id;
   }
 
-  // Future<void> addFoundItem(FoundItem foundItem) async {
-  //   await _fireStore.collection('foundItems').doc(foundItem.id).set(foundItem.toFirestore());
-  // }
   Future<void> addFoundItem(FoundItem foundItem) async {
     DocumentReference docRef =
         await _fireStore.collection('foundItems').add(foundItem.toFirestore());
@@ -144,8 +140,23 @@ class FireStoreService {
     foundItem.id = docRef.id;
   }
 
-  // Method to retrieve a user from Firestore
+  // Method to retrieve all users from FireStore
+  Future<List<UserM>> getUsersAll() async {
+    try {
+      // Query the users collection to get all documents
+      QuerySnapshot querySnapshot = await _fireStore.collection('users').get();
 
+      // Convert the query results to a list of UserM objects
+      return querySnapshot.docs.map((doc) {
+        return UserM.fromFirestore(doc.data() as Map<String, dynamic>, doc.id);
+      }).toList();
+    } catch (e) {
+      print("Error fetching users: $e");
+      return [];
+    }
+  }
+
+  // Method to retrieve a user from FireStore
   Future<UserM?> getUser(String userId) async {
     try {
       DocumentSnapshot doc =
@@ -157,6 +168,23 @@ class FireStoreService {
     } catch (e) {
       print("Error fetching user: $e");
       return null;
+    }
+  }
+
+  // Method to retrieve a limited number of users from FireStore
+  Future<List<UserM>> getUsersWithLimit(int limit) async {
+    try {
+      // Query the users collection to get a limited number of documents
+      QuerySnapshot querySnapshot =
+          await _fireStore.collection('users').limit(limit).get();
+
+      // Convert the query results to a list of UserM objects
+      return querySnapshot.docs.map((doc) {
+        return UserM.fromFirestore(doc.data() as Map<String, dynamic>, doc.id);
+      }).toList();
+    } catch (e) {
+      print("Error fetching users: $e");
+      return [];
     }
   }
 
@@ -420,10 +448,8 @@ class FireStoreService {
   // Method to retrieve posted times from lost and found items. this use for the chart
   Future<Map<String, List<String>>> getPostedTimes() async {
     try {
-      // Query the lostItems collection
       QuerySnapshot lostItemsSnapshot =
           await _fireStore.collection('lostItems').get();
-      // Query the foundItems collection
       QuerySnapshot foundItemsSnapshot =
           await _fireStore.collection('foundItems').get();
 
@@ -439,7 +465,6 @@ class FireStoreService {
         return data['postedTime'] as String;
       }).toList();
 
-      // Return a map with separate lists for lost and found items posted times
       return {
         'lost': lostItemsPostedTimes,
         'found': foundItemsPostedTimes,
