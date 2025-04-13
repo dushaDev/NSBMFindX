@@ -7,7 +7,6 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   FireStoreService _fireStoreService = FireStoreService();
 
-
   Future<User?> signInWithEmailPassword(String email, String password) async {
     try {
       final UserCredential userCredential =
@@ -37,6 +36,7 @@ class AuthService {
   Future<User?> getSignedUser() async {
     return _auth.currentUser;
   }
+
   Future<String?> getUserId() async {
     User? user = await getSignedUser();
     if (user?.email != null) {
@@ -50,6 +50,7 @@ class AuthService {
       return null;
     }
   }
+
   Future<String?> getUserDisplayName() async {
     User? user = await getSignedUser();
     if (user?.email != null) {
@@ -63,6 +64,7 @@ class AuthService {
       return null;
     }
   }
+
   Future<String?> getUserRole() async {
     User? user = await getSignedUser();
     if (user?.email != null) {

@@ -21,7 +21,6 @@ class FireStoreService {
     String name,
     String email,
     String role,
-      bool isApproved,
     String facultyId,
     String degreeProgramId,
     String about,
@@ -34,7 +33,7 @@ class FireStoreService {
             displayName: words[0],
             email: email,
             role: role,
-            reference: 'students/$id',isApproved: isApproved))
+            reference: 'students/$id'))
         .whenComplete(() async {
       await addStudent(Student(
         id: id,
@@ -46,8 +45,15 @@ class FireStoreService {
     });
   }
 
-  Future<void> registerStaff(String id, String name, String email, String role,bool isApproved,
-      String department, String position, String accessLevel) async {
+  Future<void> registerStaff(
+      String id,
+      String name,
+      String email,
+      String role,
+      bool isApproved,
+      String department,
+      String position,
+      String accessLevel) async {
     List<String> words = _random.splitName(name);
 
     await addUser(UserM(
@@ -56,7 +62,8 @@ class FireStoreService {
             displayName: words[0],
             email: email,
             role: role,
-            reference: 'staff/$id',isApproved: isApproved))
+            reference: 'staff/$id',
+            isApproved: isApproved))
         .whenComplete(() async {
       await addStaff(Staff(id: id, department: department, position: position));
     });
@@ -72,7 +79,8 @@ class FireStoreService {
             displayName: words[0],
             email: email,
             role: role,
-            reference: 'admin/$id',isApproved: true))
+            reference: 'admin/$id',
+            isApproved: true))
         .whenComplete(() async {
       await addAdmin(
           Admin(id: id, department: department, accessLevel: accessLevel));
@@ -347,12 +355,20 @@ class FireStoreService {
       return [];
     }
   }
-  Future<List<dynamic>> getLostAndFoundItemsById(String userId, int limit) async {
+
+  Future<List<dynamic>> getLostAndFoundItemsById(
+      String userId, int limit) async {
     try {
-      QuerySnapshot lostItemsSnapshot =
-      await _fireStore.collection('lostItems').where('userId', isEqualTo: userId).limit(limit).get();
-      QuerySnapshot foundItemsSnapshot =
-      await _fireStore.collection('foundItems').where('userId', isEqualTo: userId).limit(limit).get();
+      QuerySnapshot lostItemsSnapshot = await _fireStore
+          .collection('lostItems')
+          .where('userId', isEqualTo: userId)
+          .limit(limit)
+          .get();
+      QuerySnapshot foundItemsSnapshot = await _fireStore
+          .collection('foundItems')
+          .where('userId', isEqualTo: userId)
+          .limit(limit)
+          .get();
 
       List<LostItem> lostItems = lostItemsSnapshot.docs.map((doc) {
         return LostItem.fromFirestore(
@@ -378,6 +394,7 @@ class FireStoreService {
       return [];
     }
   }
+
   // Method to retrieve all users not approved
   Future<List<UserM>> getUsersNotApprovedWithLimit(int limit) async {
     try {
@@ -399,13 +416,16 @@ class FireStoreService {
       return [];
     }
   }
+
   // Method to retrieve posted times from lost and found items. this use for the chart
   Future<Map<String, List<String>>> getPostedTimes() async {
     try {
       // Query the lostItems collection
-      QuerySnapshot lostItemsSnapshot = await _fireStore.collection('lostItems').get();
+      QuerySnapshot lostItemsSnapshot =
+          await _fireStore.collection('lostItems').get();
       // Query the foundItems collection
-      QuerySnapshot foundItemsSnapshot = await _fireStore.collection('foundItems').get();
+      QuerySnapshot foundItemsSnapshot =
+          await _fireStore.collection('foundItems').get();
 
       // Extract postedTime from lostItems
       List<String> lostItemsPostedTimes = lostItemsSnapshot.docs.map((doc) {
@@ -432,6 +452,7 @@ class FireStoreService {
       };
     }
   }
+
   // Helper method to parse the custom date format
   DateTime _parseCustomDate(String dateString) {
     List<int> dateParts = dateString.split('/').map(int.parse).toList();

@@ -276,7 +276,6 @@ class _SignupState extends State<Signup> {
                                             _nameController.text,
                                             _emailController.text,
                                             'student',
-                                            false,
                                             'f1',
                                             'd1',
                                             'about here')
