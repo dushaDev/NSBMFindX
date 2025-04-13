@@ -50,12 +50,19 @@ class _DashboardState extends State<Dashboard> {
                 actions: [
                   IconButton(
                     onPressed: () {
+<<<<<<< Updated upstream
+// Navigator.push(
+//   context,
+//   MaterialPageRoute(builder: (context) => const LostPost()),
+// );
+=======
+                      //sample profile route here.
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => UserProfile(
-                            name: 'John Doe',
-                            role: 'Standard User',
+                            name: 'gdmBeligala',
+                            role: 'Student',
                             isApproved: true,
                             isRestricted: false,
                             joinDate: DateTime(2024, 1, 15),
@@ -65,6 +72,7 @@ class _DashboardState extends State<Dashboard> {
                           ),
                         ),
                       );
+>>>>>>> Stashed changes
                     },
                     icon: Icon(
                       Icons.manage_accounts_outlined,
