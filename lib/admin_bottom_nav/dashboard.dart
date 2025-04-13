@@ -13,6 +13,7 @@ import '../found_post.dart';
 import '../lost_post.dart';
 import '../read_date.dart';
 import '../res/font_profile.dart';
+import '../user_profile.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -49,10 +50,29 @@ class _DashboardState extends State<Dashboard> {
                 actions: [
                   IconButton(
                     onPressed: () {
+<<<<<<< Updated upstream
 // Navigator.push(
 //   context,
 //   MaterialPageRoute(builder: (context) => const LostPost()),
 // );
+=======
+                      //sample profile route here.
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UserProfile(
+                            name: 'gdmBeligala',
+                            role: 'Student',
+                            isApproved: true,
+                            isRestricted: false,
+                            joinDate: DateTime(2024, 1, 15),
+                            reportedItemsCount: 7,
+                            email: 'john@example.com',
+                            phone: '+1234567890',
+                          ),
+                        ),
+                      );
+>>>>>>> Stashed changes
                     },
                     icon: Icon(
                       Icons.manage_accounts_outlined,
