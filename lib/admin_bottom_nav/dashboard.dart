@@ -50,12 +50,6 @@ class _DashboardState extends State<Dashboard> {
                 actions: [
                   IconButton(
                     onPressed: () {
-<<<<<<< Updated upstream
-// Navigator.push(
-//   context,
-//   MaterialPageRoute(builder: (context) => const LostPost()),
-// );
-=======
                       //sample profile route here.
                       Navigator.push(
                         context,
@@ -72,7 +66,6 @@ class _DashboardState extends State<Dashboard> {
                           ),
                         ),
                       );
->>>>>>> Stashed changes
                     },
                     icon: Icon(
                       Icons.manage_accounts_outlined,
