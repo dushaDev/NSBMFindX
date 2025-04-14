@@ -134,7 +134,7 @@ class _LoginState extends State<Login> {
                       padding: const EdgeInsets.all(5.0),
                       child: InkWell(
                           onTap: () {
-                            showToast(
+                            _showSnackBar(
                                 'Coming soon, Please contact the administrator');
                           },
                           child: Text(
@@ -263,14 +263,20 @@ class _LoginState extends State<Login> {
         (Route<dynamic> route) => false, // Remove all routes
       );
     } else {
-      showToast('Login failed. Email or password is wrong.');
+      _showSnackBar('Login failed. Email or password is wrong.');
     }
   }
 
-  void showToast(String msg) {
+  void _showSnackBar(String msg) {
+    final _colorScheme = Theme.of(context).colorScheme;
     final snackBar = SnackBar(
-      content: Text(msg),
+      content: Text(msg,
+          style: TextStyle(
+            color: _colorScheme.onSecondary,
+          )
+      ),
       duration: const Duration(seconds: 3),
+      backgroundColor: _colorScheme.secondary,
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }

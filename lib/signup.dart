@@ -254,6 +254,7 @@ class _SignupState extends State<Signup> {
                         children: [
                           FilledButton(
                             onPressed: () async {
+                              print('already in');
                               if (_formKey.currentState!.validate()) {
                                 setState(() {
                                   _isSpinKitLoaded = true;
@@ -269,19 +270,20 @@ class _SignupState extends State<Signup> {
                                     setState(() {
                                       _isSpinKitLoaded = false;
                                     });
-                                    showToast(
+                                    _showSnackBar(
                                         'Email already in use.Try another one');
                                   } else {
                                     await firestoreService
                                         .registerStudent(
-                                            '28232',
+                                            _idController.text,
                                             _nameController.text,
                                             _readDate.getDateNow(),
                                             _emailController.text,
                                             'student',
-                                            'f1',
-                                            'd1',
-                                            'about here')
+                                            _selectedFaculty!,
+                                            _selectedDegree!,
+                                            _bioController.text)
+
                                         .whenComplete(() async {
                                       User? user =
                                           await authService.getSignedUser();
@@ -289,7 +291,7 @@ class _SignupState extends State<Signup> {
                                         _isSpinKitLoaded = false;
                                       });
                                       authService.signOut().whenComplete(() {
-                                        showToast(
+                                        _showSnackBar(
                                             'Registration successfully. use Login');
                                         navigate(user);
                                       });
@@ -374,14 +376,20 @@ class _SignupState extends State<Signup> {
     if (user != null) {
       Navigator.of(context).pop();
     } else {
-      showToast('Something went wrong. Signup failed.');
+      _showSnackBar('Something went wrong. Signup failed.');
     }
   }
 
-  void showToast(String msg) {
+  void _showSnackBar(String msg) {
+    final _colorScheme = Theme.of(context).colorScheme;
     final snackBar = SnackBar(
-      content: Text(msg),
+      content: Text(msg,
+          style: TextStyle(
+            color: _colorScheme.onSecondary,
+          )
+      ),
       duration: const Duration(seconds: 3),
+      backgroundColor: _colorScheme.secondary,
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }

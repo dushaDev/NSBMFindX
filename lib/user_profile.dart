@@ -1,11 +1,13 @@
+import 'package:find_x/firebase/auth_service.dart';
 import 'package:find_x/firebase/fire_store_service.dart';
+import 'package:find_x/login.dart';
 import 'package:find_x/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
 import 'package:find_x/res/items/build_shimmer_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class UserProfile extends StatelessWidget {
+class UserProfile extends StatefulWidget {
   final String userId;
   final bool myProf;
   final bool item;
@@ -18,9 +20,15 @@ class UserProfile extends StatelessWidget {
   });
 
   @override
+  State<UserProfile> createState() => _UserProfileState();
+}
+
+class _UserProfileState extends State<UserProfile> {
+  @override
   Widget build(BuildContext context) {
     final String _title = 'Profile';
     FireStoreService _fireStoreService = FireStoreService();
+    AuthService _authService = AuthService();
     final _colorScheme = Theme.of(context).colorScheme;
     final _readDate = ReadDate();
 
@@ -32,9 +40,26 @@ class UserProfile extends StatelessWidget {
           style: TextStyle(color: Theme.of(context).colorScheme.primary),
         ),
         foregroundColor: Theme.of(context).colorScheme.onSurface,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout_rounded),
+            onPressed: () async {
+              final shouldLogout = await _showLogoutDialog(context);
+              if (shouldLogout == true) {
+                _authService.signOut().whenComplete(() {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const Login()),
+                    (route) => false, // Remove all previous routes
+                  );
+                  _showSnackBar('Logged out successfully');
+                });
+              }
+            },
+          ),
+        ],
       ),
       body: FutureBuilder(
-          future: _fireStoreService.getUser(userId),
+          future: _fireStoreService.getUser(widget.userId),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return BuildShimmerLoading();
@@ -113,13 +138,12 @@ class UserProfile extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildDetailRow(
-                              Icons.send_rounded, 'Email', mUser.email, context),
+                          _buildDetailRow(Icons.email_rounded, 'Email',
+                              mUser.email, context),
                           _buildDetailRow(
                             Icons.calendar_month_rounded,
                             'date',
-                            '${_readDate.getDateStringToDisplay(mUser.joinDate)}, ${_readDate.getTimeStringToDisplay(mUser.joinDate)}'
-                            ,
+                            '${_readDate.getDateStringToDisplay(mUser.joinDate)}, ${_readDate.getTimeStringToDisplay(mUser.joinDate)}',
                             context,
                           ),
                           // _buildDetailRow(
@@ -134,84 +158,90 @@ class UserProfile extends StatelessWidget {
                     const SizedBox(height: 24),
 
                     // Action Buttons
-                    myProf? Container():
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 200,
-                          child: OutlinedButton(
-                            onPressed: () {},
-                            child: Text('Message'),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 16),
-                              backgroundColor: _colorScheme.surface,
-                              side: BorderSide(color: _colorScheme.primary),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4),
+                    widget.myProf
+                        ? Container()
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 200,
+                                child: OutlinedButton(
+                                  onPressed: () {},
+                                  child: Text('Message'),
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8, horizontal: 16),
+                                    backgroundColor: _colorScheme.surface,
+                                    side:
+                                        BorderSide(color: _colorScheme.primary),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
                     const SizedBox(height: 24),
                     // Activity Section
-                    myProf?
-                    Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Recent Activities',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: _colorScheme.onSurface,
+                    widget.myProf
+                        ? Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Recent Activities',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: _colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        ListTile(
-                          leading: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: _colorScheme.primary.withAlpha(10),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(Icons.add_box_outlined,
-                                color: _colorScheme.primary),
-                          ),
-                          title: Text('Sample activity ui card',
-                              style: TextStyle(color: _colorScheme.onSurface)),
-                          subtitle: Text('2 days ago',
-                              style:
-                              TextStyle(color: _colorScheme.onSurfaceVariant)),
-                          trailing: Container(
-                            alignment: Alignment.center,
-                            width: 38,
-                            height: 18,
-                            padding:
-                            EdgeInsets.symmetric(horizontal: 1, vertical: 1),
-                            decoration: BoxDecoration(
-                              color: item
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Theme.of(context).colorScheme.secondary,
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                            child: Text(item ? 'found' : 'lost',
-                                style: TextStyle(
-                                    color:
-                                    Theme.of(context).colorScheme.onPrimary)),
-                          ),
-                        ),
-                        Divider()
-                      ],
-                    ):Container(),
-
+                              const SizedBox(height: 12),
+                              ListTile(
+                                leading: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: _colorScheme.primary.withAlpha(10),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(Icons.add_box_outlined,
+                                      color: _colorScheme.primary),
+                                ),
+                                title: Text('Sample activity ui card',
+                                    style: TextStyle(
+                                        color: _colorScheme.onSurface)),
+                                subtitle: Text('2 days ago',
+                                    style: TextStyle(
+                                        color: _colorScheme.onSurfaceVariant)),
+                                trailing: Container(
+                                  alignment: Alignment.center,
+                                  width: 38,
+                                  height: 18,
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 1, vertical: 1),
+                                  decoration: BoxDecoration(
+                                    color: widget.item
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Theme.of(context)
+                                            .colorScheme
+                                            .secondary,
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                  child: Text(widget.item ? 'found' : 'lost',
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary)),
+                                ),
+                              ),
+                              Divider()
+                            ],
+                          )
+                        : Container(),
                   ],
                 ),
               );
@@ -247,5 +277,82 @@ class UserProfile extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<bool?> _showLogoutDialog(BuildContext context) async {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: true, // User can tap outside to cancel
+      builder: (context) => AlertDialog(
+        backgroundColor: colorScheme.surfaceContainer,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4),
+        ),
+        title: Row(
+          children: [
+            Icon(
+              Icons.logout_rounded,
+              color: colorScheme.secondary,
+              size: 24,
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Confirmation',
+              style: TextStyle(
+                color: colorScheme.onSurface,
+                fontSize: FontProfile.medium,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'Are you sure you want to sign out?',
+          style: TextStyle(
+              color: colorScheme.onSurfaceVariant, fontSize: FontProfile.small),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            style: TextButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: colorScheme.onSurface),
+            ),
+          ),
+          FilledButton.tonal(
+            style: FilledButton.styleFrom(
+              backgroundColor: colorScheme.secondary,
+              foregroundColor: colorScheme.onSecondary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Log Out'),
+          ),
+        ],
+        actionsAlignment: MainAxisAlignment.spaceBetween,
+      ),
+    );
+  }
+
+  void _showSnackBar(String msg) {
+    final _colorScheme = Theme.of(context).colorScheme;
+    final snackBar = SnackBar(
+      content: Text(msg,
+          style: TextStyle(
+            color: _colorScheme.onSecondary,
+          )),
+      duration: const Duration(seconds: 3),
+      backgroundColor: _colorScheme.secondary,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
