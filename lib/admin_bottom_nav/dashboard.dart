@@ -37,6 +37,7 @@ class _DashboardState extends State<Dashboard> {
           } else if (snapshot.hasError) {
             return Center(child: Text('error: ${snapshot.error}'));
           } else if (snapshot.hasData) {
+            Map<String, String?> _getId = snapshot.data as Map<String, String?>;
             return Scaffold(
               extendBody: true,
               appBar: AppBar(
@@ -54,7 +55,7 @@ class _DashboardState extends State<Dashboard> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => UserProfile(
-                            userId: '28232',
+                            userId: _getId['id']!,
                             myProf: true,
                             item: false,
                           ),
@@ -130,7 +131,7 @@ class _DashboardState extends State<Dashboard> {
                         FutureBuilder(
                             //recent updates
                             future: _fireStoreService
-                                .getLostAndFoundItemsWithLimit(7),
+                                .getLostAndFoundItemsWithLimit(3),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
@@ -143,11 +144,12 @@ class _DashboardState extends State<Dashboard> {
                                 List? allItemsList = snapshot.data;
                                 final List<Map<String, dynamic>> finalList = [];
                                 for (var item in allItemsList!) {
-                                  if (item is LostItem) {
-                                    finalList.add(item.toFirestore());
-                                  } else if (item is FoundItem) {
-                                    finalList.add(item.toFirestore());
-                                  }
+                                  // if (item is LostItem) {
+                                  //   finalList.add(item.toFirestore());
+                                  // } else if (item is FoundItem) {
+                                  //   finalList.add(item.toFirestore());
+                                  // }
+                                  finalList.add(item.toFirestore());
                                 }
 
                                 return _buildUpdatesSection(

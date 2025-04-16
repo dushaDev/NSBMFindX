@@ -50,7 +50,7 @@ class _HomeState extends State<Home> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => UserProfile(
-                          userId: '28232',
+                          userId: _getId['id']!,
                           myProf: true,
                           item: false,
                         ),
