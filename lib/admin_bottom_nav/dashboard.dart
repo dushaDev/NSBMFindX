@@ -37,7 +37,6 @@ class _DashboardState extends State<Dashboard> {
           } else if (snapshot.hasError) {
             return Center(child: Text('error: ${snapshot.error}'));
           } else if (snapshot.hasData) {
-            // _title = '${_readDate.getWishStatement()}, ${_getId['name']}!';
             return Scaffold(
               extendBody: true,
               appBar: AppBar(
@@ -55,14 +54,9 @@ class _DashboardState extends State<Dashboard> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => UserProfile(
-                            name: 'gdmBeligala',
-                            role: 'Student',
-                            isApproved: true,
-                            isRestricted: false,
-                            joinDate: DateTime(2024, 1, 15),
-                            reportedItemsCount: 7,
-                            email: 'john@example.com',
-                            phone: '+1234567890',
+                            userId: '28232',
+                            myProf: true,
+                            item: false,
                           ),
                         ),
                       );

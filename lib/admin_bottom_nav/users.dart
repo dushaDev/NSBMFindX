@@ -27,16 +27,6 @@ class _UsersState extends State<Users> {
           style: TextStyle(color: Theme.of(context).colorScheme.primary),
         ),
         foregroundColor: Theme.of(context).colorScheme.onSurface,
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.manage_accounts_outlined,
-              color: Theme.of(context).colorScheme.onSecondaryContainer,
-            ),
-            iconSize: 32.0,
-          ),
-        ],
       ),
       body: Column(
         children: [

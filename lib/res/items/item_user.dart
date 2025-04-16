@@ -25,9 +25,9 @@ class _ItemUserState extends State<ItemUser> {
       children: [
         ListTile(
           leading: CircleAvatar(
-            radius: 25,
-            backgroundImage: NetworkImage('https://cdn-icons-png.flaticon.com/128/17286/17286792.png'), // Replace with actual image URL
-            backgroundColor: Colors.grey[300],
+            radius: 28,
+            backgroundImage: AssetImage('assets/images/user.png'),
+            backgroundColor: Colors.transparent,
           )
           ,
     title: Text(widget.name,
