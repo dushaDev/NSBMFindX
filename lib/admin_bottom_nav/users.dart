@@ -1,4 +1,5 @@
 import 'package:find_x/firebase/fire_store_service.dart';
+import 'package:find_x/res/font_profile.dart';
 import 'package:find_x/res/items/build_shimmer_loading.dart';
 import 'package:find_x/res/items/item_user.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ class _UsersState extends State<Users> {
 
   @override
   Widget build(BuildContext context) {
+    ColorScheme _colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -85,18 +87,27 @@ class _UsersState extends State<Users> {
 
                   return Padding(
                     padding: const EdgeInsets.all(10.0),
-                    child: ListView.builder(
-                      itemCount: filteredModels.length,
-                      itemBuilder: (context, index) {
-                        final uModel = filteredModels[index];
-                        return ItemUser(
-                          name: uModel.name,
-                          role: uModel.role,
-                          isApproved: uModel.isApproved,
-                          isRestricted: uModel.isRestricted,
-                        );
-                      },
-                    ),
+                    child: filteredModels.length < 1
+                        ? Center(
+                            child: Text(
+                              'No users to show with this filter',
+                              style: TextStyle(
+                                  fontSize: FontProfile.small,
+                                  color: _colorScheme.onSurface),
+                            ),
+                          )
+                        : ListView.builder(
+                            itemCount: filteredModels.length,
+                            itemBuilder: (context, index) {
+                              final uModel = filteredModels[index];
+                              return ItemUser(
+                                name: uModel.name,
+                                role: uModel.role,
+                                isApproved: uModel.isApproved,
+                                isRestricted: uModel.isRestricted,
+                              );
+                            },
+                          ),
                   );
                 } else {
                   return Center(
