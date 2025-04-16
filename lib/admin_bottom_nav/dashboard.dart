@@ -465,7 +465,7 @@ class _DashboardState extends State<Dashboard> {
             ),
             SizedBox(height: 5),
             Container(
-              height: 180,
+              height: 170,
               child: ListView.builder(
                 itemCount: items.length,
                 itemBuilder: (context, index) {
