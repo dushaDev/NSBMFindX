@@ -110,6 +110,20 @@ class _LoginState extends State<Login> {
                               setState(() {
                                 _isSpinKitLoaded = false;
                               });
+                              // if (user != null) {
+                              //   //Check User is not null before syncing
+                              //   UserSyncService userSyncService =
+                              //       UserSyncService(
+                              //     _authService,
+                              //     _fireStoreService,
+                              //     _databaseHelper,
+                              //   );
+                              //   if (await _databaseHelper.isUsersTableEmpty()) {
+                              //     //Write to SQLite users table when it is empty only
+                              //     await userSyncService
+                              //         .syncUserDataFromFirebase();
+                              //   }
+                              // }
                               navigate(user);
                             });
                           }
@@ -135,7 +149,8 @@ class _LoginState extends State<Login> {
                       child: InkWell(
                           onTap: () {
                             _showSnackBar(
-                                'Coming soon, Please contact the administrator');
+                                'Coming soon, Please contact the administrator',
+                                true);
                           },
                           child: Text(
                             "Forgot password?",
@@ -263,20 +278,19 @@ class _LoginState extends State<Login> {
         (Route<dynamic> route) => false, // Remove all routes
       );
     } else {
-      _showSnackBar('Login failed. Email or password is wrong.');
+      _showSnackBar('Login failed. Email or password is wrong.', true);
     }
   }
 
-  void _showSnackBar(String msg) {
+  void _showSnackBar(String msg, bool isError) {
     final _colorScheme = Theme.of(context).colorScheme;
     final snackBar = SnackBar(
       content: Text(msg,
           style: TextStyle(
             color: _colorScheme.onSecondary,
-          )
-      ),
+          )),
       duration: const Duration(seconds: 3),
-      backgroundColor: _colorScheme.secondary,
+      backgroundColor: isError ? _colorScheme.secondary : _colorScheme.primary,
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }

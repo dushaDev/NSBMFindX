@@ -50,6 +50,20 @@ class AuthService {
       return null;
     }
   }
+  // returns the user name of the signed in user
+  Future<String?> getUserContact() async {
+    User? user = await getSignedUser();
+    if (user?.email != null) {
+      String email = user?.email ?? 'null';
+      UserM? userM = await _fireStoreService.getUserByEmail(email);
+      if (userM != null) {
+        return userM.contact;
+      }
+      return null;
+    } else {
+      return null;
+    }
+  }
 
   Future<String?> getUserDisplayName() async {
     User? user = await getSignedUser();

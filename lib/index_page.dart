@@ -93,5 +93,11 @@ class _IndexPageState extends State<IndexPage> {
   void initState() {
     super.initState();
     _userRole = _authService.getUserRole();
+    // UserSyncService userSyncService =
+    //     UserSyncService(_authService, _fireStoreService, _databaseHelper);
+    // if (await _databaseHelper.isUsersTableEmpty()) {
+    //   await userSyncService.syncUserDataFromFirebase();
+    // }
+    // _databaseHelper.close();
   }
 }

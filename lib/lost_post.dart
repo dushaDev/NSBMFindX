@@ -316,7 +316,7 @@ class _LostPostState extends State<LostPost> {
                   onTap: _agreeTerms
                       ? null
                       : () {
-                          showToast('Agree to T&C');
+                          _showSnackBar('Agree to T&C',true);
                         },
                   child: FilledButton(
                     onPressed: _agreeTerms
@@ -536,10 +536,15 @@ class _LostPostState extends State<LostPost> {
     return hour24;
   }
 
-  void showToast(String msg) {
+  void _showSnackBar(String msg, bool isError) {
+    final _colorScheme = Theme.of(context).colorScheme;
     final snackBar = SnackBar(
-      content: Text(msg),
+      content: Text(msg,
+          style: TextStyle(
+            color: _colorScheme.onSecondary,
+          )),
       duration: const Duration(seconds: 3),
+      backgroundColor: isError ? _colorScheme.secondary : _colorScheme.primary,
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }

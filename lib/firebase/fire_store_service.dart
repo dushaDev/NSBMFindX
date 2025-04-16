@@ -21,6 +21,7 @@ class FireStoreService {
     String name,
     String joinDate,
     String email,
+    String contact,
     String role,
     String facultyId,
     String degreeProgramId,
@@ -34,6 +35,7 @@ class FireStoreService {
             displayName: words[0],
             joinDate: joinDate,
             email: email,
+            contact: contact,
             role: role,
             reference: 'students/$id'))
         .whenComplete(() async {
@@ -52,6 +54,7 @@ class FireStoreService {
       String name,
       String joinDate,
       String email,
+      String contact,
       String role,
       bool isApproved,
       String department,
@@ -65,6 +68,7 @@ class FireStoreService {
             displayName: words[0],
             joinDate: joinDate,
             email: email,
+            contact: contact,
             role: role,
             reference: 'staff/$id',
             isApproved: isApproved))
@@ -73,7 +77,7 @@ class FireStoreService {
     });
   }
 
-  Future<void> registerAdmin(String id, String name, String joinDate, String email, String role,
+  Future<void> registerAdmin(String id, String name, String joinDate, String email,String contact, String role,
       String department, String accessLevel) async {
     List<String> words = _random.splitName(name);
 
@@ -83,6 +87,7 @@ class FireStoreService {
             displayName: words[0],
             joinDate: joinDate,
             email: email,
+            contact: contact,
             role: role,
             reference: 'admin/$id',
             isApproved: true))

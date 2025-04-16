@@ -1,3 +1,5 @@
+import 'package:find_x/firebase/auth_service.dart';
+import 'package:find_x/firebase/models/found_item.dart';
 import 'package:find_x/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
 import 'package:find_x/res/utils.dart';
@@ -5,7 +7,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'firebase/fire_store_service.dart';
-import 'firebase/models/lost_item.dart';
 
 class FoundPost extends StatefulWidget {
   const FoundPost({super.key});
@@ -18,18 +19,18 @@ class _FoundPostState extends State<FoundPost> {
   String _title = 'Found Post';
   bool _useOwnNumber = true;
   bool _agreeTerms = false;
-  bool _selectDate = true;
-  double _wholePadding = 10.0;
+  bool _selectDate = true; // to select date or now in Radio button (true = now)
+  double _wholePadding = 10.0; // to set padding for all widgets
   late Future<DateTime?> _selectedDate;
   late Future<TimeOfDay?> _selectedTime;
-  String _displayDate = "-";
+  String _displayDate = "-"; //to store the selected date
   String _date = '-';
-  String _displayTime = "-";
+  String _displayTime = "-"; //to store the selected date
   String _lostTime = "-";
-  String _amPm = '';
-  int _hour24 = 0;
+  String _amPm = ''; //to store AM/PM
+  int _hour24 = 0; //to store the selected hour in 24 hours format
   int _minute = 0;
-  String _contactNumber = '0767771005';
+  String _contactNumber = '';
 
   String? _selectedPrivacy = 'Public';
   String? _selectedFaculty;
@@ -51,12 +52,15 @@ class _FoundPostState extends State<FoundPost> {
   ];
 
   FireStoreService _fireStoreService = FireStoreService();
+  AuthService _authService = AuthService();
   final TextEditingController _foundTextController = TextEditingController();
   final TextEditingController _descriptionTextController =
       TextEditingController();
   final TextEditingController _locationTextController = TextEditingController();
   final TextEditingController _contactTextController = TextEditingController();
   final TextEditingController _idTextController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,517 +69,681 @@ class _FoundPostState extends State<FoundPost> {
         centerTitle: true,
         foregroundColor: Theme.of(context).colorScheme.onSurface,
       ),
-      body: ListView(
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: _wholePadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildText('Upload Images'),
-                Padding(
-                  padding: const EdgeInsets.only(left: 20.0),
-                  child: Text(
-                    "Upload maximum 20MB images",
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant),
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: _wholePadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildText('Upload Images'),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20.0),
+                    child: Text(
+                      "Upload maximum 20MB images",
+                      style: TextStyle(
+                          color:
+                              Theme.of(context).colorScheme.onSurfaceVariant),
+                    ),
                   ),
-                ),
-                SizedBox(height: 10),
-                Row(
-                  children: [
-                    Container(
-                      height: 70,
-                      width: 100,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceContainer,
-                      ),
-                      child: Icon(Icons.add,
-                          size: 32,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withAlpha(60)),
-                    ),
-                    SizedBox(width: 10),
-                    Container(
-                      height: 70,
-                      width: 100,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceContainer,
-                      ),
-                      child: Icon(Icons.add,
-                          size: 32,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withAlpha(60)),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 20.0,
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: _wholePadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildText('What You Found?'),
-                _buildTextField(_foundTextController, 'A bag')
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: _wholePadding),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildText('Privacy'),
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.5,
-                  child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .outlineVariant, // Border color
-                          width: 2.0, // Border width
-                        ),
-                        borderRadius:
-                            BorderRadius.circular(8.0), // Rounded corners
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                      child: DropdownButton<String>(
-                        value: _selectedPrivacy, // Currently selected value
-                        hint: Text(
-                            'Select'), // Hint text when no value is selected
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            _selectedPrivacy =
-                                newValue; // Update the selected value
-                          });
-                        },
-                        items: _privacy_list
-                            .map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value,
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface)),
-                          );
-                        }).toList(),
-                        isExpanded:
-                            true, // Ensure the dropdown expands to fill the container
-                        underline: Container(), // Remove the default underline
-                      )),
-                ),
-              ],
-            ),
-          ),
-          _selectedPrivacy == 'Private'
-              ? Column(
-                  children: [
-                    SizedBox(height: 20),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: _wholePadding),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _buildText('ID No'),
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            child: _buildTextField(
-                              _idTextController,
-                              '26334',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                )
-              : Container(),
-          _selectedPrivacy == 'Restricted'
-              ? Container(
-                  padding: EdgeInsets.symmetric(horizontal: _wholePadding),
-                  child: Column(
+                  SizedBox(height: 10),
+                  Row(
                     children: [
-                      SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _buildText('Faculty'),
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            child: Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .outlineVariant, // Border color
-                                    width: 2.0, // Border width
-                                  ),
-                                  borderRadius: BorderRadius.circular(
-                                      8.0), // Rounded corners
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12.0),
-                                child: DropdownButton<String>(
-                                  value:
-                                      _selectedFaculty, // Currently selected value
-                                  hint: Text(
-                                      'Select'), // Hint text when no value is selected
-                                  onChanged: (String? newValue) {
-                                    setState(() {
-                                      _selectedFaculty =
-                                          newValue; // Update the selected value
-                                    });
-                                  },
-                                  items: _faculties
-                                      .map<DropdownMenuItem<String>>(
-                                          (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value,
-                                          style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurface)),
-                                    );
-                                  }).toList(),
-                                  isExpanded:
-                                      true, // Ensure the dropdown expands to fill the container
-                                  underline:
-                                      Container(), // Remove the default underline
-                                )),
-                          ),
-                        ],
+                      Container(
+                        height: 70,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surfaceContainer,
+                        ),
+                        child: Icon(Icons.add,
+                            size: 32,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withAlpha(60)),
                       ),
-                      SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _buildText('Degree'),
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            child: Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .outlineVariant, // Border color
-                                    width: 2.0, // Border width
-                                  ),
-                                  borderRadius: BorderRadius.circular(
-                                      8.0), // Rounded corners
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12.0),
-                                child: DropdownButton<String>(
-                                  value:
-                                      _selectedDegree, // Currently selected value
-                                  hint: Text(
-                                      'Select'), // Hint text when no value is selected
-                                  onChanged: (String? newValue) {
-                                    setState(() {
-                                      _selectedDegree =
-                                          newValue; // Update the selected value
-                                    });
-                                  },
-                                  items: _degrees.map<DropdownMenuItem<String>>(
-                                      (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value,
-                                          style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurface)),
-                                    );
-                                  }).toList(),
-                                  isExpanded:
-                                      true, // Ensure the dropdown expands to fill the container
-                                  underline:
-                                      Container(), // Remove the default underline
-                                )),
-                          ),
-                        ],
-                      )
+                      SizedBox(width: 10),
+                      Container(
+                        height: 70,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surfaceContainer,
+                        ),
+                        child: Icon(Icons.add,
+                            size: 32,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withAlpha(60)),
+                      ),
                     ],
                   ),
-                )
-              : Container(),
-          SizedBox(height: 20),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: _wholePadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildText('Found Time & Date'),
-                Column(
-                  children: [
-                    Row(
-                      children: [
-                        Radio(
-                          value: false,
-                          groupValue: _selectDate,
-                          onChanged: (value) =>
-                              setState(() => _selectDate = false),
-                        ),
-                        Text(
-                          "Select Date & Time",
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface),
-                        ),
-                        Spacer(),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            FilledButton(
-                              style: FilledButton.styleFrom(
-                                minimumSize: const Size(100.0, 40.0),
-                                maximumSize: Size(200.0, 40.0),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(4.0)),
-                                backgroundColor: Theme.of(context)
-                                    .colorScheme
-                                    .surfaceContainer,
-                              ),
-                              onPressed: _selectDate
-                                  ? null
-                                  : () {
-                                      showDialogPicker(context);
-                                    },
-                              child: Text(
-                                  _displayDate == '-'
-                                      ? 'Select Date'
-                                      : '$_displayDate',
-                                  style: TextStyle(
-                                    color: _selectDate
-                                        ? Theme.of(context)
-                                            .colorScheme
-                                            .onSurface
-                                            .withAlpha(60)
-                                        : Theme.of(context).colorScheme.primary,
-                                  )),
-                            ),
-                            SizedBox(width: 10),
-                            FilledButton(
-                              style: FilledButton.styleFrom(
-                                minimumSize: const Size(100.0, 40.0),
-                                maximumSize: Size(200.0, 40.0),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(4.0)),
-                                backgroundColor: Theme.of(context)
-                                    .colorScheme
-                                    .surfaceContainer,
-                              ),
-                              onPressed: _selectDate
-                                  ? null
-                                  : () {
-                                      showDialogTimePicker(context);
-                                    },
-                              child: Text(
-                                  _displayTime == "-"
-                                      ? "Select Time"
-                                      : '${get12Hour(_hour24)}:$_minute $_amPm',
-                                  style: TextStyle(
-                                    color: _selectDate
-                                        ? Theme.of(context)
-                                            .colorScheme
-                                            .onSurface
-                                            .withAlpha(60)
-                                        : Theme.of(context).colorScheme.primary,
-                                  )),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Radio(
-                          value: true,
-                          groupValue: _selectDate,
-                          onChanged: (value) =>
-                              setState(() => _selectDate = true),
-                        ),
-                        Text(
-                          "Now",
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 20),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: _wholePadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildText('Where Now Item?'),
-                _buildTextField(_locationTextController, 'Edge Canteen')
-              ],
-            ),
-          ),
-          SizedBox(height: 10),
-          Container(
-              height: 40, // Hei
-
-              child: ListView(
-                padding: EdgeInsets.only(left: 20.0),
-                scrollDirection: Axis.horizontal, // Horizontal scroll
-                children: [
-                  _buildChip('Edge Canteen'),
-                  _buildChip('Hostel Canteen'),
-                  _buildChip('Library'),
-                  _buildChip('Computing Faculty'),
-                  _buildChip('Engineering Faculty'),
-                  _buildChip('Business Faculty'),
                 ],
-              )),
-          SizedBox(height: 20),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: _wholePadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildText('Contact Number'),
-                Row(
+              ),
+            ),
+            SizedBox(
+              height: 20.0,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: _wholePadding),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: _buildTextField(_contactTextController,
-                          _useOwnNumber ? _contactNumber : 'Enter Number',
-                          inputFormatters: [
-                            LengthLimitingTextInputFormatter(10),
-                            FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                          ],
-                          enabled: _useOwnNumber ? false : true),
+                    _buildText('What You Found?'),
+                    _buildTextField(_foundTextController, 'A bag', (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Item required.';
+                      } else if (value.length < 3) {
+                        return 'Minimum 3 characters required.';
+                      }
+                      return null;
+                    }),
+                  ]),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: _wholePadding),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildText('Privacy'),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.5,
+                    child: DropdownButtonFormField<String>(
+                      decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide(
+                                color: Theme.of(context).colorScheme.outlineVariant,
+                                width: 2.0,
+                                style: BorderStyle.solid)),
+                        disabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide(
+                                color:
+                                Theme.of(context).colorScheme.outlineVariant.withAlpha(90),
+                                width: 2.0,
+                                style: BorderStyle.solid)),
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide(
+                                color: Theme.of(context).colorScheme.outline,
+                                width: 2.0,
+                                style: BorderStyle.solid)),
+                        errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide(
+                                color: Theme.of(context).colorScheme.outlineVariant,
+                                width: 2.0,
+                                style: BorderStyle.solid)),
+                        focusedErrorBorder:  OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide(
+                                color: Theme.of(context).colorScheme.outline,
+                                width: 2.0,
+                                style: BorderStyle.solid)),
+                      ),
+                      value: _selectedPrivacy, // Currently selected value
+                      hint: Text('Select'),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedPrivacy = newValue;
+                        });
+                      },
+                      items: _privacy_list
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value,
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface)),
+                        );
+                      }).toList(),
+                      isExpanded: true,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Privacy required.';
+                        }
+                        return null;
+                      },
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+                  ),
+                ],
+              ),
+            ),
+            _selectedPrivacy == 'Private'
+                ? Column(
+                    children: [
+                      SizedBox(height: 20),
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: _wholePadding),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _buildText('ID No'),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.5,
+                              child: _buildTextField(
+                                _idTextController,
+                                '26334',
+                                (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'ID no required.';
+                                  } else if (value.length != 5) {
+                                    return 'Enter valid id.';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+                : Container(),
+            _selectedPrivacy == 'Restricted'
+                ? Container(
+                    padding: EdgeInsets.symmetric(horizontal: _wholePadding),
+                    child: Column(
                       children: [
-                        Checkbox(
-                          value: _useOwnNumber,
-                          onChanged: (value) => setState(() {
-                            _useOwnNumber = value!;
-                            _contactTextController.clear();
-                          }),
+                        SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _buildText('Faculty'),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.5,
+                              child: DropdownButtonFormField<String>(
+                                decoration: InputDecoration(
+                                  enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: BorderSide(
+                                          color: Theme.of(context).colorScheme.outlineVariant,
+                                          width: 2.0,
+                                          style: BorderStyle.solid)),
+                                  disabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: BorderSide(
+                                          color:
+                                          Theme.of(context).colorScheme.outlineVariant.withAlpha(90),
+                                          width: 2.0,
+                                          style: BorderStyle.solid)),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: BorderSide(
+                                          color: Theme.of(context).colorScheme.outline,
+                                          width: 2.0,
+                                          style: BorderStyle.solid)),
+                                  errorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: BorderSide(
+                                          color: Theme.of(context).colorScheme.outlineVariant,
+                                          width: 2.0,
+                                          style: BorderStyle.solid)),
+                                  focusedErrorBorder:  OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: BorderSide(
+                                          color: Theme.of(context).colorScheme.outline,
+                                          width: 2.0,
+                                          style: BorderStyle.solid)),
+                                ),
+                                value: _selectedFaculty,
+                                hint: Text('Select'),
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    _selectedFaculty = newValue;
+                                  });
+                                },
+                                items: _faculties
+                                    .map<DropdownMenuItem<String>>(
+                                        (String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value,
+                                        style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface)),
+                                  );
+                                }).toList(),
+                                isExpanded: true,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Faculty required.';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          "Use Own",
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface),
-                        ),
+                        SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _buildText('Degree'),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.5,
+                              child: DropdownButtonFormField<String>(
+                                decoration: InputDecoration(
+                                  enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: BorderSide(
+                                          color: Theme.of(context).colorScheme.outlineVariant,
+                                          width: 2.0,
+                                          style: BorderStyle.solid)),
+                                  disabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: BorderSide(
+                                          color:
+                                          Theme.of(context).colorScheme.outlineVariant.withAlpha(90),
+                                          width: 2.0,
+                                          style: BorderStyle.solid)),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: BorderSide(
+                                          color: Theme.of(context).colorScheme.outline,
+                                          width: 2.0,
+                                          style: BorderStyle.solid)),
+                                  errorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: BorderSide(
+                                          color: Theme.of(context).colorScheme.outlineVariant,
+                                          width: 2.0,
+                                          style: BorderStyle.solid)),
+                                  focusedErrorBorder:  OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      borderSide: BorderSide(
+                                          color: Theme.of(context).colorScheme.outline,
+                                          width: 2.0,
+                                          style: BorderStyle.solid)),
+                                ),
+                                value:
+                                    _selectedDegree, // Currently selected value
+                                hint: Text(
+                                    'Select'), // Hint text when no value is selected
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    _selectedDegree =
+                                        newValue; // Update the selected value
+                                  });
+                                },
+                                items: _degrees
+                                    .map<DropdownMenuItem<String>>(
+                                        (String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value,
+                                        style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface)),
+                                  );
+                                }).toList(),
+                                isExpanded: true,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Degree required.';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                          ],
+                        )
                       ],
                     ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 20),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: _wholePadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildText('Description'),
-                _buildTextField(_descriptionTextController,
-                    'A black bag with a red stripe on the side and...',
-                    maxLines: 3),
-              ],
-            ),
-          ),
-          SizedBox(height: 20),
-          SizedBox(height: 20),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: _wholePadding),
-            child: Row(
-              children: [
-                Checkbox(
-                  value: _agreeTerms,
-                  onChanged: (value) => setState(() => _agreeTerms = value!),
-                ),
-                _buildText('Agree to our Terms and Conditions',
-                    bottomPadding: 0),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(50.0),
-            child: Column(
-              children: [
-                GestureDetector(
-                  onTap: _agreeTerms
-                      ? null
-                      : () {
-                          showToast('Agree to T&C');
-                        },
-                  child: FilledButton(
-                    onPressed: _agreeTerms
-                        ? () async {
-                            _selectDate
-                                ? _lostTime = ReadDate().getDateNow()
-                                : _lostTime = '$_date$_displayTime';
-
-                            await _fireStoreService.addLostItem(LostItem(
-                                id: '28232',
-                                itemName: _foundTextController.text,
-                                type: true,
-                                lostTime: _lostTime,
-                                postedTime: ReadDate().getDateNow(),
-                                lastKnownLocation: _locationTextController.text,
-                                contactNumber: _useOwnNumber
-                                    ? _contactNumber
-                                    : _contactTextController.text,
-                                description: _descriptionTextController.text,
-                                images: [
-                                  'path/to/image1.jpg',
-                                  'path/to/image2.jpg'
-                                ],
-                                agreedToTerms: _agreeTerms,
-                                userId: '28232',
-                                isCompleted: false));
-
-                            //showToast('Button Working');
-                          }
-                        : null,
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size(150.0, 50.0),
-                      maximumSize: const Size(200.0, 50.0),
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                      textStyle: const TextStyle(
-                        fontSize: FontProfile.medium,
+                  )
+                : Container(),
+            SizedBox(height: 20),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: _wholePadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildText('Found Time & Date'),
+                  Column(
+                    children: [
+                      Row(
+                        children: [
+                          Radio(
+                            value: false,
+                            groupValue: _selectDate,
+                            onChanged: (value) =>
+                                setState(() => _selectDate = false),
+                          ),
+                          Text(
+                            "Select Date & Time",
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface),
+                          ),
+                          Spacer(),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              FilledButton(
+                                style: FilledButton.styleFrom(
+                                  minimumSize: const Size(100.0, 40.0),
+                                  maximumSize: Size(200.0, 40.0),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(4.0)),
+                                  backgroundColor: Theme.of(context)
+                                      .colorScheme
+                                      .surfaceContainer,
+                                ),
+                                onPressed: _selectDate
+                                    ? null
+                                    : () {
+                                        _showDialogPicker(context);
+                                      },
+                                child: Text(
+                                    _displayDate == '-'
+                                        ? 'Select Date'
+                                        : '$_displayDate',
+                                    style: TextStyle(
+                                      color: _selectDate
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withAlpha(60)
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                    )),
+                              ),
+                              SizedBox(width: 10),
+                              FilledButton(
+                                style: FilledButton.styleFrom(
+                                  minimumSize: const Size(100.0, 40.0),
+                                  maximumSize: Size(200.0, 40.0),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(4.0)),
+                                  backgroundColor: Theme.of(context)
+                                      .colorScheme
+                                      .surfaceContainer,
+                                ),
+                                onPressed: _selectDate
+                                    ? null
+                                    : () {
+                                        _showDialogTimePicker(context);
+                                      },
+                                child: Text(
+                                    _displayTime == "-"
+                                        ? "Select Time"
+                                        : '${get12Hour(_hour24)}:$_minute $_amPm',
+                                    style: TextStyle(
+                                      color: _selectDate
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withAlpha(60)
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                    )),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0)),
-                      padding: const EdgeInsets.only(
-                          left: 50.0, right: 50.0, top: 15.0, bottom: 15.0),
-                    ),
-                    child: const Text("Post Now"),
+                      Row(
+                        children: [
+                          Radio(
+                            value: true,
+                            groupValue: _selectDate,
+                            onChanged: (value) =>
+                                setState(() => _selectDate = true),
+                          ),
+                          Text(
+                            "Now",
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                )
-              ],
+                ],
+              ),
             ),
-          ),
-          SizedBox(height: 20),
-        ],
+            SizedBox(height: 20),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: _wholePadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildText('Where Now Item?'),
+                  _buildTextField(
+                    _locationTextController,
+                    'Edge Canteen',
+                    (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'required.';
+                      } else if (value.length < 2) {
+                        return 'Minimum 2 characters required.';
+                      }
+                      return null;
+                    },
+                  )
+                ],
+              ),
+            ),
+            SizedBox(height: 10),
+            Container(
+                height: 40, // Hei
+
+                child: ListView(
+                  padding: EdgeInsets.only(left: 20.0),
+                  scrollDirection: Axis.horizontal, // Horizontal scroll
+                  children: [
+                    _buildChip('Edge Canteen'),
+                    _buildChip('Hostel Canteen'),
+                    _buildChip('Library'),
+                    _buildChip('Computing Faculty'),
+                    _buildChip('Engineering Faculty'),
+                    _buildChip('Business Faculty'),
+                  ],
+                )),
+            SizedBox(height: 20),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: _wholePadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildText('Contact Number'),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: FutureBuilder(
+                            future: _authService.getUserContact(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Container();
+                              } else if (snapshot.hasData) {
+                                _contactNumber = snapshot.data!;
+                                return _buildTextField(
+                                  _contactTextController,
+                                  _useOwnNumber
+                                      ? _setAsterisk(_contactNumber)
+                                      : 'Enter Number',
+                                  (value) {
+                                    if (!_useOwnNumber) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Contact Number required.';
+                                      } else if (value.length != 10) {
+                                        return 'Enter valid number.';
+                                      }
+                                    }
+                                    return null;
+                                  },
+                                  inputFormatters: [
+                                    LengthLimitingTextInputFormatter(10),
+                                    FilteringTextInputFormatter.allow(
+                                        RegExp(r'[0-9]')),
+                                  ],
+                                  enabled: _useOwnNumber ? false : true,
+                                );
+                              } else {
+                                return Container();
+                              }
+                            }),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Checkbox(
+                            value: _useOwnNumber,
+                            onChanged: (value) => setState(() {
+                              _useOwnNumber = value!;
+                              _contactTextController.clear();
+                            }),
+                          ),
+                          Text(
+                            "Use Own",
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 20),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: _wholePadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildText('Description'),
+                  _buildTextField(_descriptionTextController,
+                      'A black bag with a red stripe on the side and...',
+                      (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Description required.';
+                    } else if (value.length < 5) {
+                      return 'Minimum 5 characters required.';
+                    }
+                    return null;
+                  }, maxLines: 3),
+                ],
+              ),
+            ),
+            SizedBox(height: 20),
+            SizedBox(height: 20),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: _wholePadding),
+              child: Row(
+                children: [
+                  Checkbox(
+                    value: _agreeTerms,
+                    onChanged: (value) => setState(() => _agreeTerms = value!),
+                  ),
+                  _buildText('Agree to our Terms and Conditions',
+                      bottomPadding: 0),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(50.0),
+              child: Column(
+                children: [
+                  GestureDetector(
+                    onTap: _agreeTerms
+                        ? null
+                        : () {
+                            _showSnackBar('Agree to T&C', true);
+                          },
+                    child: FilledButton(
+                      onPressed: _agreeTerms
+                          ? () async {
+                              if (_formKey.currentState!.validate()) {
+                                //check if all fields are valid
+                                if (_displayDate == '-' && !_selectDate ||
+                                    _displayTime == '-' && !_selectDate) {
+                                  // check if date and time are selected
+                                  _showSnackBar(
+                                      'Select Date Time or Now', true);
+                                } else {
+                                  String? userId =
+                                      await _authService.getUserId();
+                                  _selectDate
+                                      ? _lostTime = ReadDate().getDateNow()
+                                      : _lostTime = '$_date$_displayTime';
+
+                                  await _fireStoreService.addFoundItem(
+                                      FoundItem(
+                                          id: userId!,
+                                          itemName: _foundTextController.text,
+                                          type: true,
+                                          foundTime: _lostTime,
+                                          postedTime: ReadDate().getDateNow(),
+                                          contactNumber: _useOwnNumber
+                                              ? _contactNumber
+                                              : _contactTextController.text,
+                                          description:
+                                              _descriptionTextController.text,
+                                          currentLocation:
+                                              _locationTextController.text,
+                                          images: [
+                                            'path/to/image1.jpg',
+                                            'path/to/image2.jpg'
+                                          ],
+                                          agreedToTerms: _agreeTerms,
+                                          userId: userId,
+                                          privacy: _selectedPrivacy!,
+                                          restrictedFacultyId: _selectedPrivacy ==
+                                                  'Restricted'
+                                              ? _selectedFaculty
+                                              : null, // when send selected faculty, after 'Restricted' selected,
+                                          restrictedDegreeProgramId:
+                                              _selectedPrivacy == 'Restricted'
+                                                  ? _selectedDegree
+                                                  : null,
+                                          privateUserId:
+                                              _selectedPrivacy == 'Private'
+                                                  ? _idTextController.text
+                                                  : null,
+                                          isCompleted: false));
+                                }
+                              } else {
+                                _showSnackBar('Please fill all fields', true);
+                              }
+                            }
+                          : null,
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size(150.0, 50.0),
+                        maximumSize: const Size(200.0, 50.0),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onPrimary,
+                        textStyle: const TextStyle(
+                          fontSize: FontProfile.medium,
+                        ),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0)),
+                        padding: const EdgeInsets.only(
+                            left: 50.0, right: 50.0, top: 15.0, bottom: 15.0),
+                      ),
+                      child: const Text("Post Now"),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
@@ -593,11 +761,15 @@ class _FoundPostState extends State<FoundPost> {
     );
   }
 
-  Widget _buildTextField(TextEditingController textController, String hint,
-      {List<TextInputFormatter>? inputFormatters,
-      int? maxLines = 1,
-      bool enabled = true}) {
-    return TextField(
+  Widget _buildTextField(
+    TextEditingController textController,
+    String hint,
+    FormFieldValidator validator, {
+    List<TextInputFormatter>? inputFormatters,
+    int? maxLines = 1,
+    bool enabled = true,
+  }) {
+    return TextFormField(
       enabled: enabled,
       maxLines: maxLines,
       style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
@@ -623,12 +795,26 @@ class _FoundPostState extends State<FoundPost> {
                 color: Theme.of(context).colorScheme.outline,
                 width: 2.0,
                 style: BorderStyle.solid)),
+        errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.outlineVariant,
+                width: 2.0,
+                style: BorderStyle.solid)),
+        focusedErrorBorder:  OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.outline,
+                width: 2.0,
+                style: BorderStyle.solid)),
         hintText: hint,
       ),
+      validator: validator,
     );
   }
 
   Widget _buildChip(String label) {
+    //to create chips for location/ Where now Item?
     return Padding(
       padding: const EdgeInsets.all(2.0),
       child: Chip(
@@ -657,7 +843,8 @@ class _FoundPostState extends State<FoundPost> {
     );
   }
 
-  void showDialogPicker(BuildContext context) {
+  void _showDialogPicker(BuildContext context) {
+    //for date picker to select date
     _selectedDate = showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -695,7 +882,7 @@ class _FoundPostState extends State<FoundPost> {
     });
   }
 
-  void showDialogTimePicker(BuildContext context) {
+  void _showDialogTimePicker(BuildContext context) {
     _selectedTime = showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -721,7 +908,7 @@ class _FoundPostState extends State<FoundPost> {
         if (value == null) return;
         _displayTime = "/${value.hour}/${value.minute}";
         _hour24 = value.hour;
-        _amPm = getAmPm(value.hour);
+        _amPm = _getAmPm(value.hour);
         _minute = value.minute;
       });
     }, onError: (error) {
@@ -731,7 +918,8 @@ class _FoundPostState extends State<FoundPost> {
     });
   }
 
-  String getAmPm(int hour) {
+  String _getAmPm(int hour) {
+    //convert 24 hour to am/pm
     if (hour >= 12) {
       return 'PM';
     } else {
@@ -739,18 +927,34 @@ class _FoundPostState extends State<FoundPost> {
     }
   }
 
+  // function to set * to center 3 characters
+  String _setAsterisk(String str) {
+    if (str.length > 3) {
+      return str.substring(0, 3) +
+          '*' * (str.length - 7) +
+          str.substring(str.length - 4, str.length);
+    }
+    return str;
+  }
+
   int get12Hour(int hour24) {
+    //convert 24 hour to 12 hour
     if (hour24 > 12) {
       return hour24 - 12;
     }
     return hour24;
   }
 
-  void showToast(String msg) {
+  void _showSnackBar(String msg, bool isError) {
+    final _colorScheme = Theme.of(context).colorScheme;
     final snackBar = SnackBar(
-      content: Text(msg),
+      content: Text(msg,
+          style: TextStyle(
+            color: _colorScheme.onSecondary,
+          )),
       duration: const Duration(seconds: 3),
+      backgroundColor: isError ? _colorScheme.secondary : _colorScheme.primary,
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
+  } //snackBar customized with colors when error or not
 }

@@ -50,13 +50,14 @@ class _SignupState extends State<Signup> {
     AuthService authService = AuthService();
     ReadDate _readDate = ReadDate();
     FireStoreService firestoreService = FireStoreService();
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: colorScheme.surface,
         title: Text(
           "Sign Up",
           style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface,
+              color: colorScheme.onSurface,
               fontSize: FontProfile.extraLarge,
               fontWeight: FontWeight.normal),
         ),
@@ -70,8 +71,7 @@ class _SignupState extends State<Signup> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8.0),
               border: Border.all(
-                  color: Theme.of(context).colorScheme.primary.withAlpha(95),
-                  width: 2.0),
+                  color: colorScheme.primary.withAlpha(95), width: 2.0),
             ),
             child: Padding(
               padding:
@@ -84,7 +84,7 @@ class _SignupState extends State<Signup> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildText('Name on ID'),
+                        _buildText('Name on ID', colorScheme),
                         _buildTextFormField(_nameController, 'SDN Perera',
                             (value) {
                           if (value == null || value.isEmpty) {
@@ -92,54 +92,72 @@ class _SignupState extends State<Signup> {
                           } else if (value.length < 8) {
                             return 'Name must be at least 8 characters.';
                           }
-                          return '';
-                        })
+                          return null;
+                        }, colorScheme)
                       ],
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildText('ID Number'),
+                        _buildText('ID Number', colorScheme),
                         _buildTextFormField(_idController, '24356', (value) {
                           if (value == null || value.isEmpty) {
                             return 'ID Number is required.';
+                          } else if (value.length < 5) {
+                            return 'ID number not valid';
                           }
-                          return '';
-                        })
+                          return null;
+                        }, colorScheme)
                       ],
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildText('Faculty'),
+                        _buildText('Faculty', colorScheme),
                         _buildDropdown(
-                            _faculties, 'Select Faculty', _selectedFaculty,
+                            _faculties,
+                            'Select Faculty',
+                            _selectedFaculty,
                             (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Faculty is required.';
-                          }
-                          return '';
-                        }),
+                              if (value == null || value.isEmpty) {
+                                return 'Faculty is required.';
+                              }
+                              return null;
+                            },
+                            colorScheme,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedFaculty = value;
+                              });
+                            }),
                       ],
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildText('Degree Program'),
+                        _buildText('Degree Program', colorScheme),
                         _buildDropdown(
-                            _degrees, "Select Degree", _selectedDegree,
+                            _degrees,
+                            "Select Degree",
+                            _selectedDegree,
                             (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Degree is required.';
-                          }
-                          return '';
-                        }),
+                              if (value == null || value.isEmpty) {
+                                return 'Degree is required.';
+                              }
+                              return null;
+                            },
+                            colorScheme,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedDegree = value;
+                              });
+                            }),
                       ],
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildText('Contact Number'),
+                        _buildText('Contact Number', colorScheme),
                         _buildTextFormField(
                           _contactNumberController,
                           '0712345678',
@@ -149,8 +167,9 @@ class _SignupState extends State<Signup> {
                             } else if (value.length != 10) {
                               return 'Contact Number must be 10 digits.';
                             }
-                            return '';
+                            return null;
                           },
+                          colorScheme,
                           keyboardType: TextInputType.number,
                         ),
                       ],
@@ -158,9 +177,10 @@ class _SignupState extends State<Signup> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildText('Email'),
+                        _buildText('Email', colorScheme),
                         _buildTextFormField(
-                            _emailController, 'samplemaail@email.com', (value) {
+                            _emailController, 'your.student.maail@email.com',
+                            (value) {
                           if (value == null || value.isEmpty) {
                             return 'Email is required.';
                           }
@@ -168,14 +188,14 @@ class _SignupState extends State<Signup> {
                           if (!emailRegex.hasMatch(value)) {
                             return 'Invalid email format.';
                           }
-                          return '';
-                        })
+                          return null;
+                        }, colorScheme)
                       ],
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildText('Password'),
+                        _buildText('Password', colorScheme),
                         _buildTextFormField(
                           _passwordController,
                           '********',
@@ -189,8 +209,9 @@ class _SignupState extends State<Signup> {
                               return 'Password must be at least 8 characters long, '
                                   'contain an uppercase letter, a number, and a special character.';
                             }
-                            return '';
+                            return null;
                           },
+                          colorScheme,
                           obscureText: true,
                         ),
                       ],
@@ -198,20 +219,16 @@ class _SignupState extends State<Signup> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildText('Repeat password'),
+                        _buildText('Repeat password', colorScheme),
                         _buildTextFormField(
-                          _repeatPasswordController,
-                          '********',
-                          (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Repeat Password is required.';
-                            } else if (value != _passwordController.text) {
-                              return 'Passwords do not match.';
-                            }
-                            return '';
-                          },
-                          obscureText: true,
-                        ),
+                            _repeatPasswordController, '********', (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Repeat Password is required.';
+                          } else if (value != _passwordController.text) {
+                            return 'Passwords do not match.';
+                          }
+                          return null;
+                        }, obscureText: true, colorScheme),
                         Padding(
                           padding: const EdgeInsets.only(left: 8.0),
                           child: Row(
@@ -229,7 +246,7 @@ class _SignupState extends State<Signup> {
                                           .onSurface,
                                       fontSize: FontProfile.extraSmall,
                                     ),
-                                    "password must contain minimum 8 characters with numbers,a special character and one uppercase letter"),
+                                    "Password must contain minimum 8 characters with numbers,a special character and one uppercase letter"),
                               ),
                             ],
                           ),
@@ -237,13 +254,13 @@ class _SignupState extends State<Signup> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildText('Bio'),
+                            _buildText('Bio', colorScheme),
                             _buildBioField('Enter your bio', (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Bio is required.';
                               }
-                              return '';
-                            }),
+                              return null;
+                            }, colorScheme),
                           ],
                         ),
                       ],
@@ -271,7 +288,7 @@ class _SignupState extends State<Signup> {
                                       _isSpinKitLoaded = false;
                                     });
                                     _showSnackBar(
-                                        'Email already in use.Try another one');
+                                        'Email already in use.Try another one',true);
                                   } else {
                                     await firestoreService
                                         .registerStudent(
@@ -279,11 +296,11 @@ class _SignupState extends State<Signup> {
                                             _nameController.text,
                                             _readDate.getDateNow(),
                                             _emailController.text,
+                                            _contactNumberController.text,
                                             'student',
                                             _selectedFaculty!,
                                             _selectedDegree!,
                                             _bioController.text)
-
                                         .whenComplete(() async {
                                       User? user =
                                           await authService.getSignedUser();
@@ -292,21 +309,21 @@ class _SignupState extends State<Signup> {
                                       });
                                       authService.signOut().whenComplete(() {
                                         _showSnackBar(
-                                            'Registration successfully. use Login');
+                                            'Registration successfully. use Login',false);
                                         navigate(user);
                                       });
                                     });
                                   }
                                 });
+                              } else {
+                                _showSnackBar('Verification failed',true);
                               }
                             },
                             style: FilledButton.styleFrom(
                               minimumSize: const Size(150.0, 50.0),
                               maximumSize: const Size(200.0, 50.0),
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.primary,
-                              foregroundColor:
-                                  Theme.of(context).colorScheme.onPrimary,
+                              backgroundColor: colorScheme.primary,
+                              foregroundColor: colorScheme.onPrimary,
                               textStyle: const TextStyle(
                                 fontSize: FontProfile.medium,
                               ),
@@ -331,7 +348,7 @@ class _SignupState extends State<Signup> {
                           Text(
                             "Already have an account? ",
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
+                              color: colorScheme.onSurface,
                               fontSize: FontProfile.small,
                             ),
                           ),
@@ -345,8 +362,7 @@ class _SignupState extends State<Signup> {
                               child: Text(
                                 "Sign in",
                                 style: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.onSurface,
+                                    color: colorScheme.onSurface,
                                     fontSize: FontProfile.small,
                                     fontWeight: FontWeight.w800),
                               ))
@@ -363,7 +379,7 @@ class _SignupState extends State<Signup> {
             ? Align(
                 alignment: Alignment.bottomCenter,
                 child: SpinKitThreeBounce(
-                  color: Theme.of(context).colorScheme.primary,
+                  color: colorScheme.primary,
                   size: 25.0,
                 ),
               )
@@ -376,25 +392,24 @@ class _SignupState extends State<Signup> {
     if (user != null) {
       Navigator.of(context).pop();
     } else {
-      _showSnackBar('Something went wrong. Signup failed.');
+      _showSnackBar('Something went wrong. Signup failed.',true);
     }
   }
 
-  void _showSnackBar(String msg) {
+  void _showSnackBar(String msg, bool isError) {
     final _colorScheme = Theme.of(context).colorScheme;
     final snackBar = SnackBar(
       content: Text(msg,
           style: TextStyle(
             color: _colorScheme.onSecondary,
-          )
-      ),
+          )),
       duration: const Duration(seconds: 3),
-      backgroundColor: _colorScheme.secondary,
+      backgroundColor: isError ? _colorScheme.secondary : _colorScheme.primary,
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  Widget _buildText(String text) {
+  Widget _buildText(String text, ColorScheme colorScheme) {
     return Padding(
       padding: const EdgeInsets.only(
         top: 20.0,
@@ -403,7 +418,7 @@ class _SignupState extends State<Signup> {
       child: Text(
         text,
         style: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface,
+          color: colorScheme.onSurface,
           fontSize: FontProfile.medium,
         ),
       ),
@@ -415,7 +430,9 @@ class _SignupState extends State<Signup> {
     String text,
     selectedVariable,
     FormFieldValidator validator,
-  ) {
+    ColorScheme colorScheme, {
+    required Function(dynamic) onChanged,
+  }) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: DropdownButtonFormField<String>(
@@ -425,7 +442,7 @@ class _SignupState extends State<Signup> {
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.0),
               borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.outlineVariant,
+                color: colorScheme.outlineVariant,
                 width: 2.0,
                 style: BorderStyle.solid,
               ),
@@ -433,7 +450,7 @@ class _SignupState extends State<Signup> {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8.0),
               borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                color: colorScheme.onSurfaceVariant,
                 width: 2.0,
                 style: BorderStyle.solid,
               ),
@@ -441,13 +458,13 @@ class _SignupState extends State<Signup> {
             errorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8.0),
                 borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.outlineVariant,
+                    color: colorScheme.outlineVariant,
                     width: 2.0,
                     style: BorderStyle.solid)),
             focusedErrorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8.0),
                 borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.outlineVariant,
+                    color: colorScheme.outlineVariant,
                     width: 2.0,
                     style: BorderStyle.solid)),
           ),
@@ -458,51 +475,47 @@ class _SignupState extends State<Signup> {
               child: Text(
                 item,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: colorScheme.onSurface,
                 ),
               ),
             );
           }).toList(),
-          onChanged: (String? newValue) {
-            setState(() {
-              selectedVariable = newValue;
-            });
-          },
+          onChanged: onChanged,
           validator: validator),
     );
   }
 
   Widget _buildTextFormField(TextEditingController textController, String hint,
-      FormFieldValidator validator,
+      FormFieldValidator validator, ColorScheme colorScheme,
       {obscureText = false, TextInputType keyboardType = TextInputType.text}) {
     return TextFormField(
       controller: textController,
       style: TextStyle(
-        color: Theme.of(context).colorScheme.onSurface,
+        color: colorScheme.onSurface,
       ),
       decoration: InputDecoration(
         enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
             borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.outlineVariant,
+                color: colorScheme.outlineVariant,
                 width: 2.0,
                 style: BorderStyle.solid)),
         focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
             borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.outline,
+                color: colorScheme.outline,
                 width: 2.0,
                 style: BorderStyle.solid)),
         errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
             borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.outlineVariant,
+                color: colorScheme.outlineVariant,
                 width: 2.0,
                 style: BorderStyle.solid)),
         focusedErrorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
             borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.outlineVariant,
+                color: colorScheme.outlineVariant,
                 width: 2.0,
                 style: BorderStyle.solid)),
         hintText: hint,
@@ -514,7 +527,11 @@ class _SignupState extends State<Signup> {
     );
   }
 
-  Widget _buildBioField(String text, FormFieldValidator validator) {
+  Widget _buildBioField(
+    String text,
+    FormFieldValidator validator,
+    ColorScheme colorScheme,
+  ) {
     return Padding(
         padding: const EdgeInsets.all(8.0),
         child: TextFormField(
@@ -522,31 +539,31 @@ class _SignupState extends State<Signup> {
             maxLines: 5,
             controller: _bioController,
             style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface,
+              color: colorScheme.onSurface,
             ),
             decoration: InputDecoration(
               enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
                   borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.outlineVariant,
+                      color: colorScheme.outlineVariant,
                       width: 2.0,
                       style: BorderStyle.solid)),
               focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
                   borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      color: colorScheme.onSurfaceVariant,
                       width: 2.0,
                       style: BorderStyle.solid)),
               errorBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
                   borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.outlineVariant,
+                      color: colorScheme.outlineVariant,
                       width: 2.0,
                       style: BorderStyle.solid)),
               focusedErrorBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
                   borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.outlineVariant,
+                      color: colorScheme.outlineVariant,
                       width: 2.0,
                       style: BorderStyle.solid)),
               hintText: text,

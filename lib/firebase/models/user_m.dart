@@ -2,6 +2,7 @@ class UserM {
   String id;
   String name;
   String email;
+  String contact;
   String role;
   String reference;
   String displayName;
@@ -13,6 +14,7 @@ class UserM {
     required this.id,
     required this.name,
     required this.email,
+    required this.contact,
     required this.role,
     required this.displayName,
     required this.joinDate,
@@ -26,6 +28,7 @@ class UserM {
       id: id,
       name: json['name'],
       email: json['email'],
+      contact: json['contact'] ?? '',
       role: json['role'],
       displayName: json['displayName'],
       joinDate: json['joinDate'] ?? '',
@@ -40,6 +43,7 @@ class UserM {
       'id': id,
       'name': name,
       'email': email,
+      'contact': contact,
       'role': role,
       'displayName': displayName,
       'joinDate': joinDate,

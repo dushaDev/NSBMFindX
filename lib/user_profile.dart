@@ -5,7 +5,6 @@ import 'package:find_x/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
 import 'package:find_x/res/items/build_shimmer_loading.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class UserProfile extends StatefulWidget {
   final String userId;
@@ -51,7 +50,10 @@ class _UserProfileState extends State<UserProfile> {
                     MaterialPageRoute(builder: (_) => const Login()),
                     (route) => false, // Remove all previous routes
                   );
-                  _showSnackBar('Logged out successfully');
+                  // _databaseHelper.clearUsersTable(); // Clear the users table
+                  // _databaseHelper.close(); // Close the database
+
+                  _showSnackBar('Logged out successfully', false);
                 });
               }
             },
@@ -343,7 +345,7 @@ class _UserProfileState extends State<UserProfile> {
     );
   }
 
-  void _showSnackBar(String msg) {
+  void _showSnackBar(String msg, bool isError) {
     final _colorScheme = Theme.of(context).colorScheme;
     final snackBar = SnackBar(
       content: Text(msg,
@@ -351,7 +353,7 @@ class _UserProfileState extends State<UserProfile> {
             color: _colorScheme.onSecondary,
           )),
       duration: const Duration(seconds: 3),
-      backgroundColor: _colorScheme.secondary,
+      backgroundColor: isError ? _colorScheme.secondary : _colorScheme.primary,
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
