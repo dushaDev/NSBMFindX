@@ -9,6 +9,7 @@ import 'package:shimmer/shimmer.dart';
 
 import '../firebase/models/found_item.dart';
 import '../firebase/models/lost_item.dart';
+import '../user_profile.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -45,10 +46,16 @@ class _HomeState extends State<Home> {
               actions: [
                 IconButton(
                   onPressed: () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(builder: (context) => const LostPost()),
-                    // );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => UserProfile(
+                          userId: '28232',
+                          myProf: true,
+                          item: false,
+                        ),
+                      ),
+                    );
                   },
                   icon: Icon(
                     Icons.manage_accounts_outlined,
