@@ -50,7 +50,7 @@ dependencies:
   card_loading: ^0.3.2
   shimmer: ^3.0.0
   fl_chart: ^0.70.2
-
+  flutter_native_splash: ^2.4.6
 
 
 dev_dependencies:

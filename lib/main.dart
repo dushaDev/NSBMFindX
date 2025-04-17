@@ -1,4 +1,5 @@
 import 'package:find_x/res/color_profile.dart';
+import 'package:find_x/splash_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -55,11 +56,11 @@ class MyApp extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.active) {
           User? user = snapshot.data;
           if (user != null) {
-            // User is signed in, load the home page
-            return IndexPage();
+            // User is signed in, load the home page true Splash screen
+            return SplashScreen(nextPage: IndexPage());
           } else {
-            // User is not signed in, load the login page
-            return Login();
+            // User is not signed in, load the login page true Splash screen
+            return SplashScreen(nextPage: Login());
           }
         } else {
           // Show a loading indicator while checking the authentication state
