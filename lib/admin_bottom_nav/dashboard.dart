@@ -3,11 +3,8 @@ import 'package:find_x/res/items/build_shimmer_loading.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../firebase/auth_service.dart';
 import '../firebase/fire_store_service.dart';
-import '../firebase/models/found_item.dart';
-import '../firebase/models/lost_item.dart';
 import '../firebase/models/user_m.dart';
 import '../found_post.dart';
 import '../lost_post.dart';
@@ -29,6 +26,7 @@ class _DashboardState extends State<Dashboard> {
   String _title = 'Dashboard';
   @override
   Widget build(BuildContext context) {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
     return FutureBuilder(
         future: _getIdName(),
         builder: (context, snapshot) {
@@ -43,10 +41,9 @@ class _DashboardState extends State<Dashboard> {
               appBar: AppBar(
                 title: Text(
                   '$_title',
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.primary),
+                  style: TextStyle(color: colorScheme.primary),
                 ),
-                foregroundColor: Theme.of(context).colorScheme.onSurface,
+                foregroundColor: colorScheme.onSurface,
                 actions: [
                   IconButton(
                     onPressed: () {
@@ -64,7 +61,7 @@ class _DashboardState extends State<Dashboard> {
                     },
                     icon: Icon(
                       Icons.manage_accounts_outlined,
-                      color: Theme.of(context).colorScheme.onSecondaryContainer,
+                      color: colorScheme.onSecondaryContainer,
                     ),
                     iconSize: 32.0,
                   ),
@@ -86,6 +83,7 @@ class _DashboardState extends State<Dashboard> {
                                   '45%',
                                   Icons.report,
                                   'assets/images/communication.png',
+                                  colorScheme,
                                   () => LostPost())),
                           SizedBox(width: 5),
                           Expanded(
@@ -95,6 +93,7 @@ class _DashboardState extends State<Dashboard> {
                                   '38%',
                                   Icons.person_search,
                                   'assets/images/searching.png',
+                                  colorScheme,
                                   () =>
                                       FoundPost())), //There should be a FoundPost page
                         ],
@@ -110,20 +109,25 @@ class _DashboardState extends State<Dashboard> {
                                 ConnectionState.waiting) {
                               return Center(child: CircularProgressIndicator());
                             } else if (snapshot.hasError) {
-                              return _showEmptyCard('error: ${snapshot.error}');
+                              return _showEmptyCard(
+                                  'error: ${snapshot.error}', colorScheme);
                             } else if (snapshot.hasData) {
                               List<UserM>? usersNotApproved = snapshot.data;
 
                               if (usersNotApproved == null ||
                                   usersNotApproved.isEmpty) {
-                                return _showEmptyCard('No new pending users');
+                                return _showEmptyCard(
+                                    'No new pending users', colorScheme);
                               }
 
                               // Build the UI with the list of users not approved
                               return _buildPendingVerificationSection(
-                                  'Pending Verifications', usersNotApproved);
+                                  'Pending Verifications',
+                                  colorScheme,
+                                  usersNotApproved);
                             } else {
-                              return _showEmptyCard('Data not found');
+                              return _showEmptyCard(
+                                  'Data not found', colorScheme);
                             }
                           },
                         ),
@@ -139,7 +143,7 @@ class _DashboardState extends State<Dashboard> {
                                     child: CircularProgressIndicator());
                               } else if (snapshot.hasError) {
                                 return _showEmptyCard(
-                                    'error: ${snapshot.error}');
+                                    'error: ${snapshot.error}', colorScheme);
                               } else if (snapshot.hasData) {
                                 List? allItemsList = snapshot.data;
                                 final List<Map<String, dynamic>> finalList = [];
@@ -153,9 +157,10 @@ class _DashboardState extends State<Dashboard> {
                                 }
 
                                 return _buildUpdatesSection(
-                                    'Updates', finalList);
+                                    'Updates', colorScheme, finalList);
                               } else {
-                                return _showEmptyCard('No new updates');
+                                return _showEmptyCard(
+                                    'No new updates', colorScheme);
                               }
                             }),
                       ]),
@@ -204,11 +209,13 @@ class _DashboardState extends State<Dashboard> {
                               });
                               return _buildLostFoundMonth(
                                   'Last Week Chart (Count/Date)',
+                                  colorScheme,
                                   lostItemsData,
                                   foundItemsData,
                                   yAxisMax + 1);
                             } else {
-                              return _showEmptyCard('No data to show');
+                              return _showEmptyCard(
+                                  'No data to show', colorScheme);
                             }
                           }),
                       SizedBox(height: 80),
@@ -218,15 +225,21 @@ class _DashboardState extends State<Dashboard> {
               ),
             );
           } else {
-            return _showEmptyCard('Data not found');
+            return _showEmptyCard('Data not found', colorScheme);
           }
         });
   }
 
-  Widget _buildReportCard(String title, String count, String pres,
-      IconData icon, String image, Widget Function() myPageHere) {
+  Widget _buildReportCard(
+      String title,
+      String count,
+      String pres,
+      IconData icon,
+      String image,
+      ColorScheme colorScheme,
+      Widget Function() myPageHere) {
     return Card(
-        color: Theme.of(context).colorScheme.surfaceContainer,
+        color: colorScheme.surfaceContainer,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         child: InkResponse(
           onTap: () {
@@ -241,7 +254,7 @@ class _DashboardState extends State<Dashboard> {
                 padding: const EdgeInsets.all(8.0),
                 child: Text(title,
                     style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: colorScheme.onSurface,
                         fontSize: FontProfile.medium,
                         fontWeight: FontWeight.bold)),
               ),
@@ -256,12 +269,12 @@ class _DashboardState extends State<Dashboard> {
                       children: [
                         Text(count,
                             style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
+                                color: colorScheme.onSurface,
                                 fontSize: FontProfile.large,
                                 fontWeight: FontWeight.bold)),
                         Text(pres,
                             style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
+                                color: colorScheme.onSurface,
                                 fontSize: FontProfile.medium,
                                 fontWeight: FontWeight.normal)),
                       ],
@@ -281,9 +294,10 @@ class _DashboardState extends State<Dashboard> {
         ));
   }
 
-  Widget _buildUpdatesSection(String title, List<Map<String, dynamic>> items) {
+  Widget _buildUpdatesSection(
+      String title, ColorScheme colorScheme, List<Map<String, dynamic>> items) {
     return Card(
-      color: Theme.of(context).colorScheme.surfaceContainer,
+      color: colorScheme.surfaceContainer,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: Padding(
         padding: const EdgeInsets.all(5.0),
@@ -295,7 +309,7 @@ class _DashboardState extends State<Dashboard> {
               children: [
                 Text(title,
                     style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: colorScheme.onSurface,
                         fontSize: FontProfile.medium,
                         fontWeight: FontWeight.bold)),
                 TextButton(
@@ -310,7 +324,7 @@ class _DashboardState extends State<Dashboard> {
                   child: Text(
                     'View All',
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      color: colorScheme.onSurfaceVariant,
                       fontSize: FontProfile.medium,
                       fontWeight: FontWeight.normal,
                     ),
@@ -328,8 +342,7 @@ class _DashboardState extends State<Dashboard> {
                   return Column(
                     children: [
                       ListTile(
-                        tileColor:
-                            Theme.of(context).colorScheme.surfaceContainer,
+                        tileColor: colorScheme.surfaceContainer,
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: 3,
                         ),
@@ -346,14 +359,12 @@ class _DashboardState extends State<Dashboard> {
                               EdgeInsets.symmetric(horizontal: 1, vertical: 1),
                           decoration: BoxDecoration(
                             color: item['type']
-                                ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context).colorScheme.secondary,
+                                ? colorScheme.primary
+                                : colorScheme.secondary,
                             borderRadius: BorderRadius.circular(2),
                           ),
                           child: Text(item['type'] ? 'found' : 'lost',
-                              style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.onPrimary)),
+                              style: TextStyle(color: colorScheme.onPrimary)),
                         ),
                         title: Text(item['itemName']!,
                             style: TextStyle(fontWeight: FontWeight.normal)),
@@ -385,10 +396,10 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget _buildLostFoundMonth(String title, List<FlSpot> lostItemsData,
-      List<FlSpot> foundItemsData, int yAxisMax) {
+  Widget _buildLostFoundMonth(String title, ColorScheme colorScheme,
+      List<FlSpot> lostItemsData, List<FlSpot> foundItemsData, int yAxisMax) {
     return Card(
-      color: Theme.of(context).colorScheme.surfaceContainer,
+      color: colorScheme.surfaceContainer,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: Padding(
         padding: const EdgeInsets.all(5.0),
@@ -400,7 +411,7 @@ class _DashboardState extends State<Dashboard> {
               children: [
                 Text(title,
                     style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: colorScheme.onSurface,
                         fontSize: FontProfile.medium,
                         fontWeight: FontWeight.bold)),
                 TextButton(
@@ -415,7 +426,7 @@ class _DashboardState extends State<Dashboard> {
                   child: Text(
                     'View All',
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      color: colorScheme.onSurfaceVariant,
                       fontSize: FontProfile.medium,
                       fontWeight: FontWeight.normal,
                     ),
@@ -425,8 +436,8 @@ class _DashboardState extends State<Dashboard> {
             ),
             SizedBox(height: 5),
             LostFoundWeek(
-                foundItemsColor: Theme.of(context).colorScheme.primary,
-                lostItemsColor: Theme.of(context).colorScheme.secondary,
+                foundItemsColor: colorScheme.primary,
+                lostItemsColor: colorScheme.secondary,
                 lostItemsData: lostItemsData,
                 foundItemsData: foundItemsData,
                 yAxisMax: yAxisMax)
@@ -436,9 +447,10 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget _buildPendingVerificationSection(String title, List<UserM> items) {
+  Widget _buildPendingVerificationSection(
+      String title, ColorScheme colorScheme, List<UserM> items) {
     return Card(
-      color: Theme.of(context).colorScheme.surfaceContainer,
+      color: colorScheme.surfaceContainer,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: Padding(
         padding: const EdgeInsets.all(5.0),
@@ -450,14 +462,14 @@ class _DashboardState extends State<Dashboard> {
               children: [
                 Text(title,
                     style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: colorScheme.onSurface,
                         fontSize: FontProfile.medium,
                         fontWeight: FontWeight.bold)),
                 TextButton(
                   onPressed: () {},
                   child: Text('View All',
                       style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          color: colorScheme.onSurfaceVariant,
                           fontSize: FontProfile.medium,
                           fontWeight: FontWeight.normal)),
                 )
@@ -473,8 +485,7 @@ class _DashboardState extends State<Dashboard> {
                   return Column(
                     children: [
                       ListTile(
-                        tileColor:
-                            Theme.of(context).colorScheme.surfaceContainer,
+                        tileColor: colorScheme.surfaceContainer,
                         contentPadding: EdgeInsets.symmetric(
                           horizontal: 3,
                         ),
@@ -491,14 +502,12 @@ class _DashboardState extends State<Dashboard> {
                               EdgeInsets.symmetric(horizontal: 1, vertical: 1),
                           decoration: BoxDecoration(
                             color: item.role == 'student'
-                                ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context).colorScheme.secondary,
+                                ? colorScheme.primary
+                                : colorScheme.secondary,
                             borderRadius: BorderRadius.circular(2),
                           ),
                           child: Text(item.role,
-                              style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.onPrimary)),
+                              style: TextStyle(color: colorScheme.onPrimary)),
                         ),
                         title: Text(item.displayName,
                             style: TextStyle(fontWeight: FontWeight.normal)),
@@ -520,9 +529,9 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget _showEmptyCard(String message) {
+  Widget _showEmptyCard(String message, ColorScheme colorScheme) {
     return Card(
-        color: Theme.of(context).colorScheme.surfaceContainer,
+        color: colorScheme.surfaceContainer,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         child: Container(
             width: double.infinity,
@@ -531,7 +540,7 @@ class _DashboardState extends State<Dashboard> {
                 padding: const EdgeInsets.all(8.0),
                 child: Text(message,
                     style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        color: colorScheme.onSurfaceVariant,
                         fontSize: FontProfile.medium,
                         fontWeight: FontWeight.normal)),
               ),
@@ -568,5 +577,4 @@ class _DashboardState extends State<Dashboard> {
 
     return last7DaysCounts;
   }
-
 }

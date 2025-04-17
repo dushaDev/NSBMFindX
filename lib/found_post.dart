@@ -16,25 +16,23 @@ class FoundPost extends StatefulWidget {
 }
 
 class _FoundPostState extends State<FoundPost> {
-  String _title = 'Found Post';
   bool _useOwnNumber = true;
   bool _agreeTerms = false;
   bool _selectDate = true; // to select date or now in Radio button (true = now)
+  bool _isSpinKitLoaded = false;
   double _wholePadding = 10.0; // to set padding for all widgets
-  late Future<DateTime?> _selectedDate;
-  late Future<TimeOfDay?> _selectedTime;
+  String _title = 'Found Post';
   String _displayDate = "-"; //to store the selected date
   String _date = '-';
   String _displayTime = "-"; //to store the selected date
   String _lostTime = "-";
   String _amPm = ''; //to store AM/PM
-  int _hour24 = 0; //to store the selected hour in 24 hours format
-  int _minute = 0;
   String _contactNumber = '';
-
   String? _selectedPrivacy = 'Public';
   String? _selectedFaculty;
   String? _selectedDegree;
+  int _hour24 = 0; //to store the selected hour in 24 hours format
+  int _minute = 0;
   final List<String> _privacy_list = ['Public', 'Restricted', 'Private'];
   final List<String> _faculties = [
     'Faculty of Computing',
@@ -50,7 +48,8 @@ class _FoundPostState extends State<FoundPost> {
     'Business Administration',
     'Civil Engineering'
   ];
-
+  late Future<DateTime?> _selectedDate;
+  late Future<TimeOfDay?> _selectedTime;
   FireStoreService _fireStoreService = FireStoreService();
   AuthService _authService = AuthService();
   final TextEditingController _foundTextController = TextEditingController();
@@ -63,11 +62,12 @@ class _FoundPostState extends State<FoundPost> {
 
   @override
   Widget build(BuildContext context) {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: Text('$_title'),
         centerTitle: true,
-        foregroundColor: Theme.of(context).colorScheme.onSurface,
+        foregroundColor: colorScheme.onSurface,
       ),
       body: Form(
         key: _formKey,
@@ -78,14 +78,12 @@ class _FoundPostState extends State<FoundPost> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildText('Upload Images'),
+                  _buildText('Upload Images', colorScheme),
                   Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: Text(
                       "Upload maximum 20MB images",
-                      style: TextStyle(
-                          color:
-                              Theme.of(context).colorScheme.onSurfaceVariant),
+                      style: TextStyle(color: colorScheme.onSurfaceVariant),
                     ),
                   ),
                   SizedBox(height: 10),
@@ -95,7 +93,7 @@ class _FoundPostState extends State<FoundPost> {
                         height: 70,
                         width: 100,
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceContainer,
+                          color: colorScheme.surfaceContainer,
                         ),
                         child: Icon(Icons.add,
                             size: 32,
@@ -109,7 +107,7 @@ class _FoundPostState extends State<FoundPost> {
                         height: 70,
                         width: 100,
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceContainer,
+                          color: colorScheme.surfaceContainer,
                         ),
                         child: Icon(Icons.add,
                             size: 32,
@@ -131,8 +129,9 @@ class _FoundPostState extends State<FoundPost> {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildText('What You Found?'),
-                    _buildTextField(_foundTextController, 'A bag', (value) {
+                    _buildText('What You Found?', colorScheme),
+                    _buildTextField(_foundTextController, 'A bag', colorScheme,
+                        (value) {
                       if (value == null || value.isEmpty) {
                         return 'Item required.';
                       } else if (value.length < 3) {
@@ -150,7 +149,7 @@ class _FoundPostState extends State<FoundPost> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildText('Privacy'),
+                  _buildText('Privacy', colorScheme),
                   Container(
                     width: MediaQuery.of(context).size.width * 0.5,
                     child: DropdownButtonFormField<String>(
@@ -158,32 +157,38 @@ class _FoundPostState extends State<FoundPost> {
                         enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
                             borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.outlineVariant,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .outlineVariant,
                                 width: 2.0,
                                 style: BorderStyle.solid)),
                         disabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
                             borderSide: BorderSide(
-                                color:
-                                Theme.of(context).colorScheme.outlineVariant.withAlpha(90),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .outlineVariant
+                                    .withAlpha(90),
                                 width: 2.0,
                                 style: BorderStyle.solid)),
                         focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
                             borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.outline,
+                                color: colorScheme.outline,
                                 width: 2.0,
                                 style: BorderStyle.solid)),
                         errorBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
                             borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.outlineVariant,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .outlineVariant,
                                 width: 2.0,
                                 style: BorderStyle.solid)),
-                        focusedErrorBorder:  OutlineInputBorder(
+                        focusedErrorBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
                             borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.outline,
+                                color: colorScheme.outline,
                                 width: 2.0,
                                 style: BorderStyle.solid)),
                       ),
@@ -199,10 +204,7 @@ class _FoundPostState extends State<FoundPost> {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value,
-                              style: TextStyle(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface)),
+                              style: TextStyle(color: colorScheme.onSurface)),
                         );
                       }).toList(),
                       isExpanded: true,
@@ -227,12 +229,13 @@ class _FoundPostState extends State<FoundPost> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            _buildText('ID No'),
+                            _buildText('ID No', colorScheme),
                             Container(
                               width: MediaQuery.of(context).size.width * 0.5,
                               child: _buildTextField(
                                 _idTextController,
                                 '26334',
+                                colorScheme,
                                 (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'ID no required.';
@@ -258,7 +261,7 @@ class _FoundPostState extends State<FoundPost> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            _buildText('Faculty'),
+                            _buildText('Faculty', colorScheme),
                             Container(
                               width: MediaQuery.of(context).size.width * 0.5,
                               child: DropdownButtonFormField<String>(
@@ -266,32 +269,42 @@ class _FoundPostState extends State<FoundPost> {
                                   enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8.0),
                                       borderSide: BorderSide(
-                                          color: Theme.of(context).colorScheme.outlineVariant,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outlineVariant,
                                           width: 2.0,
                                           style: BorderStyle.solid)),
                                   disabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8.0),
                                       borderSide: BorderSide(
-                                          color:
-                                          Theme.of(context).colorScheme.outlineVariant.withAlpha(90),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outlineVariant
+                                              .withAlpha(90),
                                           width: 2.0,
                                           style: BorderStyle.solid)),
                                   focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8.0),
                                       borderSide: BorderSide(
-                                          color: Theme.of(context).colorScheme.outline,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outline,
                                           width: 2.0,
                                           style: BorderStyle.solid)),
                                   errorBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8.0),
                                       borderSide: BorderSide(
-                                          color: Theme.of(context).colorScheme.outlineVariant,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outlineVariant,
                                           width: 2.0,
                                           style: BorderStyle.solid)),
-                                  focusedErrorBorder:  OutlineInputBorder(
+                                  focusedErrorBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8.0),
                                       borderSide: BorderSide(
-                                          color: Theme.of(context).colorScheme.outline,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outline,
                                           width: 2.0,
                                           style: BorderStyle.solid)),
                                 ),
@@ -302,9 +315,8 @@ class _FoundPostState extends State<FoundPost> {
                                     _selectedFaculty = newValue;
                                   });
                                 },
-                                items: _faculties
-                                    .map<DropdownMenuItem<String>>(
-                                        (String value) {
+                                items: _faculties.map<DropdownMenuItem<String>>(
+                                    (String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,
                                     child: Text(value,
@@ -329,7 +341,7 @@ class _FoundPostState extends State<FoundPost> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            _buildText('Degree'),
+                            _buildText('Degree', colorScheme),
                             Container(
                               width: MediaQuery.of(context).size.width * 0.5,
                               child: DropdownButtonFormField<String>(
@@ -337,32 +349,42 @@ class _FoundPostState extends State<FoundPost> {
                                   enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8.0),
                                       borderSide: BorderSide(
-                                          color: Theme.of(context).colorScheme.outlineVariant,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outlineVariant,
                                           width: 2.0,
                                           style: BorderStyle.solid)),
                                   disabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8.0),
                                       borderSide: BorderSide(
-                                          color:
-                                          Theme.of(context).colorScheme.outlineVariant.withAlpha(90),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outlineVariant
+                                              .withAlpha(90),
                                           width: 2.0,
                                           style: BorderStyle.solid)),
                                   focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8.0),
                                       borderSide: BorderSide(
-                                          color: Theme.of(context).colorScheme.outline,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outline,
                                           width: 2.0,
                                           style: BorderStyle.solid)),
                                   errorBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8.0),
                                       borderSide: BorderSide(
-                                          color: Theme.of(context).colorScheme.outlineVariant,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outlineVariant,
                                           width: 2.0,
                                           style: BorderStyle.solid)),
-                                  focusedErrorBorder:  OutlineInputBorder(
+                                  focusedErrorBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(8.0),
                                       borderSide: BorderSide(
-                                          color: Theme.of(context).colorScheme.outline,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .outline,
                                           width: 2.0,
                                           style: BorderStyle.solid)),
                                 ),
@@ -376,9 +398,8 @@ class _FoundPostState extends State<FoundPost> {
                                         newValue; // Update the selected value
                                   });
                                 },
-                                items: _degrees
-                                    .map<DropdownMenuItem<String>>(
-                                        (String value) {
+                                items: _degrees.map<DropdownMenuItem<String>>(
+                                    (String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,
                                     child: Text(value,
@@ -409,7 +430,7 @@ class _FoundPostState extends State<FoundPost> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildText('Found Time & Date'),
+                  _buildText('Found Time & Date', colorScheme),
                   Column(
                     children: [
                       Row(
@@ -422,8 +443,7 @@ class _FoundPostState extends State<FoundPost> {
                           ),
                           Text(
                             "Select Date & Time",
-                            style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface),
+                            style: TextStyle(color: colorScheme.onSurface),
                           ),
                           Spacer(),
                           Column(
@@ -442,7 +462,7 @@ class _FoundPostState extends State<FoundPost> {
                                 onPressed: _selectDate
                                     ? null
                                     : () {
-                                        _showDialogPicker(context);
+                                        _showDialogPicker(context, colorScheme);
                                       },
                                 child: Text(
                                     _displayDate == '-'
@@ -473,7 +493,8 @@ class _FoundPostState extends State<FoundPost> {
                                 onPressed: _selectDate
                                     ? null
                                     : () {
-                                        _showDialogTimePicker(context);
+                                        _showDialogTimePicker(
+                                            context, colorScheme);
                                       },
                                 child: Text(
                                     _displayTime == "-"
@@ -504,8 +525,7 @@ class _FoundPostState extends State<FoundPost> {
                           ),
                           Text(
                             "Now",
-                            style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface),
+                            style: TextStyle(color: colorScheme.onSurface),
                           ),
                         ],
                       ),
@@ -520,13 +540,14 @@ class _FoundPostState extends State<FoundPost> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildText('Where Now Item?'),
+                  _buildText('Where Now Item?', colorScheme),
                   _buildTextField(
                     _locationTextController,
                     'Edge Canteen',
+                    colorScheme,
                     (value) {
                       if (value == null || value.isEmpty) {
-                        return 'required.';
+                        return 'Location required.';
                       } else if (value.length < 2) {
                         return 'Minimum 2 characters required.';
                       }
@@ -544,12 +565,12 @@ class _FoundPostState extends State<FoundPost> {
                   padding: EdgeInsets.only(left: 20.0),
                   scrollDirection: Axis.horizontal, // Horizontal scroll
                   children: [
-                    _buildChip('Edge Canteen'),
-                    _buildChip('Hostel Canteen'),
-                    _buildChip('Library'),
-                    _buildChip('Computing Faculty'),
-                    _buildChip('Engineering Faculty'),
-                    _buildChip('Business Faculty'),
+                    _buildChip('Edge Canteen', colorScheme),
+                    _buildChip('Hostel Canteen', colorScheme),
+                    _buildChip('Library', colorScheme),
+                    _buildChip('Computing Faculty', colorScheme),
+                    _buildChip('Engineering Faculty', colorScheme),
+                    _buildChip('Business Faculty', colorScheme),
                   ],
                 )),
             SizedBox(height: 20),
@@ -558,7 +579,7 @@ class _FoundPostState extends State<FoundPost> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildText('Contact Number'),
+                  _buildText('Contact Number', colorScheme),
                   Row(
                     children: [
                       Expanded(
@@ -575,10 +596,11 @@ class _FoundPostState extends State<FoundPost> {
                                   _useOwnNumber
                                       ? _setAsterisk(_contactNumber)
                                       : 'Enter Number',
+                                  colorScheme,
                                   (value) {
                                     if (!_useOwnNumber) {
                                       if (value == null || value.isEmpty) {
-                                        return 'Contact Number required.';
+                                        return 'Contact number required.';
                                       } else if (value.length != 10) {
                                         return 'Enter valid number.';
                                       }
@@ -609,8 +631,7 @@ class _FoundPostState extends State<FoundPost> {
                           ),
                           Text(
                             "Use Own",
-                            style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface),
+                            style: TextStyle(color: colorScheme.onSurface),
                           ),
                         ],
                       ),
@@ -625,10 +646,11 @@ class _FoundPostState extends State<FoundPost> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildText('Description'),
-                  _buildTextField(_descriptionTextController,
+                  _buildText('Description', colorScheme),
+                  _buildTextField(
+                      _descriptionTextController,
                       'A black bag with a red stripe on the side and...',
-                      (value) {
+                      colorScheme, (value) {
                     if (value == null || value.isEmpty) {
                       return 'Description required.';
                     } else if (value.length < 5) {
@@ -649,7 +671,7 @@ class _FoundPostState extends State<FoundPost> {
                     value: _agreeTerms,
                     onChanged: (value) => setState(() => _agreeTerms = value!),
                   ),
-                  _buildText('Agree to our Terms and Conditions',
+                  _buildText('Agree to our Terms and Conditions', colorScheme,
                       bottomPadding: 0),
                 ],
               ),
@@ -662,7 +684,7 @@ class _FoundPostState extends State<FoundPost> {
                     onTap: _agreeTerms
                         ? null
                         : () {
-                            _showSnackBar('Agree to T&C', true);
+                            _showSnackBar('Agree to T&C', colorScheme, true);
                           },
                     child: FilledButton(
                       onPressed: _agreeTerms
@@ -673,8 +695,11 @@ class _FoundPostState extends State<FoundPost> {
                                     _displayTime == '-' && !_selectDate) {
                                   // check if date and time are selected
                                   _showSnackBar(
-                                      'Select Date Time or Now', true);
+                                      'Select Date Time or option \"Now\"',
+                                      colorScheme,
+                                      true);
                                 } else {
+                                  _isSpinKitLoaded = true; // show loading spinner
                                   String? userId =
                                       await _authService.getUserId();
                                   _selectDate
@@ -714,19 +739,24 @@ class _FoundPostState extends State<FoundPost> {
                                               _selectedPrivacy == 'Private'
                                                   ? _idTextController.text
                                                   : null,
-                                          isCompleted: false));
+                                          isCompleted: false))  .whenComplete(() {
+                                    _showSnackBar('Found item posted successfully',
+                                        colorScheme, false);
+                                    _isSpinKitLoaded = false;
+                                    Navigator.pop(context);
+                                  });
                                 }
                               } else {
-                                _showSnackBar('Please fill all fields', true);
+                                _showSnackBar('Please fill all fields',
+                                    colorScheme, true);
                               }
                             }
                           : null,
                       style: FilledButton.styleFrom(
                         minimumSize: const Size(150.0, 50.0),
                         maximumSize: const Size(200.0, 50.0),
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor:
-                            Theme.of(context).colorScheme.onPrimary,
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
                         textStyle: const TextStyle(
                           fontSize: FontProfile.medium,
                         ),
@@ -748,13 +778,14 @@ class _FoundPostState extends State<FoundPost> {
     );
   }
 
-  Widget _buildText(String text, {double bottomPadding = 10.0}) {
+  Widget _buildText(String text, ColorScheme colorScheme,
+      {double bottomPadding = 10.0}) {
     return Padding(
       padding: EdgeInsets.only(bottom: bottomPadding),
       child: Text(
         text,
         style: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface,
+          color: colorScheme.onSurface,
           fontSize: FontProfile.medium,
         ),
       ),
@@ -764,6 +795,7 @@ class _FoundPostState extends State<FoundPost> {
   Widget _buildTextField(
     TextEditingController textController,
     String hint,
+    ColorScheme colorScheme,
     FormFieldValidator validator, {
     List<TextInputFormatter>? inputFormatters,
     int? maxLines = 1,
@@ -772,39 +804,38 @@ class _FoundPostState extends State<FoundPost> {
     return TextFormField(
       enabled: enabled,
       maxLines: maxLines,
-      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+      style: TextStyle(color: colorScheme.onSurface),
       inputFormatters: inputFormatters,
       controller: textController,
       decoration: InputDecoration(
         enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
             borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.outlineVariant,
+                color: colorScheme.outlineVariant,
                 width: 2.0,
                 style: BorderStyle.solid)),
         disabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
             borderSide: BorderSide(
-                color:
-                    Theme.of(context).colorScheme.outlineVariant.withAlpha(90),
+                color: colorScheme.outlineVariant.withAlpha(90),
                 width: 2.0,
                 style: BorderStyle.solid)),
         focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
             borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.outline,
+                color: colorScheme.outline,
                 width: 2.0,
                 style: BorderStyle.solid)),
         errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
             borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.outlineVariant,
+                color: colorScheme.outlineVariant,
                 width: 2.0,
                 style: BorderStyle.solid)),
-        focusedErrorBorder:  OutlineInputBorder(
+        focusedErrorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
             borderSide: BorderSide(
-                color: Theme.of(context).colorScheme.outline,
+                color: colorScheme.outline,
                 width: 2.0,
                 style: BorderStyle.solid)),
         hintText: hint,
@@ -813,7 +844,7 @@ class _FoundPostState extends State<FoundPost> {
     );
   }
 
-  Widget _buildChip(String label) {
+  Widget _buildChip(String label, ColorScheme colorScheme) {
     //to create chips for location/ Where now Item?
     return Padding(
       padding: const EdgeInsets.all(2.0),
@@ -831,19 +862,22 @@ class _FoundPostState extends State<FoundPost> {
           label,
           style: TextStyle(
             fontSize: FontProfile.extraSmall,
-            color: Theme.of(context).colorScheme.onSurface.withAlpha(90),
+            color: colorScheme.onSurface.withAlpha(90),
           ),
         ),
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
             side: BorderSide(
-              color: Theme.of(context).colorScheme.outlineVariant,
+              color: colorScheme.outlineVariant,
             )),
       ),
     );
   }
 
-  void _showDialogPicker(BuildContext context) {
+  void _showDialogPicker(
+    BuildContext context,
+    ColorScheme colorScheme,
+  ) {
     //for date picker to select date
     _selectedDate = showDatePicker(
       context: context,
@@ -854,13 +888,12 @@ class _FoundPostState extends State<FoundPost> {
         return Theme(
           data: ThemeData.light().copyWith(
             colorScheme: ColorScheme.light(
-              primary: Theme.of(context).colorScheme.primary,
-              onPrimary: Theme.of(context).colorScheme.onPrimary,
-              surface: Theme.of(context).colorScheme.surface,
-              onSurface: Theme.of(context).colorScheme.onSurface,
-              secondary: Theme.of(context).colorScheme.secondary,
-              onPrimaryContainer:
-                  Theme.of(context).colorScheme.onPrimaryContainer,
+              primary: colorScheme.primary,
+              onPrimary: colorScheme.onPrimary,
+              surface: colorScheme.surface,
+              onSurface: colorScheme.onSurface,
+              secondary: colorScheme.secondary,
+              onPrimaryContainer: colorScheme.onPrimaryContainer,
             ),
           ),
           child: child!,
@@ -882,7 +915,10 @@ class _FoundPostState extends State<FoundPost> {
     });
   }
 
-  void _showDialogTimePicker(BuildContext context) {
+  void _showDialogTimePicker(
+    BuildContext context,
+    ColorScheme colorScheme,
+  ) {
     _selectedTime = showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -890,13 +926,12 @@ class _FoundPostState extends State<FoundPost> {
         return Theme(
           data: ThemeData.light().copyWith(
             colorScheme: ColorScheme.light(
-              primary: Theme.of(context).colorScheme.primary,
-              onPrimary: Theme.of(context).colorScheme.onPrimary,
-              surface: Theme.of(context).colorScheme.surface,
-              onSurface: Theme.of(context).colorScheme.onSurface,
-              secondary: Theme.of(context).colorScheme.secondary,
-              onPrimaryContainer:
-                  Theme.of(context).colorScheme.onPrimaryContainer,
+              primary: colorScheme.primary,
+              onPrimary: colorScheme.onPrimary,
+              surface: colorScheme.surface,
+              onSurface: colorScheme.onSurface,
+              secondary: colorScheme.secondary,
+              onPrimaryContainer: colorScheme.onPrimaryContainer,
             ),
           ),
           child: child!,
@@ -945,8 +980,8 @@ class _FoundPostState extends State<FoundPost> {
     return hour24;
   }
 
-  void _showSnackBar(String msg, bool isError) {
-    final _colorScheme = Theme.of(context).colorScheme;
+  void _showSnackBar(String msg, ColorScheme colorScheme, bool isError) {
+    final _colorScheme = colorScheme;
     final snackBar = SnackBar(
       content: Text(msg,
           style: TextStyle(

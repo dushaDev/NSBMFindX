@@ -6,6 +6,9 @@ import 'package:find_x/res/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+
+import 'firebase/auth_service.dart';
 
 class LostPost extends StatefulWidget {
   const LostPost({super.key});
@@ -15,368 +18,475 @@ class LostPost extends StatefulWidget {
 }
 
 class _LostPostState extends State<LostPost> {
-  String _title = 'Lost Post';
   bool _useOwnNumber = true;
   bool _agreeTerms = false;
   bool _selectDate = true;
+  bool _isSpinKitLoaded = false;
   double _wholePadding = 10.0;
-  late Future<DateTime?> _selectedDate;
-  late Future<TimeOfDay?> _selectedTime;
+  String _title = 'Lost Post';
   String _displayDate = "-";
   String _date = '-';
   String _displayTime = "-";
   String _lostTime = "-";
   String _amPm = '';
+  String _contactNumber = '';
   int _hour24 = 0;
   int _minute = 0;
-  String _contactNumber = '0767771005';
+  late Future<DateTime?> _selectedDate;
+  late Future<TimeOfDay?> _selectedTime;
   FireStoreService _fireStoreService = FireStoreService();
+  AuthService _authService = AuthService();
   final TextEditingController _lostTextController = TextEditingController();
   final TextEditingController _descriptionTextController =
       TextEditingController();
   final TextEditingController _locationTextController = TextEditingController();
   final TextEditingController _contactTextController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: Text('$_title'),
         centerTitle: true,
-        foregroundColor: Theme.of(context).colorScheme.onSurface,
+        foregroundColor: colorScheme.onSurface,
       ),
-      body: ListView(
+      body: Stack(
         children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: _wholePadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Form(
+            key: _formKey,
+            child: ListView(
               children: [
-                _buildText('What You Lost?'),
-                _buildTextField(_lostTextController, 'A bag')
-              ],
-            ),
-          ),
-          SizedBox(height: 20),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: _wholePadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildText('Lost Time & Date'),
-                Column(
-                  children: [
-                    Row(
-                      children: [
-                        Radio(
-                          value: false,
-                          groupValue: _selectDate,
-                          onChanged: (value) =>
-                              setState(() => _selectDate = false),
-                        ),
-                        Text(
-                          "Select Date & Time",
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface),
-                        ),
-                        Spacer(),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            FilledButton(
-                              style: FilledButton.styleFrom(
-                                minimumSize: const Size(100.0, 40.0),
-                                maximumSize: Size(200.0, 40.0),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(4.0)),
-                                backgroundColor: Theme.of(context)
-                                    .colorScheme
-                                    .surfaceContainer,
-                              ),
-                              onPressed: _selectDate
-                                  ? null
-                                  : () {
-                                      showDialogPicker(context);
-                                    },
-                              child: Text(
-                                  _displayDate == '-'
-                                      ? 'Select Date'
-                                      : '$_displayDate',
-                                  style: TextStyle(
-                                    color: _selectDate
-                                        ? Theme.of(context)
-                                            .colorScheme
-                                            .onSurface
-                                            .withAlpha(60)
-                                        : Theme.of(context).colorScheme.primary,
-                                  )),
-                            ),
-                            SizedBox(width: 10),
-                            FilledButton(
-                              style: FilledButton.styleFrom(
-                                minimumSize: const Size(100.0, 40.0),
-                                maximumSize: Size(200.0, 40.0),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(4.0)),
-                                backgroundColor: Theme.of(context)
-                                    .colorScheme
-                                    .surfaceContainer,
-                              ),
-                              onPressed: _selectDate
-                                  ? null
-                                  : () {
-                                      showDialogTimePicker(context);
-                                    },
-                              child: Text(
-                                  _displayTime == "-"
-                                      ? "Select Time"
-                                      : '${get12Hour(_hour24)}:$_minute $_amPm',
-                                  style: TextStyle(
-                                    color: _selectDate
-                                        ? Theme.of(context)
-                                            .colorScheme
-                                            .onSurface
-                                            .withAlpha(60)
-                                        : Theme.of(context).colorScheme.primary,
-                                  )),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Radio(
-                          value: true,
-                          groupValue: _selectDate,
-                          onChanged: (value) =>
-                              setState(() => _selectDate = true),
-                        ),
-                        Text(
-                          "Now",
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 20),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: _wholePadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildText('Last Known Location'),
-                _buildTextField(_locationTextController, 'Edge Canteen')
-              ],
-            ),
-          ),
-          SizedBox(height: 10),
-          Container(
-              height: 40, // Hei
-
-              child: ListView(
-                padding: EdgeInsets.only(left: 20.0),
-                scrollDirection: Axis.horizontal, // Horizontal scroll
-                children: [
-                  _buildChip('Edge Canteen'),
-                  _buildChip('Hostel Canteen'),
-                  _buildChip('Library'),
-                  _buildChip('Computing Faculty'),
-                  _buildChip('Engineering Faculty'),
-                  _buildChip('Business Faculty'),
-                ],
-              )),
-          SizedBox(height: 20),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: _wholePadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildText('Contact Number'),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildTextField(_contactTextController,
-                          _useOwnNumber ? _contactNumber : 'Enter Number',
-                          inputFormatters: [
-                            LengthLimitingTextInputFormatter(10),
-                            FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                          ],
-                          enabled: _useOwnNumber ? false : true),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Checkbox(
-                          value: _useOwnNumber,
-                          onChanged: (value) =>
-                              setState((){
-                                _useOwnNumber = value!;
-                                     _contactTextController.clear();
-                                } ),
-                        ),
-                        Text(
-                          "Use Own",
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 20),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: _wholePadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildText('Description'),
-                _buildTextField(_descriptionTextController,
-                    'A black bag with a red stripe on the side and...',
-                    maxLines: 3),
-              ],
-            ),
-          ),
-          SizedBox(height: 20),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: _wholePadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildText('Upload Images If You Have'),
                 Padding(
-                  padding: const EdgeInsets.only(left: 20.0),
-                  child: Text(
-                    "Upload maximum 20MB images",
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  padding: EdgeInsets.symmetric(horizontal: _wholePadding),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildText('What You Lost?', colorScheme),
+                      _buildTextField(_lostTextController, 'A bag', (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Item required.';
+                        } else if (value.length < 3) {
+                          return 'Length too short.';
+                        }
+                        return null;
+                      }, colorScheme)
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: _wholePadding),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildText('Lost Time & Date', colorScheme),
+                      Column(
+                        children: [
+                          Row(
+                            children: [
+                              Radio(
+                                value: false,
+                                groupValue: _selectDate,
+                                onChanged: (value) =>
+                                    setState(() => _selectDate = false),
+                              ),
+                              Text(
+                                "Select Date & Time",
+                                style: TextStyle(color: colorScheme.onSurface),
+                              ),
+                              Spacer(),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  FilledButton(
+                                    style: FilledButton.styleFrom(
+                                      minimumSize: const Size(100.0, 40.0),
+                                      maximumSize: Size(200.0, 40.0),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(4.0)),
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .surfaceContainer,
+                                    ),
+                                    onPressed: _selectDate
+                                        ? null
+                                        : () {
+                                            showDialogPicker(
+                                                context, colorScheme);
+                                          },
+                                    child: Text(
+                                        _displayDate == '-'
+                                            ? 'Select Date'
+                                            : '$_displayDate',
+                                        style: TextStyle(
+                                          color: _selectDate
+                                              ? Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface
+                                                  .withAlpha(60)
+                                              : colorScheme.primary,
+                                        )),
+                                  ),
+                                  SizedBox(width: 10),
+                                  FilledButton(
+                                    style: FilledButton.styleFrom(
+                                      minimumSize: const Size(100.0, 40.0),
+                                      maximumSize: Size(200.0, 40.0),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(4.0)),
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .surfaceContainer,
+                                    ),
+                                    onPressed: _selectDate
+                                        ? null
+                                        : () {
+                                            showDialogTimePicker(
+                                                context, colorScheme);
+                                          },
+                                    child: Text(
+                                        _displayTime == "-"
+                                            ? "Select Time"
+                                            : '${get12Hour(_hour24)}:$_minute $_amPm',
+                                        style: TextStyle(
+                                          color: _selectDate
+                                              ? Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface
+                                                  .withAlpha(60)
+                                              : colorScheme.primary,
+                                        )),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Radio(
+                                value: true,
+                                groupValue: _selectDate,
+                                onChanged: (value) =>
+                                    setState(() => _selectDate = true),
+                              ),
+                              Text(
+                                "Now",
+                                style: TextStyle(color: colorScheme.onSurface),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: _wholePadding),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildText('Last Known Location', colorScheme),
+                      _buildTextField(_locationTextController, 'Edge Canteen',
+                          (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Location required.';
+                        } else if (value.length < 3) {
+                          return 'Length too short.';
+                        }
+                        return null;
+                      }, colorScheme)
+                    ],
                   ),
                 ),
                 SizedBox(height: 10),
-                Row(
-                  children: [
-                    Container(
-                      height: 70,
-                      width: 100,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceContainer,
+                Container(
+                    height: 40, // Hei
+
+                    child: ListView(
+                      padding: EdgeInsets.only(left: 20.0),
+                      scrollDirection: Axis.horizontal, // Horizontal scroll
+                      children: [
+                        _buildChip('Edge Canteen', colorScheme),
+                        _buildChip('Hostel Canteen', colorScheme),
+                        _buildChip('Library', colorScheme),
+                        _buildChip('Computing Faculty', colorScheme),
+                        _buildChip('Engineering Faculty', colorScheme),
+                        _buildChip('Business Faculty', colorScheme),
+                      ],
+                    )),
+                SizedBox(height: 20),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: _wholePadding),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildText('Contact Number', colorScheme),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: FutureBuilder(
+                                future: _authService.getUserContact(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return Container();
+                                  } else if (snapshot.hasData) {
+                                    _contactNumber = snapshot.data!;
+                                    return _buildTextField(
+                                        _contactTextController,
+                                        _useOwnNumber
+                                            ? _setAsterisk(_contactNumber)
+                                            : 'Enter Number', (value) {
+                                      if (!_useOwnNumber) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Contact number required.';
+                                        } else if (value.length != 10) {
+                                          return 'Enter valid number.';
+                                        }
+                                      }
+                                      return null;
+                                    }, colorScheme,
+                                        inputFormatters: [
+                                          LengthLimitingTextInputFormatter(10),
+                                          FilteringTextInputFormatter.allow(
+                                              RegExp(r'[0-9]')),
+                                        ],
+                                        enabled: _useOwnNumber ? false : true);
+                                  } else {
+                                    return Container();
+                                  }
+                                }),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Checkbox(
+                                value: _useOwnNumber,
+                                onChanged: (value) => setState(() {
+                                  _useOwnNumber = value!;
+                                  _contactTextController.clear();
+                                }),
+                              ),
+                              Text(
+                                "Use Own",
+                                style: TextStyle(color: colorScheme.onSurface),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                      child: Icon(Icons.add,
-                          size: 32,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withAlpha(60)),
-                    ),
-                    SizedBox(width: 10),
-                    Container(
-                      height: 70,
-                      width: 100,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceContainer,
-                      ),
-                      child: Icon(Icons.add,
-                          size: 32,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withAlpha(60)),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
+                SizedBox(height: 20),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: _wholePadding),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildText('Description', colorScheme),
+                      _buildTextField(_descriptionTextController,
+                          'A black bag with a red stripe on the side and...',
+                          (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Description required.';
+                        } else if (value.length < 5) {
+                          return 'Length too short.';
+                        }
+                        return null;
+                      }, colorScheme, maxLines: 3),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: _wholePadding),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildText('Upload Images If You Have', colorScheme),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20.0),
+                        child: Text(
+                          "Upload maximum 20MB images",
+                          style: TextStyle(color: colorScheme.onSurfaceVariant),
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Container(
+                            height: 70,
+                            width: 100,
+                            decoration: BoxDecoration(
+                              color: colorScheme.surfaceContainer,
+                            ),
+                            child: Icon(Icons.add,
+                                size: 32,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withAlpha(60)),
+                          ),
+                          SizedBox(width: 10),
+                          Container(
+                            height: 70,
+                            width: 100,
+                            decoration: BoxDecoration(
+                              color: colorScheme.surfaceContainer,
+                            ),
+                            child: Icon(Icons.add,
+                                size: 32,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withAlpha(60)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: _wholePadding),
+                  child: Row(
+                    children: [
+                      Checkbox(
+                        value: _agreeTerms,
+                        onChanged: (value) =>
+                            setState(() => _agreeTerms = value!),
+                      ),
+                      _buildText(
+                          'Agree to our Terms and Conditions', colorScheme,
+                          bottomPadding: 0),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(50.0),
+                  child: Column(
+                    children: [
+                      GestureDetector(
+                        onTap: _agreeTerms
+                            ? null
+                            : () {
+                                _showSnackBar(
+                                    'Agree to T&C', colorScheme, true);
+                              },
+                        child: FilledButton(
+                          onPressed: _agreeTerms
+                              ? () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    if (_displayDate == '-' && !_selectDate ||
+                                        _displayTime == '-' && !_selectDate) {
+                                      // check if date and time are selected
+                                      _showSnackBar(
+                                          'Select Date Time or option \"Now\"',
+                                          colorScheme,
+                                          true);
+                                    } else {
+                                      _isSpinKitLoaded =
+                                          true; // show loading spinner
+                                      String? userId =
+                                          await _authService.getUserId();
+                                      _selectDate
+                                          ? _lostTime = ReadDate().getDateNow()
+                                          : _lostTime = '$_date$_displayTime';
+
+                                      await _fireStoreService
+                                          .addLostItem(LostItem(
+                                              id: userId!,
+                                              itemName:
+                                                  _lostTextController.text,
+                                              type: false,
+                                              lostTime: _lostTime,
+                                              postedTime:
+                                                  ReadDate().getDateNow(),
+                                              lastKnownLocation:
+                                                  _locationTextController.text,
+                                              contactNumber: _useOwnNumber
+                                                  ? _contactNumber
+                                                  : _contactTextController.text,
+                                              description:
+                                                  _descriptionTextController
+                                                      .text,
+                                              images: [
+                                                'path/to/image1.jpg',
+                                                'path/to/image2.jpg'
+                                              ],
+                                              agreedToTerms: _agreeTerms,
+                                              userId: userId,
+                                              isCompleted: false))
+                                          .whenComplete(() {
+                                        _showSnackBar('Lost item posted successfully',
+                                            colorScheme, false);
+                                        _isSpinKitLoaded = false;
+                                        Navigator.pop(context);
+                                      });
+                                    }
+                                  } else {
+                                    _showSnackBar('Please fill all fields',
+                                        colorScheme, true);
+                                  }
+                                }
+                              : null,
+                          style: FilledButton.styleFrom(
+                            minimumSize: const Size(150.0, 50.0),
+                            maximumSize: const Size(200.0, 50.0),
+                            backgroundColor: colorScheme.primary,
+                            foregroundColor: colorScheme.onPrimary,
+                            textStyle: const TextStyle(
+                              fontSize: FontProfile.medium,
+                            ),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0)),
+                            padding: const EdgeInsets.only(
+                                left: 50.0,
+                                right: 50.0,
+                                top: 15.0,
+                                bottom: 15.0),
+                          ),
+                          child: const Text("Post Now"),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20),
               ],
             ),
           ),
-          SizedBox(height: 20),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: _wholePadding),
-            child: Row(
-              children: [
-                Checkbox(
-                  value: _agreeTerms,
-                  onChanged: (value) => setState(() => _agreeTerms = value!),
-                ),
-                _buildText('Agree to our Terms and Conditions',
-                    bottomPadding: 0),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(50.0),
-            child: Column(
-              children: [
-                GestureDetector(
-                  onTap: _agreeTerms
-                      ? null
-                      : () {
-                          _showSnackBar('Agree to T&C',true);
-                        },
-                  child: FilledButton(
-                    onPressed: _agreeTerms
-                        ? () async {
-                            _selectDate
-                                ?  _lostTime = ReadDate().getDateNow()
-                                :_lostTime = '$_date$_displayTime';
-
-                            await _fireStoreService.addLostItem(LostItem(
-                                id: '28232',
-                                itemName: _lostTextController.text,
-                                type: false,
-                                lostTime: _lostTime,
-                                postedTime: ReadDate().getDateNow(),
-                                lastKnownLocation: _locationTextController.text,
-                                contactNumber: _useOwnNumber?_contactNumber: _contactTextController.text,
-                                description: _descriptionTextController.text,
-                                images: [
-                                  'path/to/image1.jpg',
-                                  'path/to/image2.jpg'
-                                ],
-                                agreedToTerms: _agreeTerms,
-                                userId: '28232',
-                                isCompleted: false));
-
-                            //showToast('Button Working');
-                          }
-                        : null,
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size(150.0, 50.0),
-                      maximumSize: const Size(200.0, 50.0),
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                      textStyle: const TextStyle(
-                        fontSize: FontProfile.medium,
-                      ),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0)),
-                      padding: const EdgeInsets.only(
-                          left: 50.0, right: 50.0, top: 15.0, bottom: 15.0),
+          _isSpinKitLoaded
+              ? Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    margin: const EdgeInsets.only(top: 100.0),
+                    child: SpinKitThreeBounce(
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 25.0,
                     ),
-                    child: const Text("Post Now"),
                   ),
                 )
-              ],
-            ),
-          ),
-          SizedBox(height: 20),
+              : Container(),
         ],
       ),
     );
   }
 
-  Widget _buildText(String text, {double bottomPadding = 10.0}) {
+  Widget _buildText(String text, ColorScheme colorScheme,
+      {double bottomPadding = 10.0}) {
     return Padding(
       padding: EdgeInsets.only(bottom: bottomPadding),
       child: Text(
         text,
         style: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface,
+          color: colorScheme.onSurface,
           fontSize: FontProfile.medium,
         ),
       ),
@@ -384,10 +494,11 @@ class _LostPostState extends State<LostPost> {
   }
 
   Widget _buildTextField(TextEditingController textController, String hint,
+      FormFieldValidator validator, ColorScheme colorScheme,
       {List<TextInputFormatter>? inputFormatters,
       int? maxLines = 1,
       bool enabled = true}) {
-    return TextField(
+    return TextFormField(
       enabled: enabled,
       maxLines: maxLines,
       style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
@@ -413,12 +524,28 @@ class _LostPostState extends State<LostPost> {
                 color: Theme.of(context).colorScheme.outline,
                 width: 2.0,
                 style: BorderStyle.solid)),
+        errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.outlineVariant,
+                width: 2.0,
+                style: BorderStyle.solid)),
+        focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8.0),
+            borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.outline,
+                width: 2.0,
+                style: BorderStyle.solid)),
         hintText: hint,
       ),
+      validator: validator,
     );
   }
 
-  Widget _buildChip(String label) {
+  Widget _buildChip(
+    String label,
+    ColorScheme colorScheme,
+  ) {
     return Padding(
       padding: const EdgeInsets.all(2.0),
       child: Chip(
@@ -435,19 +562,22 @@ class _LostPostState extends State<LostPost> {
           label,
           style: TextStyle(
             fontSize: FontProfile.extraSmall,
-            color: Theme.of(context).colorScheme.onSurface.withAlpha(90),
+            color: colorScheme.onSurface.withAlpha(90),
           ),
         ),
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
             side: BorderSide(
-              color: Theme.of(context).colorScheme.outlineVariant,
+              color: colorScheme.outlineVariant,
             )),
       ),
     );
   }
 
-  void showDialogPicker(BuildContext context) {
+  void showDialogPicker(
+    BuildContext context,
+    ColorScheme colorScheme,
+  ) {
     _selectedDate = showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -457,13 +587,12 @@ class _LostPostState extends State<LostPost> {
         return Theme(
           data: ThemeData.light().copyWith(
             colorScheme: ColorScheme.light(
-              primary: Theme.of(context).colorScheme.primary,
-              onPrimary: Theme.of(context).colorScheme.onPrimary,
-              surface: Theme.of(context).colorScheme.surface,
-              onSurface: Theme.of(context).colorScheme.onSurface,
-              secondary: Theme.of(context).colorScheme.secondary,
-              onPrimaryContainer:
-                  Theme.of(context).colorScheme.onPrimaryContainer,
+              primary: colorScheme.primary,
+              onPrimary: colorScheme.onPrimary,
+              surface: colorScheme.surface,
+              onSurface: colorScheme.onSurface,
+              secondary: colorScheme.secondary,
+              onPrimaryContainer: colorScheme.onPrimaryContainer,
             ),
           ),
           child: child!,
@@ -485,7 +614,10 @@ class _LostPostState extends State<LostPost> {
     });
   }
 
-  void showDialogTimePicker(BuildContext context) {
+  void showDialogTimePicker(
+    BuildContext context,
+    ColorScheme colorScheme,
+  ) {
     _selectedTime = showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -493,13 +625,12 @@ class _LostPostState extends State<LostPost> {
         return Theme(
           data: ThemeData.light().copyWith(
             colorScheme: ColorScheme.light(
-              primary: Theme.of(context).colorScheme.primary,
-              onPrimary: Theme.of(context).colorScheme.onPrimary,
-              surface: Theme.of(context).colorScheme.surface,
-              onSurface: Theme.of(context).colorScheme.onSurface,
-              secondary: Theme.of(context).colorScheme.secondary,
-              onPrimaryContainer:
-                  Theme.of(context).colorScheme.onPrimaryContainer,
+              primary: colorScheme.primary,
+              onPrimary: colorScheme.onPrimary,
+              surface: colorScheme.surface,
+              onSurface: colorScheme.onSurface,
+              secondary: colorScheme.secondary,
+              onPrimaryContainer: colorScheme.onPrimaryContainer,
             ),
           ),
           child: child!,
@@ -522,6 +653,7 @@ class _LostPostState extends State<LostPost> {
   }
 
   String getAmPm(int hour) {
+    // Convert 24-hour format to AM/PM
     if (hour >= 12) {
       return 'PM';
     } else {
@@ -529,15 +661,31 @@ class _LostPostState extends State<LostPost> {
     }
   }
 
+  // function to set * to center 3 characters
+  String _setAsterisk(String str) {
+    if (str.length > 3) {
+      return str.substring(0, 3) +
+          '*' * (str.length - 7) +
+          str.substring(str.length - 4, str.length);
+    }
+    return str;
+  }
+
   int get12Hour(int hour24) {
+    // Convert 24-hour format to 12-hour format
     if (hour24 > 12) {
       return hour24 - 12;
     }
     return hour24;
   }
 
-  void _showSnackBar(String msg, bool isError) {
-    final _colorScheme = Theme.of(context).colorScheme;
+  void _showSnackBar(
+    // Show a SnackBar with a message and custom color for errors
+    String msg,
+    ColorScheme colorScheme,
+    bool isError,
+  ) {
+    final _colorScheme = colorScheme;
     final snackBar = SnackBar(
       content: Text(msg,
           style: TextStyle(
