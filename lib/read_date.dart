@@ -130,11 +130,11 @@ class ReadDate {
   String getWishStatement() {
     int hour = _dateTime.hour;
     if (hour >= 0 && hour < 12) {
-      return "Good Morning";
+      return "Morning";
     } else if (hour >= 12 && hour < 16) {
-      return "Good Afternoon";
+      return "Afternoon";
     } else {
-      return "Good Evening";
+      return "Evening";
     }
   }
 }
