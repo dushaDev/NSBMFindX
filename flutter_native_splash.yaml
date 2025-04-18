@@ -1,0 +1,21 @@
+flutter_native_splash:
+  android : true
+  ios: true
+  web: false
+
+  color: "#ffffff"
+  image: assets/images/logo.png
+  branding: assets/images/logo_nsbm.png
+
+  color_dark: "#282828"
+  image_dark: assets/images/logo.png
+  branding_dark: assets/images/logo_nsbm.png
+
+  android_12:
+    color: "#ffffff"
+    image: assets/images/logo.png
+    branding: assets/images/logo_nsbm.png
+
+    color_dark: "#282828"
+    image_dark: assets/images/logo.png
+    branding_dark: assets/images/logo_nsbm.png

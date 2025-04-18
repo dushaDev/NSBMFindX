@@ -1,15 +1,18 @@
 import 'package:find_x/res/color_profile.dart';
-import 'package:find_x/splash_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'index_page.dart';
 import 'login.dart';
 
 void main() async {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
   await dotenv.load();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -19,12 +22,18 @@ void main() async {
     messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID']!,
     projectId: dotenv.env['FIREBASE_PROJECT_ID']!,
   ));
+
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
@@ -57,10 +66,10 @@ class MyApp extends StatelessWidget {
           User? user = snapshot.data;
           if (user != null) {
             // User is signed in, load the home page true Splash screen
-            return SplashScreen(nextPage: IndexPage());
+            return IndexPage();
           } else {
             // User is not signed in, load the login page true Splash screen
-            return SplashScreen(nextPage: Login());
+            return Login();
           }
         } else {
           // Show a loading indicator while checking the authentication state
@@ -72,5 +81,18 @@ class MyApp extends StatelessWidget {
         }
       },
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initialization();
+  }
+
+  void initialization() async {
+    print('initializing..');
+    await Future.delayed(const Duration(seconds: 2));
+    FlutterNativeSplash.remove();
+    print('initialization complete');
   }
 }
