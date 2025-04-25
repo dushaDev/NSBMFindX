@@ -1,8 +1,13 @@
+import 'package:find_x/admin_bottom_navigation.dart';
+import 'package:find_x/index_page.dart';
 import 'package:find_x/res/charts/lost_found_week.dart';
 import 'package:find_x/res/items/build_shimmer_loading.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import '../NavigationProvider.dart';
+import '../bottom_navigation.dart';
 import '../firebase/auth_service.dart';
 import '../firebase/fire_store_service.dart';
 import '../firebase/models/user_m.dart';
@@ -124,7 +129,12 @@ class _DashboardState extends State<Dashboard> {
                               return _buildPendingVerificationSection(
                                   'Pending Verifications',
                                   colorScheme,
-                                  usersNotApproved);
+                                  usersNotApproved, () {
+                                // Navigate to the pending verifications page on bottom navigation bar
+                                Provider.of<NavigationProvider>(context,
+                                        listen: false)
+                                    .setCurrentIndex(1);
+                              });
                             } else {
                               return _showEmptyCard(
                                   'Data not found', colorScheme);
@@ -447,8 +457,8 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget _buildPendingVerificationSection(
-      String title, ColorScheme colorScheme, List<UserM> items) {
+  Widget _buildPendingVerificationSection(String title, ColorScheme colorScheme,
+      List<UserM> items, VoidCallback onPressed) {
     return Card(
       color: colorScheme.surfaceContainer,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -466,7 +476,7 @@ class _DashboardState extends State<Dashboard> {
                         fontSize: FontProfile.medium,
                         fontWeight: FontWeight.bold)),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: onPressed,
                   child: Text('View All',
                       style: TextStyle(
                           color: colorScheme.onSurfaceVariant,

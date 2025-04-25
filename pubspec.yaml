@@ -50,6 +50,7 @@ dependencies:
   card_loading: ^0.3.2
   shimmer: ^3.0.0
   fl_chart: ^0.70.2
+  provider: ^6.1.4
 
 
 

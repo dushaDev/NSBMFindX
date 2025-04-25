@@ -119,7 +119,8 @@ class _HomeState extends State<Home> {
                                 return _buildUpdatesSection(
                                     'Updates', colorScheme, finalList);
                               } else {
-                                return _showEmptyCard('Data not found', colorScheme);
+                                return _showEmptyCard(
+                                    'Data not found', colorScheme);
                               }
                             }),
                         SizedBox(height: 10),
@@ -148,7 +149,8 @@ class _HomeState extends State<Home> {
                                 return _buildUpdatesSection(
                                     'Your history', colorScheme, finalList);
                               } else {
-                                return _showEmptyCard('Data not found', colorScheme);
+                                return _showEmptyCard(
+                                    'Data not found', colorScheme);
                               }
                             }),
                       ]),
