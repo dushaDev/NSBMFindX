@@ -130,10 +130,10 @@ class _DashboardState extends State<Dashboard> {
                                   'Pending Verifications',
                                   colorScheme,
                                   usersNotApproved, () {
-                                // Navigate to the pending verifications page on bottom navigation bar
+                                // Navigate to the Users page on bottom navigation bar
                                 Provider.of<NavigationProvider>(context,
                                         listen: false)
-                                    .setCurrentIndex(1);
+                                    .navigateTo(1, data: 'Pending'); // 1 is Users page with selected Pending option
                               });
                             } else {
                               return _showEmptyCard(
@@ -158,11 +158,6 @@ class _DashboardState extends State<Dashboard> {
                                 List? allItemsList = snapshot.data;
                                 final List<Map<String, dynamic>> finalList = [];
                                 for (var item in allItemsList!) {
-                                  // if (item is LostItem) {
-                                  //   finalList.add(item.toFirestore());
-                                  // } else if (item is FoundItem) {
-                                  //   finalList.add(item.toFirestore());
-                                  // }
                                   finalList.add(item.toFirestore());
                                 }
 

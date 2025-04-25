@@ -3,25 +3,40 @@ import 'package:find_x/res/font_profile.dart';
 import 'package:find_x/res/items/build_shimmer_loading.dart';
 import 'package:find_x/res/items/item_user.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../NavigationProvider.dart';
 
 class Users extends StatefulWidget {
-  const Users({super.key});
+  final String filterText;
+  Users({super.key, this.filterText = 'All'});
 
   @override
-  State<Users> createState() => _UsersState();
+  State<Users> createState() => _UsersState(
+        currentFilter: filterText,
+      );
 }
 
 class _UsersState extends State<Users> {
+  String currentFilter;
+  _UsersState({
+    required this.currentFilter,
+  });
   String _title = 'Users';
   FireStoreService _fireStoreService = FireStoreService();
-  String _currentFilter = 'All'; // Track active filter
 
   // Filter options
   final List<String> _filters = ['All', 'Approved', 'Pending', 'Restricted'];
 
   @override
   Widget build(BuildContext context) {
+    final navProvider = Provider.of<NavigationProvider>(
+        context); // this use for get data from other page
+    currentFilter =
+        navProvider.pageData ?? 'All'; // this use for get data from other page
+
     ColorScheme _colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -44,17 +59,17 @@ class _UsersState extends State<Users> {
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: FilterChip(
                     label: Text(filter),
-                    selected: _currentFilter == filter,
+                    selected: currentFilter == filter,
                     onSelected: (selected) {
                       setState(() {
-                        _currentFilter = filter;
+                        currentFilter = filter;
                       });
                     },
                     backgroundColor: Theme.of(context).colorScheme.surface,
                     selectedColor:
                         Theme.of(context).colorScheme.primaryContainer,
                     labelStyle: TextStyle(
-                      color: _currentFilter == filter
+                      color: currentFilter == filter
                           ? Theme.of(context).colorScheme.onSurface
                           : Theme.of(context).colorScheme.onSurface,
                     ),
@@ -76,12 +91,11 @@ class _UsersState extends State<Users> {
                   final models = snapshot.data!;
                   // Apply filter
                   final filteredModels = models.where((user) {
-                    if (_currentFilter == 'All') return true;
-                    if (_currentFilter == 'Approved') return user.isApproved;
-                    if (_currentFilter == 'Pending')
+                    if (currentFilter == 'All') return true;
+                    if (currentFilter == 'Approved') return user.isApproved;
+                    if (currentFilter == 'Pending')
                       return !user.isApproved && !user.isRestricted;
-                    if (_currentFilter == 'Restricted')
-                      return user.isRestricted;
+                    if (currentFilter == 'Restricted') return user.isRestricted;
                     return true;
                   }).toList();
 
