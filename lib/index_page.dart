@@ -67,7 +67,7 @@ class _IndexPageState extends State<IndexPage> {
                     child: AdminBottomNavigation(
                       selectedIndex: navProvider.currentIndex,
                       onItemSelected: (index) =>
-                          navProvider.navigateTo(index, data: 'All'),
+                          navProvider.navigateTo(index, data: 'All'), //that 'All' used for display data on Users page.
                     )),
               ]);
             } else if (snapshot.data == 'student') {

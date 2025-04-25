@@ -162,7 +162,13 @@ class _DashboardState extends State<Dashboard> {
                                 }
 
                                 return _buildUpdatesSection(
-                                    'Updates', colorScheme, finalList);
+                                    'Updates', colorScheme, finalList,(){
+                                  // Navigate to the Posts page on bottom navigation bar
+                                  Provider.of<NavigationProvider>(context,
+                                      listen: false)
+                                      .navigateTo(2,); // 2 is Posts page without any data for now
+
+                                });
                               } else {
                                 return _showEmptyCard(
                                     'No new updates', colorScheme);
@@ -300,7 +306,7 @@ class _DashboardState extends State<Dashboard> {
   }
 
   Widget _buildUpdatesSection(
-      String title, ColorScheme colorScheme, List<Map<String, dynamic>> items) {
+      String title, ColorScheme colorScheme, List<Map<String, dynamic>> items, VoidCallback onPressed) {
     return Card(
       color: colorScheme.surfaceContainer,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -318,7 +324,7 @@ class _DashboardState extends State<Dashboard> {
                         fontSize: FontProfile.medium,
                         fontWeight: FontWeight.bold)),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: onPressed,
                   style: TextButton.styleFrom(
                     splashFactory: NoSplash
                         .splashFactory, // This completely removes the splash effect
