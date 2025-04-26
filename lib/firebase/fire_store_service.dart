@@ -222,22 +222,38 @@ class FireStoreService {
     }
   }
 
-  Future<String?> getUserNameById(String id) async {
+  Future<List<String?>> getUserNamesByIds(List<String> ids) async {
     try {
-      QuerySnapshot querySnapshot = await _fireStore
-          .collection('users')
-          .where('id', isEqualTo: id)
-          .limit(1)
-          .get();
+      if (ids.isEmpty) return [];
 
-      if (querySnapshot.docs.isNotEmpty) {
-        // Extract only the 'name' field from the document
-        return querySnapshot.docs.first.get('name') as String?;
+      // Get unique IDs for querying
+      final uniqueIds = ids.toSet().toList();
+      final Map<String, String> nameMap = {};
+
+      // Process in batches of 10 (Firestore's whereIn limit)
+      const batchSize = 10;
+      for (var i = 0; i < uniqueIds.length; i += batchSize) {
+        final batch = uniqueIds.sublist(
+          i,
+          i + batchSize > uniqueIds.length ? uniqueIds.length : i + batchSize,
+        );
+
+        final querySnapshot = await _fireStore
+            .collection('users')
+            .where(FieldPath.documentId, whereIn: batch)
+            .get();
+
+        // Map results
+        for (var doc in querySnapshot.docs) {
+          nameMap[doc.id] = doc.get('name') as String? ?? 'Anonymous';
+        }
       }
-      return null;
+
+      // Return names in original order with duplicates preserved
+      return ids.map((id) => nameMap[id]).toList();
     } catch (e) {
-      print("Error fetching: $e");
-      return null;
+      print("Error fetching usernames: $e");
+      return List.filled(ids.length, null); // Return null for all on error
     }
   }
 
@@ -376,10 +392,13 @@ class FireStoreService {
       });
       //get userName using userId
       List<String?> userNames = [];
+      List<String> userIds = [];
+
       for (var item in allItems) {
-        userNames.add(await getUserNameById(item.userId));
+        userIds.add(item.userId);
       }
-      Map<String, List<dynamic>> allItemsMap= {
+      userNames = await getUserNamesByIds(userIds);
+      Map<String, List<dynamic>> allItemsMap = {
         'items': allItems,
         'userNames': userNames,
       };

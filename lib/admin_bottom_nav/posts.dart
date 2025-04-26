@@ -43,6 +43,7 @@ class _PostsState extends State<Posts> {
                 combineLostAndFoundItems(data!['userNames'],data['items']);
 
             return ListView.builder(
+              padding: EdgeInsets.only(bottom: 80.0),
               itemCount: unifiedItems.length,
               itemBuilder: (context, index) {
                 final item = unifiedItems[index];
@@ -75,7 +76,6 @@ class _PostsState extends State<Posts> {
     // Extract LostItem and FoundItem from the data
     int count = 0;
     for (var item in data) {
-
       String userName = userNames?[count] ?? 'Unknown User';
 
       if (item is LostItem) {

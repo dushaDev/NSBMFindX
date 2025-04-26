@@ -1,6 +1,8 @@
 import 'package:find_x/firebase/models/lost_found_unified.dart';
+import 'package:find_x/res/font_profile.dart';
 import 'package:flutter/material.dart';
 
+import '../../post_details.dart';
 import '../../read_date.dart';
 
 class ItemPost extends StatelessWidget {
@@ -22,76 +24,91 @@ class ItemPost extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Post Type Badge
-              Row(
-                children: [
-                  Container(
-                    alignment: Alignment.center,
-                    width: 38,
-                    height: 18,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 1, vertical: 1),
-                    decoration: BoxDecoration(
-                      color: item.type == 'found'
-                          ? colorScheme.primary
-                          : colorScheme.secondary,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                    child: Text(
-                      item.type,
-                      style: TextStyle(
-                        color: colorScheme.onPrimary,
-                        fontSize: 12,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PostDetails(
+                    id: item.id, // Your LostItem or FoundItem object
+                    isFoundItem: item.type=='lost'?false:true, // true for FoundItem, false for LostItem
+                  ),
+                ),
+              );
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Post Type Badge
+                Row(
+                  children: [
+                    Container(
+                      alignment: Alignment.center,
+                      width: 38,
+                      height: 18,
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: item.type == 'found'
+                            ? colorScheme.primary
+                            : colorScheme.secondary,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                      child: Text(
+                        item.type,
+                        style: TextStyle(
+                          color: colorScheme.onPrimary,
+                          fontSize: FontProfile.extraSmall,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
+                    const SizedBox(width: 8),
 
-                  // Title
-                  Text(
-                    item.itemName,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: colorScheme.onSurface,
+                    // Title
+                    Text(
+                      item.itemName,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: FontProfile.large,
+                        color: colorScheme.onSurface,
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
 
-              const SizedBox(height: 4),
+                const SizedBox(height: 4),
 
-              // Description
-              Text(
-                item.description,
-                style: TextStyle(color: colorScheme.onSurfaceVariant),
-              ),
-              const SizedBox(height: 8),
+                // Description
+                Text(
+                  item.description,
+                  style: TextStyle(fontSize: FontProfile.small, color: colorScheme.onSurfaceVariant),
+                ),
+                const SizedBox(height: 8),
 
-              // Footer with time and user
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    _readDate.getDuration(item.postedTime),
-                    style: TextStyle(
-                      color: colorScheme.onSurfaceVariant,
-                      fontSize: 12,
+                // Footer with time and user
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'by ${item.userName ?? 'Anonymous'}',
+                      style: TextStyle(
+                        color: colorScheme.onSurfaceVariant,
+                        fontSize: FontProfile.extraSmall,
+                      ),
                     ),
-                  ),
-                  Text(
-                    'by ${item.userName ?? 'Anonymous'}',
-                    style: TextStyle(
-                      color: colorScheme.onSurfaceVariant,
-                      fontSize: 12,
+                    Text(
+                      '${_readDate.getDuration(item.postedTime)} ago'
+                      ,
+                      style: TextStyle(
+                        color: colorScheme.onSurfaceVariant,
+                        fontSize: FontProfile.extraSmall,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
         Divider(
