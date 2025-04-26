@@ -77,8 +77,15 @@ class FireStoreService {
     });
   }
 
-  Future<void> registerAdmin(String id, String name, String joinDate, String email,String contact, String role,
-      String department, String accessLevel) async {
+  Future<void> registerAdmin(
+      String id,
+      String name,
+      String joinDate,
+      String email,
+      String contact,
+      String role,
+      String department,
+      String accessLevel) async {
     List<String> words = _random.splitName(name);
 
     await addUser(UserM(
@@ -215,6 +222,41 @@ class FireStoreService {
     }
   }
 
+  Future<List<String?>> getUserNamesByIds(List<String> ids) async {
+    try {
+      if (ids.isEmpty) return [];
+
+      // Get unique IDs for querying
+      final uniqueIds = ids.toSet().toList();
+      final Map<String, String> nameMap = {};
+
+      // Process in batches of 10 (Firestore's whereIn limit)
+      const batchSize = 10;
+      for (var i = 0; i < uniqueIds.length; i += batchSize) {
+        final batch = uniqueIds.sublist(
+          i,
+          i + batchSize > uniqueIds.length ? uniqueIds.length : i + batchSize,
+        );
+
+        final querySnapshot = await _fireStore
+            .collection('users')
+            .where(FieldPath.documentId, whereIn: batch)
+            .get();
+
+        // Map results
+        for (var doc in querySnapshot.docs) {
+          nameMap[doc.id] = doc.get('name') as String? ?? 'Anonymous';
+        }
+      }
+
+      // Return names in original order with duplicates preserved
+      return ids.map((id) => nameMap[id]).toList();
+    } catch (e) {
+      print("Error fetching usernames: $e");
+      return List.filled(ids.length, null); // Return null for all on error
+    }
+  }
+
   Future<Admin?> getAdmin(String adminId) async {
     try {
       DocumentSnapshot doc =
@@ -324,7 +366,7 @@ class FireStoreService {
   }
 
   // Method to retrieve all lost and found items sorted by date
-  Future<List<dynamic>> getLostAndFoundItems() async {
+  Future<Map<String, List<dynamic>>> getLostAndFoundItems() async {
     try {
       QuerySnapshot lostItemsSnapshot =
           await _fireStore.collection('lostItems').get();
@@ -348,11 +390,26 @@ class FireStoreService {
         DateTime dateB = _parseCustomDate(b.postedTime);
         return dateB.compareTo(dateA); // Sort in descending order
       });
+      //get userName using userId
+      List<String?> userNames = [];
+      List<String> userIds = [];
 
-      return allItems;
+      for (var item in allItems) {
+        userIds.add(item.userId);
+      }
+      userNames = await getUserNamesByIds(userIds);
+      Map<String, List<dynamic>> allItemsMap = {
+        'items': allItems,
+        'userNames': userNames,
+      };
+
+      return allItemsMap;
     } catch (e) {
       print("Error fetching lost and found items: $e");
-      return [];
+      return {
+        'items': [],
+        'userNames': [],
+      };
     }
   }
 
