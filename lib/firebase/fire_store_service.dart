@@ -77,8 +77,15 @@ class FireStoreService {
     });
   }
 
-  Future<void> registerAdmin(String id, String name, String joinDate, String email,String contact, String role,
-      String department, String accessLevel) async {
+  Future<void> registerAdmin(
+      String id,
+      String name,
+      String joinDate,
+      String email,
+      String contact,
+      String role,
+      String department,
+      String accessLevel) async {
     List<String> words = _random.splitName(name);
 
     await addUser(UserM(
@@ -215,6 +222,25 @@ class FireStoreService {
     }
   }
 
+  Future<String?> getUserNameById(String id) async {
+    try {
+      QuerySnapshot querySnapshot = await _fireStore
+          .collection('users')
+          .where('id', isEqualTo: id)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Extract only the 'name' field from the document
+        return querySnapshot.docs.first.get('name') as String?;
+      }
+      return null;
+    } catch (e) {
+      print("Error fetching: $e");
+      return null;
+    }
+  }
+
   Future<Admin?> getAdmin(String adminId) async {
     try {
       DocumentSnapshot doc =
@@ -324,7 +350,7 @@ class FireStoreService {
   }
 
   // Method to retrieve all lost and found items sorted by date
-  Future<List<dynamic>> getLostAndFoundItems() async {
+  Future<Map<String, List<dynamic>>> getLostAndFoundItems() async {
     try {
       QuerySnapshot lostItemsSnapshot =
           await _fireStore.collection('lostItems').get();
@@ -348,11 +374,23 @@ class FireStoreService {
         DateTime dateB = _parseCustomDate(b.postedTime);
         return dateB.compareTo(dateA); // Sort in descending order
       });
+      //get userName using userId
+      List<String?> userNames = [];
+      for (var item in allItems) {
+        userNames.add(await getUserNameById(item.userId));
+      }
+      Map<String, List<dynamic>> allItemsMap= {
+        'items': allItems,
+        'userNames': userNames,
+      };
 
-      return allItems;
+      return allItemsMap;
     } catch (e) {
       print("Error fetching lost and found items: $e");
-      return [];
+      return {
+        'items': [],
+        'userNames': [],
+      };
     }
   }
 
