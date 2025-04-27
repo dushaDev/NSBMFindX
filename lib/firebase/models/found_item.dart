@@ -1,6 +1,7 @@
 class FoundItem {
   String id; // Unique ID to identify the post
   String itemName;
+  String itemName_lc; // Lowercase version of itemName for easier search
   bool type;//type for found item-1,lost item-0
   String foundTime;
   String postedTime;
@@ -19,6 +20,7 @@ class FoundItem {
   FoundItem({
     required this.id,
     required this.itemName,
+    required this.itemName_lc,
     required this.type,
     required this.foundTime,
     required this.postedTime,
@@ -40,6 +42,7 @@ class FoundItem {
     return FoundItem(
       id: id,
       itemName: json['itemName'],
+      itemName_lc: json['itemName'].toString().toLowerCase(),
       type: json['type'],
       foundTime: json['foundTime'],
       postedTime: json['postedTime'],
@@ -61,6 +64,7 @@ class FoundItem {
   Map<String, dynamic> toFirestore() {
     return {
       'itemName': itemName,
+      'itemName_lc': itemName_lc,
       'foundTime': foundTime,
       'type': type,
       'postedTime': postedTime,

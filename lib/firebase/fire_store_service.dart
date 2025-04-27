@@ -6,6 +6,7 @@ import 'models/Student.dart';
 import 'models/admin.dart';
 import 'models/degree_program.dart';
 import 'models/found_item.dart';
+import 'models/lost_found_unified.dart';
 import 'models/lost_item.dart';
 import 'models/staff.dart';
 import 'models/user_m.dart';
@@ -32,6 +33,7 @@ class FireStoreService {
     await addUser(UserM(
             id: id,
             name: name,
+            name_lc: name.toLowerCase(),
             displayName: words[0],
             joinDate: joinDate,
             email: email,
@@ -65,6 +67,7 @@ class FireStoreService {
     await addUser(UserM(
             id: id,
             name: name,
+            name_lc: name.toLowerCase(),
             displayName: words[0],
             joinDate: joinDate,
             email: email,
@@ -91,6 +94,7 @@ class FireStoreService {
     await addUser(UserM(
             id: id,
             name: name,
+            name_lc: name.toLowerCase(),
             displayName: words[0],
             joinDate: joinDate,
             email: email,
@@ -536,6 +540,105 @@ class FireStoreService {
       return {
         'lost': [],
         'found': [],
+      };
+    }
+  }
+
+  // Function to search across users, lost items, and found items
+  Future<Map<String, List<dynamic>>> searchAllCategories(String keyword) async {
+    try {
+      // Search users by name
+      QuerySnapshot userSnapshot = await _fireStore
+          .collection('users')
+          .where('name_lc', isGreaterThanOrEqualTo: keyword)
+          .where('name_lc', isLessThan: keyword + 'z')
+          .get();
+
+      List<UserM> users = userSnapshot.docs.map((doc) {
+        return UserM.fromFirestore(doc.data() as Map<String, dynamic>, doc.id);
+      }).toList();
+
+      // Search lost items by item name
+      QuerySnapshot lostItemsSnapshot = await _fireStore
+          .collection('lostItems')
+          .where('itemName_lc', isGreaterThanOrEqualTo: keyword)
+          .where('itemName_lc', isLessThan: keyword + 'z')
+          .get();
+
+      List<LostFoundUnified> lostItems = lostItemsSnapshot.docs.map((doc) {
+        var data = doc.data() as Map<String, dynamic>;
+        return LostFoundUnified(
+          id: doc.id,
+          userId: data['userId'],
+          userName: '', // Placeholder, will be filled later
+          itemName: data['itemName'],
+          description: data['description'],
+          postedTime: data['postedTime'],
+          isCompleted: data['isCompleted'],
+          type: 'lost',
+        );
+      }).toList();
+
+      // Search found items by item name
+      QuerySnapshot foundItemsSnapshot = await _fireStore
+          .collection('foundItems')
+          .where('itemName_lc', isGreaterThanOrEqualTo: keyword)
+          .where('itemName_lc', isLessThan: keyword + 'z')
+          .get();
+
+      List<LostFoundUnified> foundItems = foundItemsSnapshot.docs.map((doc) {
+        var data = doc.data() as Map<String, dynamic>;
+        return LostFoundUnified(
+          id: doc.id,
+          userId: data['userId'],
+          userName: '', // Placeholder, will be filled later
+          itemName: data['itemName'],
+          description: data['description'],
+          postedTime: data['postedTime'],
+          isCompleted: data['isCompleted'],
+          type: 'found',
+        );
+      }).toList();
+
+      // Combine lost and found items
+      List<LostFoundUnified> allItems = [...lostItems, ...foundItems];
+
+      // Get userIds from all items
+      List<String> userIds = allItems.map((item) => item.userId).toSet().toList();
+
+      // Initialize userNames list only if userIds is not empty
+      List<String?> userNames = userIds.isNotEmpty
+          ? List<String?>.filled(userIds.length, null)
+          : [];
+
+      if (userIds.isNotEmpty) {
+        // Get usernames using userIds
+        userNames = await getUserNamesByIds(userIds);
+      }
+
+      // Fill in usernames for lost and found items
+      for (int i = 0; i < allItems.length; i++) {
+        String? userName = userNames.isNotEmpty ? userNames[i] : 'Unknown';
+        allItems[i].userName = userName ?? 'Unknown';
+      }
+
+      // Sort all items by postedTime in descending order
+      allItems.sort((a, b) {
+        DateTime dateA = _parseCustomDate(a.postedTime);
+        DateTime dateB = _parseCustomDate(b.postedTime);
+        return dateB.compareTo(dateA);
+      });
+
+      // Return results as a map
+      return {
+        'users': users,
+        'items': allItems,
+      };
+    } catch (e) {
+      print("Error searching all categories: $e");
+      return {
+        'users': [],
+        'items': [],
       };
     }
   }

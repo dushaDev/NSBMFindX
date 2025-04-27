@@ -1,3 +1,4 @@
+import 'package:find_x/res/font_profile.dart';
 import 'package:flutter/material.dart';
 
 class ItemUser extends StatefulWidget {
@@ -31,7 +32,7 @@ class _ItemUserState extends State<ItemUser> {
           )
           ,
     title: Text(widget.name,
-              style: const TextStyle(fontWeight: FontWeight.bold)),
+              style: TextStyle(fontSize: FontProfile.medium,fontWeight: FontWeight.w600)),
           subtitle: Row(
             children: [
               Text(widget.role),

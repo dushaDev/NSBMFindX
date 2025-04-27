@@ -74,8 +74,8 @@ class ItemPost extends StatelessWidget {
                     Text(
                       item.itemName,
                       style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: FontProfile.large,
+                        fontWeight: FontWeight.w600,
+                        fontSize: FontProfile.medium,
                         color: colorScheme.onSurface,
                       ),
                     ),

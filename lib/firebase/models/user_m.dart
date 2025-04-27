@@ -1,6 +1,7 @@
 class UserM {
   String id;
   String name;
+  String name_lc; //name lowercase for make search easier
   String email;
   String contact;
   String role;
@@ -13,6 +14,7 @@ class UserM {
   UserM({
     required this.id,
     required this.name,
+    required this.name_lc,
     required this.email,
     required this.contact,
     required this.role,
@@ -27,6 +29,7 @@ class UserM {
     return UserM(
       id: id,
       name: json['name'],
+      name_lc: json['name'].toString().toLowerCase(),
       email: json['email'],
       contact: json['contact'] ?? '',
       role: json['role'],
@@ -42,6 +45,7 @@ class UserM {
     return {
       'id': id,
       'name': name,
+      'name_lc': name_lc,
       'email': email,
       'contact': contact,
       'role': role,
