@@ -6,6 +6,7 @@ class LostFoundUnified {
   String itemName;
   String description;
   String postedTime;
+  bool isCompleted;
   String type; // 'lost' or 'found'
 
   LostFoundUnified({
@@ -15,6 +16,7 @@ class LostFoundUnified {
     required this.itemName,
     required this.description,
     required this.postedTime,
+    required this.isCompleted,
     required this.type,
   });
 
@@ -27,6 +29,7 @@ class LostFoundUnified {
       'itemName': itemName,
       'description': description,
       'postedTime': postedTime,
+      'isCompleted': isCompleted,
       'type': type,
     };
   }

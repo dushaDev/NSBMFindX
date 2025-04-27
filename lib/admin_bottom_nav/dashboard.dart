@@ -133,7 +133,10 @@ class _DashboardState extends State<Dashboard> {
                                 // Navigate to the Users page on bottom navigation bar
                                 Provider.of<NavigationProvider>(context,
                                         listen: false)
-                                    .navigateTo(1, data: 'Pending'); // 1 is Users page with selected Pending option
+                                    .navigateTo(1,
+
+                                        data:
+                                            'Pending'); // 1 is Users page with selected Pending option
                               });
                             } else {
                               return _showEmptyCard(
@@ -162,12 +165,12 @@ class _DashboardState extends State<Dashboard> {
                                 }
 
                                 return _buildUpdatesSection(
-                                    'Updates', colorScheme, finalList,(){
+                                    'Updates', colorScheme, finalList, () {
                                   // Navigate to the Posts page on bottom navigation bar
                                   Provider.of<NavigationProvider>(context,
-                                      listen: false)
-                                      .navigateTo(2,); // 2 is Posts page without any data for now
-
+                                          listen: false)
+                                      .navigateTo(2,
+                                       ); // 2 is Posts page without any data for now
                                 });
                               } else {
                                 return _showEmptyCard(
@@ -305,8 +308,8 @@ class _DashboardState extends State<Dashboard> {
         ));
   }
 
-  Widget _buildUpdatesSection(
-      String title, ColorScheme colorScheme, List<Map<String, dynamic>> items, VoidCallback onPressed) {
+  Widget _buildUpdatesSection(String title, ColorScheme colorScheme,
+      List<Map<String, dynamic>> items, VoidCallback onPressed) {
     return Card(
       color: colorScheme.surfaceContainer,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),

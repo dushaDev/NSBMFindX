@@ -77,8 +77,8 @@ class _PostDetailsState extends State<PostDetails> {
             children: [
               Container(
                 alignment: Alignment.center,
-                width: 65,
-                height: 26,
+                width: 60,
+                height: 24,
                 padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
                 decoration: BoxDecoration(
                   color: widget.isFoundItem ? colorScheme.primary : colorScheme.secondary,
@@ -98,7 +98,7 @@ class _PostDetailsState extends State<PostDetails> {
                 Icon(
                   Icons.check_circle,
                   color: colorScheme.primary,
-                  size: 27,
+                  size: 25,
                 ),
             ],
           ),
@@ -198,7 +198,9 @@ class _PostDetailsState extends State<PostDetails> {
           children: [
              Icon(Icons.phone,color: colorScheme.onSurface,),
             const SizedBox(width: 12),
-            Text(contact),
+            Text(contact,style: TextStyle(
+                color: colorScheme.onSurface,
+                fontSize: FontProfile.small),),
             const Spacer(),
             IconButton(
               icon: Icon(Icons.content_copy,color: colorScheme.onSurface,),

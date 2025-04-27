@@ -18,10 +18,10 @@ class Users extends StatefulWidget {
 }
 
 class _UsersState extends State<Users> {
-  String currentFilter;
+  String _currentFilter;
   _UsersState({
-    required this.currentFilter,
-  });
+    required String currentFilter,
+  }) : _currentFilter = currentFilter;
   String _title = 'Users';
   FireStoreService _fireStoreService = FireStoreService();
 
@@ -32,8 +32,12 @@ class _UsersState extends State<Users> {
   Widget build(BuildContext context) {
     final navProvider = Provider.of<NavigationProvider>(
         context); // this use for get data from other page
-    currentFilter =
-        navProvider.pageData ?? 'All'; // this use for get data from other page
+
+    if(navProvider.pageData != null) {
+      _currentFilter =
+          navProvider.pageData??'All'; // this use for get data from other page
+    }
+    navProvider.pageData = null;
 
     ColorScheme _colorScheme = Theme.of(context).colorScheme;
 
@@ -59,17 +63,17 @@ class _UsersState extends State<Users> {
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: FilterChip(
                     label: Text(filter),
-                    selected: currentFilter == filter,
+                    selected: _currentFilter == filter,
                     onSelected: (selected) {
                       setState(() {
-                        currentFilter = filter;
+                        _currentFilter = filter;
                       });
                     },
                     backgroundColor: Theme.of(context).colorScheme.surface,
                     selectedColor:
                         Theme.of(context).colorScheme.primaryContainer,
                     labelStyle: TextStyle(
-                      color: currentFilter == filter
+                      color: _currentFilter == filter
                           ? Theme.of(context).colorScheme.onSurface
                           : Theme.of(context).colorScheme.onSurface,
                     ),
@@ -91,11 +95,11 @@ class _UsersState extends State<Users> {
                   final models = snapshot.data!;
                   // Apply filter
                   final filteredModels = models.where((user) {
-                    if (currentFilter == 'All') return true;
-                    if (currentFilter == 'Approved') return user.isApproved;
-                    if (currentFilter == 'Pending')
+                    if (_currentFilter == 'All') return true;
+                    if (_currentFilter == 'Approved') return user.isApproved;
+                    if (_currentFilter == 'Pending')
                       return !user.isApproved && !user.isRestricted;
-                    if (currentFilter == 'Restricted') return user.isRestricted;
+                    if (_currentFilter == 'Restricted') return user.isRestricted;
                     return true;
                   }).toList();
 
@@ -104,7 +108,7 @@ class _UsersState extends State<Users> {
                     child: filteredModels.length < 1
                         ? Center(
                             child: Text(
-                              'No users to show with this filter',
+                              'No $_currentFilter users to show ',
                               style: TextStyle(
                                   fontSize: FontProfile.small,
                                   color: _colorScheme.onSurface),

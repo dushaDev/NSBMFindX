@@ -62,8 +62,14 @@ class ItemPost extends StatelessWidget {
                         ),
                       ),
                     ),
+                    const SizedBox(width: 4),
+                    if (item.isCompleted)
+                      Icon(
+                        Icons.check_circle,
+                        color: colorScheme.primary,
+                        size: 20,
+                      ),
                     const SizedBox(width: 8),
-
                     // Title
                     Text(
                       item.itemName,
