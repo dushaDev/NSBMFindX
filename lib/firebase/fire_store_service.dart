@@ -8,6 +8,7 @@ import 'models/degree_program.dart';
 import 'models/found_item.dart';
 import 'models/lost_found_unified.dart';
 import 'models/lost_item.dart';
+import 'models/notification.dart';
 import 'models/staff.dart';
 import 'models/user_m.dart';
 
@@ -549,7 +550,8 @@ class FireStoreService {
     try {
       // Search users by name
       QuerySnapshot userSnapshot = await _fireStore
-          .collection('users').limit(30)
+          .collection('users')
+          .limit(30)
           .where('name_lc', isGreaterThanOrEqualTo: keyword)
           .where('name_lc', isLessThan: keyword + 'z')
           .get();
@@ -560,7 +562,8 @@ class FireStoreService {
 
       // Search lost items by item name
       QuerySnapshot lostItemsSnapshot = await _fireStore
-          .collection('lostItems').limit(30)
+          .collection('lostItems')
+          .limit(30)
           .where('itemName_lc', isGreaterThanOrEqualTo: keyword)
           .where('itemName_lc', isLessThan: keyword + 'z')
           .get();
@@ -581,7 +584,8 @@ class FireStoreService {
 
       // Search found items by item name
       QuerySnapshot foundItemsSnapshot = await _fireStore
-          .collection('foundItems').limit(30)
+          .collection('foundItems')
+          .limit(30)
           .where('itemName_lc', isGreaterThanOrEqualTo: keyword)
           .where('itemName_lc', isLessThan: keyword + 'z')
           .get();
@@ -604,12 +608,12 @@ class FireStoreService {
       List<LostFoundUnified> allItems = [...lostItems, ...foundItems];
 
       // Get userIds from all items
-      List<String> userIds = allItems.map((item) => item.userId).toSet().toList();
+      List<String> userIds =
+          allItems.map((item) => item.userId).toSet().toList();
 
       // Initialize userNames list only if userIds is not empty
-      List<String?> userNames = userIds.isNotEmpty
-          ? List<String?>.filled(userIds.length, null)
-          : [];
+      List<String?> userNames =
+          userIds.isNotEmpty ? List<String?>.filled(userIds.length, null) : [];
 
       if (userIds.isNotEmpty) {
         // Get usernames using userIds
@@ -640,6 +644,59 @@ class FireStoreService {
         'users': [],
         'items': [],
       };
+    }
+  }
+
+  // Function to write a notification to a user's subcollection
+  Future<void> addNotification(String userId, Notification notification) async {
+    try {
+      // Use the Firestore auto-generated ID for the notification
+      DocumentReference docRef = await _fireStore
+          .collection('users')
+          .doc(userId)
+          .collection('notifications')
+          .add(notification.toMap());
+
+      // Update the notification object with the generated ID
+      notification.id = docRef.id;
+
+      // Optionally, update the document with the ID if needed
+      await docRef.update({'id': docRef.id});
+    } catch (e) {
+      print("Error adding notification: $e");
+    }
+  }
+
+  // Function to read all notifications for a specific user
+  Future<List<Notification>> getUserNotifications(String userId) async {
+    try {
+      QuerySnapshot querySnapshot = await _fireStore
+          .collection('users')
+          .doc(userId)
+          .collection('notifications')
+          .get();
+
+      return querySnapshot.docs.map((doc) {
+        return Notification.fromMap(doc.data() as Map<String, dynamic>);
+      }).toList();
+    } catch (e) {
+      print("Error fetching notifications: $e");
+      return [];
+    }
+  }
+
+  // Function to delete a notification by its ID
+  Future<void> deleteNotification(String userId, String notificationId) async {
+    try {
+      await _fireStore
+          .collection('users')
+          .doc(userId)
+          .collection('notifications')
+          .doc(notificationId)
+          .delete();
+      print("Notification deleted successfully.");
+    } catch (e) {
+      print("Error deleting notification: $e");
     }
   }
 
