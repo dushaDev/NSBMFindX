@@ -549,7 +549,7 @@ class FireStoreService {
     try {
       // Search users by name
       QuerySnapshot userSnapshot = await _fireStore
-          .collection('users')
+          .collection('users').limit(30)
           .where('name_lc', isGreaterThanOrEqualTo: keyword)
           .where('name_lc', isLessThan: keyword + 'z')
           .get();
@@ -560,7 +560,7 @@ class FireStoreService {
 
       // Search lost items by item name
       QuerySnapshot lostItemsSnapshot = await _fireStore
-          .collection('lostItems')
+          .collection('lostItems').limit(30)
           .where('itemName_lc', isGreaterThanOrEqualTo: keyword)
           .where('itemName_lc', isLessThan: keyword + 'z')
           .get();
@@ -581,7 +581,7 @@ class FireStoreService {
 
       // Search found items by item name
       QuerySnapshot foundItemsSnapshot = await _fireStore
-          .collection('foundItems')
+          .collection('foundItems').limit(30)
           .where('itemName_lc', isGreaterThanOrEqualTo: keyword)
           .where('itemName_lc', isLessThan: keyword + 'z')
           .get();
