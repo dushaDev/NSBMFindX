@@ -146,6 +146,60 @@ class _DashboardState extends State<Dashboard> {
                         ),
                         SizedBox(height: 10),
                         FutureBuilder(
+                            future: _fireStoreService.getPostedTimes(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Center(child: CircularProgressIndicator());
+                              } else if (snapshot.hasError) {
+                                return Center(
+                                    child: Text('error: ${snapshot.error}'));
+                              } else if (snapshot.hasData) {
+                                int yAxisMax = 4;
+                                Map<String, List<String>>? postedTimes =
+                                    snapshot.data;
+
+                                List<int> foundCountData = _countDatesInLast7Days(
+                                    postedTimes!['found']!);
+                                List<int> lostCountData =
+                                _countDatesInLast7Days(postedTimes['lost']!);
+
+                                // Generate found items data with loop
+                                final foundItemsData = List.generate(7, (index) {
+                                  yAxisMax <= foundCountData[index]
+                                      ? yAxisMax = foundCountData[index]
+                                      : null;
+                                  return FlSpot(
+                                    (index + 1).toDouble(), // Day number (1-7)
+                                    foundCountData[index]
+                                        .toDouble(), // Count value
+                                  );
+                                });
+
+                                // Generate lost items data with loop
+                                final lostItemsData = List.generate(7, (index) {
+                                  yAxisMax <= lostCountData[index]
+                                      ? yAxisMax = lostCountData[index]
+                                      : null;
+                                  return FlSpot(
+                                    (index + 1).toDouble(), // Day number (1-7)
+                                    lostCountData[index]
+                                        .toDouble(), // Count value
+                                  );
+                                });
+                                return _buildLostFoundWeek(
+                                    'Last Week Chart (Count/Date)',
+                                    colorScheme,
+                                    lostItemsData,
+                                    foundItemsData,
+                                    yAxisMax + 1);
+                              } else {
+                                return _showEmptyCard(
+                                    'No data to show', colorScheme);
+                              }
+                            }),
+                        SizedBox(height: 10),
+                        FutureBuilder(
                             //recent updates
                             future: _fireStoreService
                                 .getLostAndFoundItemsWithLimit(3),
@@ -178,60 +232,6 @@ class _DashboardState extends State<Dashboard> {
                               }
                             }),
                       ]),
-                      SizedBox(height: 10),
-                      FutureBuilder(
-                          future: _fireStoreService.getPostedTimes(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                  child: Text('error: ${snapshot.error}'));
-                            } else if (snapshot.hasData) {
-                              int yAxisMax = 4;
-                              Map<String, List<String>>? postedTimes =
-                                  snapshot.data;
-
-                              List<int> foundCountData = _countDatesInLast7Days(
-                                  postedTimes!['found']!);
-                              List<int> lostCountData =
-                                  _countDatesInLast7Days(postedTimes['lost']!);
-
-                              // Generate found items data with loop
-                              final foundItemsData = List.generate(7, (index) {
-                                yAxisMax <= foundCountData[index]
-                                    ? yAxisMax = foundCountData[index]
-                                    : null;
-                                return FlSpot(
-                                  (index + 1).toDouble(), // Day number (1-7)
-                                  foundCountData[index]
-                                      .toDouble(), // Count value
-                                );
-                              });
-
-                              // Generate lost items data with loop
-                              final lostItemsData = List.generate(7, (index) {
-                                yAxisMax <= lostCountData[index]
-                                    ? yAxisMax = lostCountData[index]
-                                    : null;
-                                return FlSpot(
-                                  (index + 1).toDouble(), // Day number (1-7)
-                                  lostCountData[index]
-                                      .toDouble(), // Count value
-                                );
-                              });
-                              return _buildLostFoundMonth(
-                                  'Last Week Chart (Count/Date)',
-                                  colorScheme,
-                                  lostItemsData,
-                                  foundItemsData,
-                                  yAxisMax + 1);
-                            } else {
-                              return _showEmptyCard(
-                                  'No data to show', colorScheme);
-                            }
-                          }),
                       SizedBox(height: 80),
                     ],
                   ),
@@ -410,7 +410,7 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget _buildLostFoundMonth(String title, ColorScheme colorScheme,
+  Widget _buildLostFoundWeek(String title, ColorScheme colorScheme,
       List<FlSpot> lostItemsData, List<FlSpot> foundItemsData, int yAxisMax) {
     return Card(
       color: colorScheme.surfaceContainer,
@@ -491,7 +491,7 @@ class _DashboardState extends State<Dashboard> {
             ),
             SizedBox(height: 5),
             Container(
-              height: 170,
+              height: 140,
               child: ListView.builder(
                 itemCount: items.length,
                 itemBuilder: (context, index) {
