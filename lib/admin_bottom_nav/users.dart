@@ -1,3 +1,4 @@
+import 'package:find_x/admin/add_user.dart';
 import 'package:find_x/firebase/fire_store_service.dart';
 import 'package:find_x/res/font_profile.dart';
 import 'package:find_x/res/items/build_shimmer_loading.dart';
@@ -123,6 +124,21 @@ class _UsersState extends State<Users> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 70.0),
+        child: FloatingActionButton(
+          onPressed: () {
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AddUser(),
+              ),
+            );
+          },
+          child: Icon(Icons.add),
+        ),
       ),
     );
   }

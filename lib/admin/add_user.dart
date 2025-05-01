@@ -1,8 +1,13 @@
+import 'dart:math';
+
 import 'package:find_x/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import '../email_service.dart';
+import '../firebase/auth_service.dart';
 import '../firebase/fire_store_service.dart';
 
 class AddUser extends StatefulWidget {
@@ -13,46 +18,68 @@ class AddUser extends StatefulWidget {
 }
 
 class _AddUserState extends State<AddUser> {
+  String _title = 'Add New User';
+  AuthService authService = AuthService();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _repeatPasswordController =
-      TextEditingController();
-  final TextEditingController _bioController = TextEditingController();
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _contactNumberController =
       TextEditingController();
-
+  String _autoPassword = ' dfH48k@34Fe';
   bool _isSpinKitLoaded = false;
   final _formKey = GlobalKey<FormState>();
+
+  final List<String> _departments = [
+    'Computer Science',
+    'Software Engineering',
+    'Data Science',
+    'Cyber Security',
+    'Network Engineering',
+    'Web Development',
+  ];
+  String? _selectedDepartment;
+
+  final List<String> _positions = [
+    'Intern',
+    'Junior Developer',
+    'Senior Developer',
+    'Team Lead',
+    'Manager',
+  ];
+  String? _selectedPosition;
 
   @override
   Widget build(BuildContext context) {
     ReadDate _readDate = ReadDate();
     FireStoreService firestoreService = FireStoreService();
     ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    final Email email = Email(
+      body:
+          'Logging details are here. don;t share this details. Email: ${_emailController.text} \n Password: $_autoPassword',
+      subject: ' Username and Password for FindX App',
+      recipients: ['dushanmadushankabeligala9@gmail.com'],
+      isHTML: false,
+    );
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: colorScheme.surface,
         title: Text(
-          "Add User",
-          style: TextStyle(
-              color: colorScheme.onSurface,
-              fontSize: FontProfile.extraLarge,
-              fontWeight: FontWeight.normal),
+          '$_title',
+          style: TextStyle(color: colorScheme.primary),
         ),
-        centerTitle: true,
       ),
       body: Stack(children: [
         SingleChildScrollView(
           child: Container(
             margin: const EdgeInsets.all(16.0),
             padding: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-              border: Border.all(
-                  color: colorScheme.primary.withAlpha(95), width: 2.0),
-            ),
+            // decoration: BoxDecoration(
+            //   borderRadius: BorderRadius.circular(8.0),
+            //   border: Border.all(
+            //       color: colorScheme.primary.withAlpha(95), width: 2.0),
+            // ),
             child: Padding(
               padding:
                   const EdgeInsets.only(bottom: 8.0, left: 8.0, right: 8.0),
@@ -115,7 +142,7 @@ class _AddUserState extends State<AddUser> {
                       children: [
                         _buildText('Email', colorScheme),
                         _buildTextFormField(
-                            _emailController, 'your.student.maail@email.com',
+                            _emailController, 'user.staff.mail@email.com',
                             (value) {
                           if (value == null || value.isEmpty) {
                             return 'Email is required.';
@@ -131,74 +158,45 @@ class _AddUserState extends State<AddUser> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildText('Password', colorScheme),
-                        _buildTextFormField(
-                          _passwordController,
-                          '********',
-                          (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Password is required.';
-                            }
-                            final passwordRegex = RegExp(
-                                r'^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$');
-                            if (!passwordRegex.hasMatch(value)) {
-                              return 'Password must be at least 8 characters long, '
-                                  'contain an uppercase letter, a number, and a special character.';
-                            }
-                            return null;
-                          },
-                          colorScheme,
-                          obscureText: true,
-                        ),
+                        _buildText('Department', colorScheme),
+                        _buildDropdown(
+                            _departments,
+                            "Select Department",
+                            _selectedDepartment,
+                            (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Department is required.';
+                              }
+                              return null;
+                            },
+                            colorScheme,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedDepartment = value;
+                              });
+                            }),
                       ],
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildText('Repeat password', colorScheme),
-                        _buildTextFormField(
-                            _repeatPasswordController, '********', (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Repeat Password is required.';
-                          } else if (value != _passwordController.text) {
-                            return 'Passwords do not match.';
-                          }
-                          return null;
-                        }, obscureText: true, colorScheme),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "*",
-                                style: TextStyle(color: Colors.redAccent),
-                              ),
-                              Flexible(
-                                child: Text(
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                      fontSize: FontProfile.extraSmall,
-                                    ),
-                                    "Password must contain minimum 8 characters with numbers,a special character and one uppercase letter"),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildText('Bio', colorScheme),
-                            _buildBioField('Enter your bio', (value) {
+                        _buildText('Position', colorScheme),
+                        _buildDropdown(
+                            _positions,
+                            "Select Position",
+                            _selectedPosition,
+                            (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Bio is required.';
+                                return 'Position is required.';
                               }
                               return null;
-                            }, colorScheme),
-                          ],
-                        ),
+                            },
+                            colorScheme,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedPosition = value;
+                              });
+                            }),
                       ],
                     ),
                     Padding(
@@ -211,29 +209,54 @@ class _AddUserState extends State<AddUser> {
                                 setState(() {
                                   _isSpinKitLoaded = true;
                                 });
-                                try {
-                                  await firestoreService.registerStudent(
-                                    _idController.text,
-                                    _nameController.text,
-                                    _readDate.getDateNow(),
-                                    _emailController.text,
-                                    _contactNumberController.text,
-                                    'student',
-                                    _bioController.text,
-                                    'additionalArgument1', // Replace with actual value,should remove this
-                                    'additionalArgument2', // Replace with actual value,should remove this
-                                  );
-                                  setState(() {
-                                    _isSpinKitLoaded = false;
-                                  });
-                                  _showSnackBar(
-                                      'User added successfully!', false);
-                                } catch (e) {
-                                  setState(() {
-                                    _isSpinKitLoaded = false;
-                                  });
-                                  _showSnackBar('Failed to add user: $e', true);
-                                }
+
+                                await authService
+                                    .signUpWithEmailPassword(
+                                        _emailController.text, _autoPassword)
+                                    .whenComplete(() async {
+                                  User? user =
+                                      await authService.getSignedUser();
+                                  if (user == null) {
+                                    setState(() {
+                                      _isSpinKitLoaded = false;
+                                    });
+                                    _showSnackBar(
+                                        'Email already in use.Try another one',
+                                        true);
+                                  } else {
+                                    _generatePassword();
+                                    bool valid = await _sendMail(
+                                        user.email!, _autoPassword);
+                                    if (valid) {
+                                      print('Email sent successfully');
+                                    }
+
+                                    await firestoreService
+                                        .registerStaff(
+                                      _idController.text,
+                                      _nameController.text,
+                                      _readDate.getDateNow(),
+                                      _emailController.text,
+                                      _contactNumberController.text,
+                                      'staff',
+                                      true,
+                                      _selectedDepartment!,
+                                      _selectedPosition!,
+                                    )
+                                        .whenComplete(() async {
+                                      User? user =
+                                          await authService.getSignedUser();
+                                      await FlutterEmailSender.send(email);
+                                      setState(() {
+                                        _isSpinKitLoaded = false;
+                                      });
+                                      _showSnackBar(
+                                          'User added successfully. Username and Password mailed to user',
+                                          false);
+                                      navigate(user);
+                                    });
+                                  }
+                                });
                               } else {
                                 _showSnackBar('Form validation failed.', true);
                               }
@@ -258,7 +281,7 @@ class _AddUserState extends State<AddUser> {
                           )
                         ],
                       ),
-                    ),                   
+                    ),
                   ],
                 ),
               ),
@@ -282,7 +305,7 @@ class _AddUserState extends State<AddUser> {
     if (user != null) {
       Navigator.of(context).pop();
     } else {
-      _showSnackBar('Something went wrong. Signup failed.',true);
+      _showSnackBar('Something went wrong. Signup failed.', true);
     }
   }
 
@@ -357,47 +380,137 @@ class _AddUserState extends State<AddUser> {
     );
   }
 
-  Widget _buildBioField(
+  // Widget _buildBioField(
+  //   String text,
+  //   FormFieldValidator validator,
+  //   ColorScheme colorScheme,
+  // ) {
+  //   return Padding(
+  //       padding: const EdgeInsets.all(8.0),
+  //       child: TextFormField(
+  //           minLines: 3,
+  //           maxLines: 5,
+  //           controller: _bioController,
+  //           style: TextStyle(
+  //             color: colorScheme.onSurface,
+  //           ),
+  //           decoration: InputDecoration(
+  //             enabledBorder: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(8.0),
+  //                 borderSide: BorderSide(
+  //                     color: colorScheme.outlineVariant,
+  //                     width: 2.0,
+  //                     style: BorderStyle.solid)),
+  //             focusedBorder: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(8.0),
+  //                 borderSide: BorderSide(
+  //                     color: colorScheme.onSurfaceVariant,
+  //                     width: 2.0,
+  //                     style: BorderStyle.solid)),
+  //             errorBorder: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(8.0),
+  //                 borderSide: BorderSide(
+  //                     color: colorScheme.outlineVariant,
+  //                     width: 2.0,
+  //                     style: BorderStyle.solid)),
+  //             focusedErrorBorder: OutlineInputBorder(
+  //                 borderRadius: BorderRadius.circular(8.0),
+  //                 borderSide: BorderSide(
+  //                     color: colorScheme.outlineVariant,
+  //                     width: 2.0,
+  //                     style: BorderStyle.solid)),
+  //             hintText: text,
+  //           ),
+  //           validator: validator));
+  // }
+
+  Widget _buildDropdown(
+    List<String> items,
     String text,
+    selectedVariable,
     FormFieldValidator validator,
-    ColorScheme colorScheme,
-  ) {
+    ColorScheme colorScheme, {
+    required Function(dynamic) onChanged,
+  }) {
     return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: TextFormField(
-            minLines: 3,
-            maxLines: 5,
-            controller: _bioController,
-            style: TextStyle(
-              color: colorScheme.onSurface,
+      padding: const EdgeInsets.all(8.0),
+      child: DropdownButtonFormField<String>(
+          value: selectedVariable,
+          isExpanded: true,
+          decoration: InputDecoration(
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: BorderSide(
+                color: colorScheme.outlineVariant,
+                width: 2.0,
+                style: BorderStyle.solid,
+              ),
             ),
-            decoration: InputDecoration(
-              enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide(
-                      color: colorScheme.outlineVariant,
-                      width: 2.0,
-                      style: BorderStyle.solid)),
-              focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide(
-                      color: colorScheme.onSurfaceVariant,
-                      width: 2.0,
-                      style: BorderStyle.solid)),
-              errorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide(
-                      color: colorScheme.outlineVariant,
-                      width: 2.0,
-                      style: BorderStyle.solid)),
-              focusedErrorBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide(
-                      color: colorScheme.outlineVariant,
-                      width: 2.0,
-                      style: BorderStyle.solid)),
-              hintText: text,
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: BorderSide(
+                color: colorScheme.onSurfaceVariant,
+                width: 2.0,
+                style: BorderStyle.solid,
+              ),
             ),
-            validator: validator));
+            errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide: BorderSide(
+                    color: colorScheme.outlineVariant,
+                    width: 2.0,
+                    style: BorderStyle.solid)),
+            focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide: BorderSide(
+                    color: colorScheme.outlineVariant,
+                    width: 2.0,
+                    style: BorderStyle.solid)),
+          ),
+          hint: Text(text),
+          items: items.map((String item) {
+            return DropdownMenuItem(
+              value: item,
+              child: Text(
+                item,
+                style: TextStyle(
+                  color: colorScheme.onSurface,
+                ),
+              ),
+            );
+          }).toList(),
+          onChanged: onChanged,
+          validator: validator),
+    );
+  }
+
+  // Method for Generating Random Passwords
+  void _generatePassword() {
+    final random = Random();
+    final characters =
+        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#\$%^&*()_+';
+    String password = '';
+
+    for (int i = 0; i < 12; i++) {
+      password += characters[random.nextInt(characters.length)];
+    }
+    _autoPassword = password;
+  }
+
+// Example usage when a user registers
+  Future<bool> _sendMail(String email, String password) async {
+    try {
+      // Then send the welcome email
+      await EmailService.sendRegistrationEmail(
+        userEmail: email,
+        password: password,
+      );
+
+      return true;
+    } catch (e) {
+      // Handle errors
+      print('Registration failed: ${e.toString()}');
+      return false;
+    }
   }
 }
