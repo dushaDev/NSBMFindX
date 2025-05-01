@@ -1,3 +1,5 @@
+import 'package:find_x/firebase/models/notification_m.dart';
+import 'package:find_x/read_date.dart';
 import 'package:flutter/material.dart';
 import 'package:find_x/firebase/fire_store_service.dart'; // Assume this exists
 
@@ -10,12 +12,13 @@ class AdminNotifications extends StatefulWidget {
 
 class _AdminNotificationsState extends State<AdminNotifications> {
   final FireStoreService _firestoreService = FireStoreService();
-  late Future<List<NotificationModel>> _notificationsFuture;
+  final ReadDate _readDate = ReadDate();
+  late Future<List<NotificationM>> _notificationsFuture;
 
   @override
   void initState() {
     super.initState();
-    _notificationsFuture = _firestoreService.getAdminNotifications();
+    _notificationsFuture = _firestoreService.getNotificationsById('28232');
   }
 
   @override
@@ -33,7 +36,7 @@ class _AdminNotificationsState extends State<AdminNotifications> {
           ),
         ],
       ),
-      body: FutureBuilder<List<NotificationModel>>(
+      body: FutureBuilder<List<NotificationM>>(
         future: _notificationsFuture,
         builder: (context, snapshot) {
           // Handle loading state
@@ -67,7 +70,7 @@ class _AdminNotificationsState extends State<AdminNotifications> {
                 children: [
                   Icon(Icons.notifications_off,
                       size: 48,
-                      color: colorScheme.onSurface.withOpacity(0.5)),
+                      color: colorScheme.onSurface.withAlpha(150)),
                   const SizedBox(height: 16),
                   Text('No notifications yet',
                       style: textTheme.titleMedium),
@@ -102,7 +105,7 @@ class _AdminNotificationsState extends State<AdminNotifications> {
   }
 
   Widget _buildNotificationCard(
-      NotificationModel notification,
+      NotificationM notification,
       ColorScheme colorScheme,
       TextTheme textTheme,
       ) {
@@ -112,7 +115,7 @@ class _AdminNotificationsState extends State<AdminNotifications> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: colorScheme.outline.withOpacity(0.2),
+          color: colorScheme.outline.withAlpha(100),
           width: 1,
         ),
       ),
@@ -146,14 +149,14 @@ class _AdminNotificationsState extends State<AdminNotifications> {
             ),
             const SizedBox(height: 4),
             Text(
-              _formatTimeAgo(notification.timestamp),
+              _readDate.getDateStringToDisplay(notification.postedTime),
               style: textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
           ],
         ),
-        trailing: notification.isUnread
+        trailing: !notification.isRead
             ? Container(
           width: 8,
           height: 8,
@@ -170,11 +173,11 @@ class _AdminNotificationsState extends State<AdminNotifications> {
 
   Future<void> _refreshNotifications() async {
     setState(() {
-      _notificationsFuture = _firestoreService.getAdminNotifications();
+      _notificationsFuture = _firestoreService.getNotificationsById('28232');
     });
   }
 
-  void _handleNotificationTap(NotificationModel notification) {
+  void _handleNotificationTap(NotificationM notification) {
     // Handle notification tap based on type
     switch (notification.type) {
       case 'new_user':
@@ -213,33 +216,4 @@ class _AdminNotificationsState extends State<AdminNotifications> {
         return Icons.notifications;
     }
   }
-
-  String _formatTimeAgo(DateTime timestamp) {
-    final now = DateTime.now();
-    final difference = now.difference(timestamp);
-
-    if (difference.inDays > 0) return '${difference.inDays}d ago';
-    if (difference.inHours > 0) return '${difference.inHours}h ago';
-    if (difference.inMinutes > 0) return '${difference.inMinutes}m ago';
-    return 'Just now';
-  }
-}
-
-// Example Notification Model
-class NotificationModel {
-  final String id;
-  final String title;
-  final String message;
-  final String type;
-  final DateTime timestamp;
-  final bool isUnread;
-
-  NotificationModel({
-    required this.id,
-    required this.title,
-    required this.message,
-    required this.type,
-    required this.timestamp,
-    this.isUnread = true,
-  });
 }

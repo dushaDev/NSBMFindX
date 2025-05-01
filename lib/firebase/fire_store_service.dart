@@ -8,7 +8,7 @@ import 'models/degree_program.dart';
 import 'models/found_item.dart';
 import 'models/lost_found_unified.dart';
 import 'models/lost_item.dart';
-import 'models/notification.dart';
+import 'models/notification_m.dart';
 import 'models/staff.dart';
 import 'models/user_m.dart';
 
@@ -648,7 +648,7 @@ class FireStoreService {
   }
 
   // Function to write a notification to a user's subcollection
-  Future<void> addNotification(String userId, Notification notification) async {
+  Future<void> addNotification(String userId, NotificationM notification) async {
     try {
       // Use the Firestore auto-generated ID for the notification
       DocumentReference docRef = await _fireStore
@@ -668,7 +668,7 @@ class FireStoreService {
   }
 
   // Function to read all notifications for a specific user
-  Future<List<Notification>> getUserNotifications(String userId) async {
+  Future<List<NotificationM>> getNotificationsById(String userId) async {
     try {
       QuerySnapshot querySnapshot = await _fireStore
           .collection('users')
@@ -677,7 +677,7 @@ class FireStoreService {
           .get();
 
       return querySnapshot.docs.map((doc) {
-        return Notification.fromMap(doc.data() as Map<String, dynamic>);
+        return NotificationM.fromMap(doc.data() as Map<String, dynamic>);
       }).toList();
     } catch (e) {
       print("Error fetching notifications: $e");
