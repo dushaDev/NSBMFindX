@@ -54,14 +54,6 @@ class _AddUserState extends State<AddUser> {
     FireStoreService firestoreService = FireStoreService();
     ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    final Email email = Email(
-      body:
-          'Logging details are here. don;t share this details. Email: ${_emailController.text} \n Password: $_autoPassword',
-      subject: ' Username and Password for FindX App',
-      recipients: ['dushanmadushankabeligala9@gmail.com'],
-      isHTML: false,
-    );
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: colorScheme.surface,
@@ -246,7 +238,6 @@ class _AddUserState extends State<AddUser> {
                                         .whenComplete(() async {
                                       User? user =
                                           await authService.getSignedUser();
-                                      await FlutterEmailSender.send(email);
                                       setState(() {
                                         _isSpinKitLoaded = false;
                                       });
