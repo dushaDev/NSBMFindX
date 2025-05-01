@@ -25,7 +25,7 @@ class _AddUserState extends State<AddUser> {
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _contactNumberController =
       TextEditingController();
-  String _autoPassword = ' dfH48k@34Fe';
+  String _autoPassword = 'dfH48k@34Fe';
   bool _isSpinKitLoaded = false;
   final _formKey = GlobalKey<FormState>();
 
@@ -201,7 +201,7 @@ class _AddUserState extends State<AddUser> {
                                 setState(() {
                                   _isSpinKitLoaded = true;
                                 });
-
+                                _generatePassword();
                                 await authService
                                     .signUpWithEmailPassword(
                                         _emailController.text, _autoPassword)
@@ -216,7 +216,6 @@ class _AddUserState extends State<AddUser> {
                                         'Email already in use.Try another one',
                                         true);
                                   } else {
-                                    _generatePassword();
                                     bool valid = await _sendMail(
                                         user.email!, _autoPassword);
                                     if (valid) {
