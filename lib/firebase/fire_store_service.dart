@@ -61,8 +61,7 @@ class FireStoreService {
       String role,
       bool isApproved,
       String department,
-      String position,
-      String accessLevel) async {
+      String position,) async {
     List<String> words = _random.splitName(name);
 
     await addUser(UserM(

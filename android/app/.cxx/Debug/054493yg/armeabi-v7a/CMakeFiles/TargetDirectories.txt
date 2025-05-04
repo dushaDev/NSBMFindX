@@ -1,0 +1,2 @@
+C:/Users/USER/Desktop/NSBMFindX/android/app/.cxx/Debug/054493yg/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/USER/Desktop/NSBMFindX/android/app/.cxx/Debug/054493yg/armeabi-v7a/CMakeFiles/rebuild_cache.dir
