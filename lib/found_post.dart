@@ -710,6 +710,7 @@ class _FoundPostState extends State<FoundPost> {
                                       FoundItem(
                                           id: userId!,
                                           itemName: _foundTextController.text,
+                                          itemName_lc: _foundTextController.text.toLowerCase(),
                                           type: true,
                                           foundTime: _lostTime,
                                           postedTime: ReadDate().getDateNow(),

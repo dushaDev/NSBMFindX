@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'NavigationProvider.dart';
 import 'index_page.dart';
 import 'login.dart';
 
@@ -18,7 +20,13 @@ void main() async {
     messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID']!,
     projectId: dotenv.env['FIREBASE_PROJECT_ID']!,
   ));
-  runApp(MyApp());
+  runApp(
+    // ChangeNotifierProvider is a provider that allows you to listen to changes in the NavigationProvider class
+    ChangeNotifierProvider(
+      create: (context) => NavigationProvider(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -55,7 +63,7 @@ class MyApp extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.active) {
           User? user = snapshot.data;
           if (user != null) {
-            // User is signed in, load the home page
+            // User is signed in, load the home page after index page manage user's type (admin/student)
             return IndexPage();
           } else {
             // User is not signed in, load the login page

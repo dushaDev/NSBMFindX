@@ -4,25 +4,44 @@ import 'package:find_x/res/font_profile.dart';
 import 'package:find_x/res/items/build_shimmer_loading.dart';
 import 'package:find_x/res/items/item_user.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../NavigationProvider.dart';
 
 class Users extends StatefulWidget {
-  const Users({super.key});
+  final String filterText;
+  Users({super.key, this.filterText = 'All'});
 
   @override
-  State<Users> createState() => _UsersState();
+  State<Users> createState() => _UsersState(
+        currentFilter: filterText,
+      );
 }
 
 class _UsersState extends State<Users> {
+  String _currentFilter;
+  _UsersState({
+    required String currentFilter,
+  }) : _currentFilter = currentFilter;
   String _title = 'Users';
   FireStoreService _fireStoreService = FireStoreService();
-  String _currentFilter = 'All'; // Track active filter
 
   // Filter options
   final List<String> _filters = ['All', 'Approved', 'Pending', 'Restricted'];
 
   @override
   Widget build(BuildContext context) {
+    final navProvider = Provider.of<NavigationProvider>(
+        context); // this use for get data from other page
+
+    if(navProvider.pageData != null) {
+      _currentFilter =
+          navProvider.pageData??'All'; // this use for get data from other page
+    }
+    navProvider.pageData = null;
+
     ColorScheme _colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -81,8 +100,7 @@ class _UsersState extends State<Users> {
                     if (_currentFilter == 'Approved') return user.isApproved;
                     if (_currentFilter == 'Pending')
                       return !user.isApproved && !user.isRestricted;
-                    if (_currentFilter == 'Restricted')
-                      return user.isRestricted;
+                    if (_currentFilter == 'Restricted') return user.isRestricted;
                     return true;
                   }).toList();
 
@@ -91,7 +109,7 @@ class _UsersState extends State<Users> {
                     child: filteredModels.length < 1
                         ? Center(
                             child: Text(
-                              'No users to show with this filter',
+                              'No $_currentFilter users to show ',
                               style: TextStyle(
                                   fontSize: FontProfile.small,
                                   color: _colorScheme.onSurface),

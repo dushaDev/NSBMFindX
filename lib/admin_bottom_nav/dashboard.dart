@@ -1,8 +1,13 @@
+import 'package:find_x/admin_bottom_navigation.dart';
+import 'package:find_x/index_page.dart';
 import 'package:find_x/res/charts/lost_found_week.dart';
 import 'package:find_x/res/items/build_shimmer_loading.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import '../NavigationProvider.dart';
+import '../bottom_navigation.dart';
 import '../firebase/auth_service.dart';
 import '../firebase/fire_store_service.dart';
 import '../firebase/models/user_m.dart';
@@ -124,13 +129,75 @@ class _DashboardState extends State<Dashboard> {
                               return _buildPendingVerificationSection(
                                   'Pending Verifications',
                                   colorScheme,
-                                  usersNotApproved);
+                                  usersNotApproved, () {
+                                // Navigate to the Users page on bottom navigation bar
+                                Provider.of<NavigationProvider>(context,
+                                        listen: false)
+                                    .navigateTo(1,
+
+                                        data:
+                                            'Pending'); // 1 is Users page with selected Pending option
+                              });
                             } else {
                               return _showEmptyCard(
                                   'Data not found', colorScheme);
                             }
                           },
                         ),
+                        SizedBox(height: 10),
+                        FutureBuilder(
+                            future: _fireStoreService.getPostedTimes(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Center(child: CircularProgressIndicator());
+                              } else if (snapshot.hasError) {
+                                return Center(
+                                    child: Text('error: ${snapshot.error}'));
+                              } else if (snapshot.hasData) {
+                                int yAxisMax = 4;
+                                Map<String, List<String>>? postedTimes =
+                                    snapshot.data;
+
+                                List<int> foundCountData = _countDatesInLast7Days(
+                                    postedTimes!['found']!);
+                                List<int> lostCountData =
+                                _countDatesInLast7Days(postedTimes['lost']!);
+
+                                // Generate found items data with loop
+                                final foundItemsData = List.generate(7, (index) {
+                                  yAxisMax <= foundCountData[index]
+                                      ? yAxisMax = foundCountData[index]
+                                      : null;
+                                  return FlSpot(
+                                    (index + 1).toDouble(), // Day number (1-7)
+                                    foundCountData[index]
+                                        .toDouble(), // Count value
+                                  );
+                                });
+
+                                // Generate lost items data with loop
+                                final lostItemsData = List.generate(7, (index) {
+                                  yAxisMax <= lostCountData[index]
+                                      ? yAxisMax = lostCountData[index]
+                                      : null;
+                                  return FlSpot(
+                                    (index + 1).toDouble(), // Day number (1-7)
+                                    lostCountData[index]
+                                        .toDouble(), // Count value
+                                  );
+                                });
+                                return _buildLostFoundWeek(
+                                    'Last Week Chart (Count/Date)',
+                                    colorScheme,
+                                    lostItemsData,
+                                    foundItemsData,
+                                    yAxisMax + 1);
+                              } else {
+                                return _showEmptyCard(
+                                    'No data to show', colorScheme);
+                              }
+                            }),
                         SizedBox(height: 10),
                         FutureBuilder(
                             //recent updates
@@ -148,76 +215,23 @@ class _DashboardState extends State<Dashboard> {
                                 List? allItemsList = snapshot.data;
                                 final List<Map<String, dynamic>> finalList = [];
                                 for (var item in allItemsList!) {
-                                  // if (item is LostItem) {
-                                  //   finalList.add(item.toFirestore());
-                                  // } else if (item is FoundItem) {
-                                  //   finalList.add(item.toFirestore());
-                                  // }
                                   finalList.add(item.toFirestore());
                                 }
 
                                 return _buildUpdatesSection(
-                                    'Updates', colorScheme, finalList);
+                                    'Updates', colorScheme, finalList, () {
+                                  // Navigate to the Posts page on bottom navigation bar
+                                  Provider.of<NavigationProvider>(context,
+                                          listen: false)
+                                      .navigateTo(2,
+                                       ); // 2 is Posts page without any data for now
+                                });
                               } else {
                                 return _showEmptyCard(
                                     'No new updates', colorScheme);
                               }
                             }),
                       ]),
-                      SizedBox(height: 10),
-                      FutureBuilder(
-                          future: _fireStoreService.getPostedTimes(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                  child: Text('error: ${snapshot.error}'));
-                            } else if (snapshot.hasData) {
-                              int yAxisMax = 4;
-                              Map<String, List<String>>? postedTimes =
-                                  snapshot.data;
-
-                              List<int> foundCountData = _countDatesInLast7Days(
-                                  postedTimes!['found']!);
-                              List<int> lostCountData =
-                                  _countDatesInLast7Days(postedTimes['lost']!);
-
-                              // Generate found items data with loop
-                              final foundItemsData = List.generate(7, (index) {
-                                yAxisMax <= foundCountData[index]
-                                    ? yAxisMax = foundCountData[index]
-                                    : null;
-                                return FlSpot(
-                                  (index + 1).toDouble(), // Day number (1-7)
-                                  foundCountData[index]
-                                      .toDouble(), // Count value
-                                );
-                              });
-
-                              // Generate lost items data with loop
-                              final lostItemsData = List.generate(7, (index) {
-                                yAxisMax <= lostCountData[index]
-                                    ? yAxisMax = lostCountData[index]
-                                    : null;
-                                return FlSpot(
-                                  (index + 1).toDouble(), // Day number (1-7)
-                                  lostCountData[index]
-                                      .toDouble(), // Count value
-                                );
-                              });
-                              return _buildLostFoundMonth(
-                                  'Last Week Chart (Count/Date)',
-                                  colorScheme,
-                                  lostItemsData,
-                                  foundItemsData,
-                                  yAxisMax + 1);
-                            } else {
-                              return _showEmptyCard(
-                                  'No data to show', colorScheme);
-                            }
-                          }),
                       SizedBox(height: 80),
                     ],
                   ),
@@ -294,8 +308,8 @@ class _DashboardState extends State<Dashboard> {
         ));
   }
 
-  Widget _buildUpdatesSection(
-      String title, ColorScheme colorScheme, List<Map<String, dynamic>> items) {
+  Widget _buildUpdatesSection(String title, ColorScheme colorScheme,
+      List<Map<String, dynamic>> items, VoidCallback onPressed) {
     return Card(
       color: colorScheme.surfaceContainer,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -313,7 +327,7 @@ class _DashboardState extends State<Dashboard> {
                         fontSize: FontProfile.medium,
                         fontWeight: FontWeight.bold)),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: onPressed,
                   style: TextButton.styleFrom(
                     splashFactory: NoSplash
                         .splashFactory, // This completely removes the splash effect
@@ -396,7 +410,7 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget _buildLostFoundMonth(String title, ColorScheme colorScheme,
+  Widget _buildLostFoundWeek(String title, ColorScheme colorScheme,
       List<FlSpot> lostItemsData, List<FlSpot> foundItemsData, int yAxisMax) {
     return Card(
       color: colorScheme.surfaceContainer,
@@ -447,8 +461,8 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget _buildPendingVerificationSection(
-      String title, ColorScheme colorScheme, List<UserM> items) {
+  Widget _buildPendingVerificationSection(String title, ColorScheme colorScheme,
+      List<UserM> items, VoidCallback onPressed) {
     return Card(
       color: colorScheme.surfaceContainer,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -466,7 +480,7 @@ class _DashboardState extends State<Dashboard> {
                         fontSize: FontProfile.medium,
                         fontWeight: FontWeight.bold)),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: onPressed,
                   child: Text('View All',
                       style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
@@ -477,7 +491,7 @@ class _DashboardState extends State<Dashboard> {
             ),
             SizedBox(height: 5),
             Container(
-              height: 170,
+              height: 140,
               child: ListView.builder(
                 itemCount: items.length,
                 itemBuilder: (context, index) {

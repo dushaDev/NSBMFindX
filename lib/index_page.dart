@@ -6,6 +6,8 @@ import 'package:find_x/admin_bottom_navigation.dart';
 import 'package:find_x/bottom_nav/notifications.dart';
 import 'package:find_x/firebase/auth_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'NavigationProvider.dart';
 import 'admin_bottom_nav/dashboard.dart';
 import 'bottom_nav/search.dart';
 import 'bottom_nav/home.dart';
@@ -34,6 +36,11 @@ class _IndexPageState extends State<IndexPage> {
   Widget build(BuildContext context) {
     _authService.getSignedUser();
 
+    // provider for manage navigation
+    // this provider use for manage pages customly when click button on any page.
+    // only uses for admin yet.
+    final navProvider = Provider.of<NavigationProvider>(context);
+
     return Scaffold(
         resizeToAvoidBottomInset: false,
         body: FutureBuilder(
@@ -53,16 +60,15 @@ class _IndexPageState extends State<IndexPage> {
               );
             } else if (snapshot.data == 'admin' || snapshot.data == 'staff') {
               return Stack(children: [
-                _admin_tabs[_selectedIndex],
+                //navProvider used for manage pages customly when click button on any page.
+                _admin_tabs[navProvider.currentIndex],
                 Align(
                     alignment: Alignment.bottomCenter,
                     child: AdminBottomNavigation(
-                      selectedIndex: _selectedIndex,
-                      onItemSelected: (int index) {
-                        setState(() {
-                          _selectedIndex = index;
-                        });
-                      },
+                      selectedIndex: navProvider.currentIndex,
+                      onItemSelected: (index) =>
+                          navProvider.navigateTo(index, data: 'All'),//true use for indicate if the navigation is from another page.
+                      //that 'All' used for display data on Users page.
                     )),
               ]);
             } else if (snapshot.data == 'student') {

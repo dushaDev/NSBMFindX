@@ -404,6 +404,7 @@ class _LostPostState extends State<LostPost> {
                                               id: userId!,
                                               itemName:
                                                   _lostTextController.text,
+                                              itemName_lc: _lostTextController.text.toLowerCase(),
                                               type: false,
                                               lostTime: _lostTime,
                                               postedTime:
