@@ -72,168 +72,173 @@ class _DashboardState extends State<Dashboard> {
                   ),
                 ],
               ),
-              body: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                              child: _buildReportCard(
-                                  'Today Lost Reports',
-                                  '387',
-                                  '45%',
-                                  Icons.report,
-                                  'assets/images/communication.png',
-                                  colorScheme,
-                                  () => LostPost())),
-                          SizedBox(width: 5),
-                          Expanded(
-                              child: _buildReportCard(
-                                  'Today Found Reports',
-                                  '314',
-                                  '38%',
-                                  Icons.person_search,
-                                  'assets/images/searching.png',
-                                  colorScheme,
-                                  () =>
-                                      FoundPost())), //There should be a FoundPost page
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      Column(children: [
-                        //pending verifications
-                        FutureBuilder(
-                          future:
-                              _fireStoreService.getUsersNotApprovedWithLimit(5),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return _showEmptyCard(
-                                  'error: ${snapshot.error}', colorScheme);
-                            } else if (snapshot.hasData) {
-                              List<UserM>? usersNotApproved = snapshot.data;
-
-                              if (usersNotApproved == null ||
-                                  usersNotApproved.isEmpty) {
-                                return _showEmptyCard(
-                                    'No new pending users', colorScheme);
-                              }
-
-                              // Build the UI with the list of users not approved
-                              return _buildPendingVerificationSection(
-                                  'Pending Verifications',
-                                  colorScheme,
-                                  usersNotApproved, () {
-                                // Navigate to the Users page on bottom navigation bar
-                                Provider.of<NavigationProvider>(context,
-                                        listen: false)
-                                    .navigateTo(1,
-
-                                        data:
-                                            'Pending'); // 1 is Users page with selected Pending option
-                              });
-                            } else {
-                              return _showEmptyCard(
-                                  'Data not found', colorScheme);
-                            }
-                          },
+              body: RefreshIndicator(
+                onRefresh: () async {
+                  setState(() {});
+                },
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                                child: _buildReportCard(
+                                    'Today Lost Reports',
+                                    '387',
+                                    '45%',
+                                    Icons.report,
+                                    'assets/images/communication.png',
+                                    colorScheme,
+                                    () => LostPost())),
+                            SizedBox(width: 5),
+                            Expanded(
+                                child: _buildReportCard(
+                                    'Today Found Reports',
+                                    '314',
+                                    '38%',
+                                    Icons.person_search,
+                                    'assets/images/searching.png',
+                                    colorScheme,
+                                    () =>
+                                        FoundPost())), //There should be a FoundPost page
+                          ],
                         ),
                         SizedBox(height: 10),
-                        FutureBuilder(
-                            future: _fireStoreService.getPostedTimes(),
+                        Column(children: [
+                          //pending verifications
+                          FutureBuilder(
+                            future:
+                                _fireStoreService.getUsersNotApprovedWithLimit(5),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
                                 return Center(child: CircularProgressIndicator());
                               } else if (snapshot.hasError) {
-                                return Center(
-                                    child: Text('error: ${snapshot.error}'));
-                              } else if (snapshot.hasData) {
-                                int yAxisMax = 4;
-                                Map<String, List<String>>? postedTimes =
-                                    snapshot.data;
-
-                                List<int> foundCountData = _countDatesInLast7Days(
-                                    postedTimes!['found']!);
-                                List<int> lostCountData =
-                                _countDatesInLast7Days(postedTimes['lost']!);
-
-                                // Generate found items data with loop
-                                final foundItemsData = List.generate(7, (index) {
-                                  yAxisMax <= foundCountData[index]
-                                      ? yAxisMax = foundCountData[index]
-                                      : null;
-                                  return FlSpot(
-                                    (index + 1).toDouble(), // Day number (1-7)
-                                    foundCountData[index]
-                                        .toDouble(), // Count value
-                                  );
-                                });
-
-                                // Generate lost items data with loop
-                                final lostItemsData = List.generate(7, (index) {
-                                  yAxisMax <= lostCountData[index]
-                                      ? yAxisMax = lostCountData[index]
-                                      : null;
-                                  return FlSpot(
-                                    (index + 1).toDouble(), // Day number (1-7)
-                                    lostCountData[index]
-                                        .toDouble(), // Count value
-                                  );
-                                });
-                                return _buildLostFoundWeek(
-                                    'Last Week Chart (Count/Date)',
-                                    colorScheme,
-                                    lostItemsData,
-                                    foundItemsData,
-                                    yAxisMax + 1);
-                              } else {
-                                return _showEmptyCard(
-                                    'No data to show', colorScheme);
-                              }
-                            }),
-                        SizedBox(height: 10),
-                        FutureBuilder(
-                            //recent updates
-                            future: _fireStoreService
-                                .getLostAndFoundItemsWithLimit(3),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Center(
-                                    child: CircularProgressIndicator());
-                              } else if (snapshot.hasError) {
                                 return _showEmptyCard(
                                     'error: ${snapshot.error}', colorScheme);
                               } else if (snapshot.hasData) {
-                                List? allItemsList = snapshot.data;
-                                final List<Map<String, dynamic>> finalList = [];
-                                for (var item in allItemsList!) {
-                                  finalList.add(item.toFirestore());
+                                List<UserM>? usersNotApproved = snapshot.data;
+
+                                if (usersNotApproved == null ||
+                                    usersNotApproved.isEmpty) {
+                                  return _showEmptyCard(
+                                      'No new pending users', colorScheme);
                                 }
 
-                                return _buildUpdatesSection(
-                                    'Updates', colorScheme, finalList, () {
-                                  // Navigate to the Posts page on bottom navigation bar
+                                // Build the UI with the list of users not approved
+                                return _buildPendingVerificationSection(
+                                    'Pending Verifications',
+                                    colorScheme,
+                                    usersNotApproved, () {
+                                  // Navigate to the Users page on bottom navigation bar
                                   Provider.of<NavigationProvider>(context,
                                           listen: false)
-                                      .navigateTo(2,
-                                       ); // 2 is Posts page without any data for now
+                                      .navigateTo(1,
+
+                                          data:
+                                              'Pending'); // 1 is Users page with selected Pending option
                                 });
                               } else {
                                 return _showEmptyCard(
-                                    'No new updates', colorScheme);
+                                    'Data not found', colorScheme);
                               }
-                            }),
-                      ]),
-                      SizedBox(height: 80),
-                    ],
+                            },
+                          ),
+                          SizedBox(height: 10),
+                          FutureBuilder(
+                              future: _fireStoreService.getPostedTimes(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(child: CircularProgressIndicator());
+                                } else if (snapshot.hasError) {
+                                  return Center(
+                                      child: Text('error: ${snapshot.error}'));
+                                } else if (snapshot.hasData) {
+                                  int yAxisMax = 4;
+                                  Map<String, List<String>>? postedTimes =
+                                      snapshot.data;
+
+                                  List<int> foundCountData = _countDatesInLast7Days(
+                                      postedTimes!['found']!);
+                                  List<int> lostCountData =
+                                  _countDatesInLast7Days(postedTimes['lost']!);
+
+                                  // Generate found items data with loop
+                                  final foundItemsData = List.generate(7, (index) {
+                                    yAxisMax <= foundCountData[index]
+                                        ? yAxisMax = foundCountData[index]
+                                        : null;
+                                    return FlSpot(
+                                      (index + 1).toDouble(), // Day number (1-7)
+                                      foundCountData[index]
+                                          .toDouble(), // Count value
+                                    );
+                                  });
+
+                                  // Generate lost items data with loop
+                                  final lostItemsData = List.generate(7, (index) {
+                                    yAxisMax <= lostCountData[index]
+                                        ? yAxisMax = lostCountData[index]
+                                        : null;
+                                    return FlSpot(
+                                      (index + 1).toDouble(), // Day number (1-7)
+                                      lostCountData[index]
+                                          .toDouble(), // Count value
+                                    );
+                                  });
+                                  return _buildLostFoundWeek(
+                                      'Last Week Chart (Count/Date)',
+                                      colorScheme,
+                                      lostItemsData,
+                                      foundItemsData,
+                                      yAxisMax + 1);
+                                } else {
+                                  return _showEmptyCard(
+                                      'No data to show', colorScheme);
+                                }
+                              }),
+                          SizedBox(height: 10),
+                          FutureBuilder(
+                              //recent updates
+                              future: _fireStoreService
+                                  .getLostAndFoundItemsWithLimit(3),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(
+                                      child: CircularProgressIndicator());
+                                } else if (snapshot.hasError) {
+                                  return _showEmptyCard(
+                                      'error: ${snapshot.error}', colorScheme);
+                                } else if (snapshot.hasData) {
+                                  List? allItemsList = snapshot.data;
+                                  final List<Map<String, dynamic>> finalList = [];
+                                  for (var item in allItemsList!) {
+                                    finalList.add(item.toFirestore());
+                                  }
+
+                                  return _buildUpdatesSection(
+                                      'Updates', colorScheme, finalList, () {
+                                    // Navigate to the Posts page on bottom navigation bar
+                                    Provider.of<NavigationProvider>(context,
+                                            listen: false)
+                                        .navigateTo(2,
+                                         ); // 2 is Posts page without any data for now
+                                  });
+                                } else {
+                                  return _showEmptyCard(
+                                      'No new updates', colorScheme);
+                                }
+                              }),
+                        ]),
+                        SizedBox(height: 80),
+                      ],
+                    ),
                   ),
                 ),
               ),

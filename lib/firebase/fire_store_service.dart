@@ -369,6 +369,30 @@ class FireStoreService {
     }
   }
 
+  // Function to get the count of lost items
+  Future<int> getLostItemsCount() async {
+    try {
+      // Query the lostItems collection
+      QuerySnapshot querySnapshot = await _fireStore.collection('lostItems').get();
+      return querySnapshot.docs.length;
+    } catch (e) {
+      print("Error getting lost items count: $e");
+      return 0;
+    }
+  }
+
+  // Function to get the count of found items
+  Future<int> getFoundItemsCount() async {
+    try {
+      // Query the foundItems collection
+      QuerySnapshot querySnapshot = await _fireStore.collection('foundItems').get();
+      return querySnapshot.docs.length;
+    } catch (e) {
+      print("Error getting found items count: $e");
+      return 0;
+    }
+  }
+
   // Method to retrieve all lost and found items sorted by date
   Future<Map<String, List<dynamic>>> getLostAndFoundItems() async {
     try {

@@ -804,10 +804,7 @@ class _FoundPostState extends State<FoundPost> {
                                               _descriptionTextController.text,
                                           currentLocation:
                                               _locationTextController.text,
-                                          images: [
-                                            'path/to/image1.jpg',
-                                            'path/to/image2.jpg'
-                                          ],
+                                          images: _imageUrls,
                                           agreedToTerms: _agreeTerms,
                                           userId: userId,
                                           privacy: _selectedPrivacy!,
