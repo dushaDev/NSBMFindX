@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:find_x/random.dart';
+import 'package:find_x/res/random.dart';
 
 import 'models/Faculty.dart';
 import 'models/Student.dart';

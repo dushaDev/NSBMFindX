@@ -1,11 +1,17 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:find_x/firebase/auth_service.dart';
 import 'package:find_x/firebase/models/found_item.dart';
-import 'package:find_x/read_date.dart';
+import 'package:find_x/res/compress_file.dart';
+import 'package:find_x/res/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
 import 'package:find_x/res/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'firebase/fire_base_storage.dart';
 import 'firebase/fire_store_service.dart';
 
 class FoundPost extends StatefulWidget {
@@ -31,8 +37,12 @@ class _FoundPostState extends State<FoundPost> {
   String? _selectedPrivacy = 'Public';
   String? _selectedFaculty;
   String? _selectedDegree;
+  List<File> _images = [];
+  List<String> _imageUrls = [];
   int _hour24 = 0; //to store the selected hour in 24 hours format
   int _minute = 0;
+  double _uploadProgress1 = 0.0;
+  double _uploadProgress2 = 0.0;
   final List<String> _privacy_list = ['Public', 'Restricted', 'Private'];
   final List<String> _faculties = [
     'Faculty of Computing',
@@ -51,6 +61,7 @@ class _FoundPostState extends State<FoundPost> {
   late Future<DateTime?> _selectedDate;
   late Future<TimeOfDay?> _selectedTime;
   FireStoreService _fireStoreService = FireStoreService();
+  final FireBaseStorage _storageService = FireBaseStorage();
   AuthService _authService = AuthService();
   final TextEditingController _foundTextController = TextEditingController();
   final TextEditingController _descriptionTextController =
@@ -58,7 +69,11 @@ class _FoundPostState extends State<FoundPost> {
   final TextEditingController _locationTextController = TextEditingController();
   final TextEditingController _contactTextController = TextEditingController();
   final TextEditingController _idTextController = TextEditingController();
+  StreamController<String> _controller1 = StreamController<String>.broadcast();
+  StreamController<String> _controller2 = StreamController<String>.broadcast();
   final _formKey = GlobalKey<FormState>();
+  final ImagePicker _picker = ImagePicker();
+  final CompressFile _compressFile = CompressFile();
 
   @override
   Widget build(BuildContext context) {
@@ -82,39 +97,105 @@ class _FoundPostState extends State<FoundPost> {
                   Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: Text(
-                      "Upload maximum 20MB images",
+                      "Upload maximum 10MB images",
                       style: TextStyle(color: colorScheme.onSurfaceVariant),
                     ),
                   ),
                   SizedBox(height: 10),
                   Row(
                     children: [
-                      Container(
-                        height: 70,
-                        width: 100,
-                        decoration: BoxDecoration(
-                          color: colorScheme.surfaceContainer,
-                        ),
-                        child: Icon(Icons.add,
-                            size: 32,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withAlpha(60)),
+                      GestureDetector(
+                        onTap: () async {
+                          String imgUrl =
+                              await _pickAndUploadImage(_controller1, 1);
+                          _imageUrls.add(imgUrl);
+                          _controller1.sink.add(imgUrl);
+                        },
+                        child: StreamBuilder(
+                            stream: _controller1.stream,
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                return Container(
+                                  height: 70,
+                                  width: 100,
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.surfaceContainer,
+                                  ),
+                                  child: Stack(children: [
+                                    Image.file(_images[0]),
+                                    Column(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        LinearProgressIndicator(
+                                          value: _uploadProgress1,
+                                        ),
+                                      ],
+                                    )
+                                  ]),
+                                );
+                              } else {
+                                return Container(
+                                  height: 70,
+                                  width: 100,
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.surfaceContainer,
+                                  ),
+                                  child: Icon(Icons.add,
+                                      size: 32,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withAlpha(60)),
+                                );
+                              }
+                            }),
                       ),
                       SizedBox(width: 10),
-                      Container(
-                        height: 70,
-                        width: 100,
-                        decoration: BoxDecoration(
-                          color: colorScheme.surfaceContainer,
-                        ),
-                        child: Icon(Icons.add,
-                            size: 32,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withAlpha(60)),
+                      GestureDetector(
+                        onTap: () async {
+                          String imgUrl =
+                              await _pickAndUploadImage(_controller2, 2);
+                          _imageUrls.add(imgUrl);
+                          _controller2.sink.add(imgUrl);
+                        },
+                        child: StreamBuilder(
+                            stream: _controller2.stream,
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                return Container(
+                                  height: 70,
+                                  width: 100,
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.surfaceContainer,
+                                  ),
+                                  child: Stack(children: [
+                                    Image.file(_images[1]),
+                                    Column(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        LinearProgressIndicator(
+                                          value: _uploadProgress2,
+                                        ),
+                                      ],
+                                    )
+                                  ]),
+                                );
+                              } else {
+                                return Container(
+                                  height: 70,
+                                  width: 100,
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.surfaceContainer,
+                                  ),
+                                  child: Icon(Icons.add,
+                                      size: 32,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withAlpha(60)),
+                                );
+                              }
+                            }),
                       ),
                     ],
                   ),
@@ -699,18 +780,20 @@ class _FoundPostState extends State<FoundPost> {
                                       colorScheme,
                                       true);
                                 } else {
-                                  _isSpinKitLoaded = true; // show loading spinner
+                                  _isSpinKitLoaded =
+                                      true; // show loading spinner
                                   String? userId =
                                       await _authService.getUserId();
                                   _selectDate
                                       ? _lostTime = ReadDate().getDateNow()
                                       : _lostTime = '$_date$_displayTime';
 
-                                  await _fireStoreService.addFoundItem(
-                                      FoundItem(
+                                  await _fireStoreService
+                                      .addFoundItem(FoundItem(
                                           id: userId!,
                                           itemName: _foundTextController.text,
-                                          itemName_lc: _foundTextController.text.toLowerCase(),
+                                          itemName_lc: _foundTextController.text
+                                              .toLowerCase(),
                                           type: true,
                                           foundTime: _lostTime,
                                           postedTime: ReadDate().getDateNow(),
@@ -740,9 +823,12 @@ class _FoundPostState extends State<FoundPost> {
                                               _selectedPrivacy == 'Private'
                                                   ? _idTextController.text
                                                   : null,
-                                          isCompleted: false))  .whenComplete(() {
-                                    _showSnackBar('Found item posted successfully',
-                                        colorScheme, false);
+                                          isCompleted: false))
+                                      .whenComplete(() {
+                                    _showSnackBar(
+                                        'Found item posted successfully',
+                                        colorScheme,
+                                        false);
                                     _isSpinKitLoaded = false;
                                     Navigator.pop(context);
                                   });
@@ -993,4 +1079,49 @@ class _FoundPostState extends State<FoundPost> {
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   } //snackBar customized with colors when error or not
+
+  Future<String> _pickAndUploadImage(
+      StreamController<String> controller, int progressVersion) async {
+    try {
+      // 1. Pick an image
+      final XFile? pickedFile =
+          await _picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile == null) return '';
+
+      // 2. Compress the image
+      File imageFile = File(pickedFile.path);
+      File compressedFile = await _compressFile.compressImage(imageFile, 700);
+      _images.add(compressedFile);
+
+      // 3. Update UI immediately with empty string (shows loading state)
+      controller.sink.add('');
+
+      // 4. Get user ID and upload
+      String? userId = await _authService.getUserId();
+      if (userId == null) throw Exception('User not authenticated');
+
+      // 5. Upload with progress (using your FirebaseStorage class)
+      String imageUrl = await _storageService.uploadImage(
+        compressedFile,
+        userId,
+        (double progress) {
+          // Optional: Send progress updates to stream
+          if (progressVersion == 1) {
+            _uploadProgress1 = progress;
+          } else {
+            _uploadProgress2 = progress;
+          }
+          controller.sink.add('');
+        },
+      );
+
+      // 6. Send final URL to stream
+      controller.sink.add(imageUrl);
+      return imageUrl;
+    } catch (e) {
+      // 7. Handle errors
+      controller.sink.addError('Error: ${e.toString()}');
+      rethrow;
+    }
+  }
 }

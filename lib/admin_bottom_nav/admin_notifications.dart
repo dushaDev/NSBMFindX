@@ -1,5 +1,5 @@
 import 'package:find_x/firebase/models/notification_m.dart';
-import 'package:find_x/read_date.dart';
+import 'package:find_x/res/read_date.dart';
 import 'package:flutter/material.dart';
 import 'package:find_x/firebase/fire_store_service.dart'; // Assume this exists
 

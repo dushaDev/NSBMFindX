@@ -7,7 +7,7 @@ import 'package:find_x/bottom_nav/notifications.dart';
 import 'package:find_x/firebase/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'NavigationProvider.dart';
+import 'navigation_provider.dart';
 import 'admin_bottom_nav/dashboard.dart';
 import 'bottom_nav/search.dart';
 import 'bottom_nav/home.dart';

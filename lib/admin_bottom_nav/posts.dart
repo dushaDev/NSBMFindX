@@ -7,7 +7,7 @@ import '../firebase/fire_store_service.dart';
 import '../firebase/models/lost_found_unified.dart';
 import '../res/items/build_shimmer_loading.dart';
 import '../res/items/item_post.dart';
-import '../NavigationProvider.dart';
+import '../navigation_provider.dart';
 
 class Posts extends StatefulWidget {
   const Posts({super.key});

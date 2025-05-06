@@ -3,7 +3,7 @@ import 'package:find_x/res/font_profile.dart';
 import 'package:flutter/material.dart';
 
 import '../../post_details.dart';
-import '../../read_date.dart';
+import '../read_date.dart';
 
 class ItemPost extends StatelessWidget {
   final LostFoundUnified item;

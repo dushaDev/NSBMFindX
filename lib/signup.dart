@@ -1,5 +1,5 @@
 import 'package:find_x/login.dart';
-import 'package:find_x/read_date.dart';
+import 'package:find_x/res/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

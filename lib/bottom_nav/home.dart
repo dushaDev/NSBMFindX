@@ -2,7 +2,7 @@ import 'package:find_x/firebase/auth_service.dart';
 import 'package:find_x/firebase/fire_store_service.dart';
 import 'package:find_x/found_post.dart';
 import 'package:find_x/lost_post.dart';
-import 'package:find_x/read_date.dart';
+import 'package:find_x/res/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';

@@ -6,14 +6,14 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../NavigationProvider.dart';
+import '../navigation_provider.dart';
 import '../bottom_navigation.dart';
 import '../firebase/auth_service.dart';
 import '../firebase/fire_store_service.dart';
 import '../firebase/models/user_m.dart';
 import '../found_post.dart';
 import '../lost_post.dart';
-import '../read_date.dart';
+import '../res/read_date.dart';
 import '../res/font_profile.dart';
 import '../user_profile.dart';
 

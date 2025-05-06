@@ -1,12 +1,12 @@
 import 'dart:math';
 
-import 'package:find_x/read_date.dart';
+import 'package:find_x/res/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import '../email_service.dart';
+import '../res/email_service.dart';
 import '../firebase/auth_service.dart';
 import '../firebase/fire_store_service.dart';
 
