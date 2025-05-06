@@ -59,6 +59,31 @@ class _PostDetailsState extends State<PostDetails> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Image Gallery
+          post.images.isEmpty?
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                height: 100,
+                child: Center(
+                  child: Column(
+                    children: [
+                      Text('No images to show',
+                          style: TextStyle(
+                              color: colorScheme.onSurface,
+                              fontSize: FontProfile.small)),
+                      const SizedBox(height: 8),
+                      Icon(
+                        Icons.sentiment_dissatisfied_rounded,
+                        size: 50,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ):
           _buildImageGallery(post.images, colorScheme, context),
           const SizedBox(height: 20),
 
