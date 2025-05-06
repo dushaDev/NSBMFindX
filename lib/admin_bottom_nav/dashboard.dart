@@ -1,5 +1,3 @@
-import 'package:find_x/admin_bottom_navigation.dart';
-import 'package:find_x/index_page.dart';
 import 'package:find_x/res/charts/lost_found_week.dart';
 import 'package:find_x/res/items/build_shimmer_loading.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -7,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../navigation_provider.dart';
-import '../bottom_navigation.dart';
 import '../firebase/auth_service.dart';
 import '../firebase/fire_store_service.dart';
 import '../firebase/models/user_m.dart';
@@ -29,6 +26,7 @@ class _DashboardState extends State<Dashboard> {
   AuthService _authService = AuthService();
   ReadDate _readDate = ReadDate();
   String _title = 'Dashboard';
+  int _lostFoundCount = 0;
   @override
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -82,41 +80,107 @@ class _DashboardState extends State<Dashboard> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                                child: _buildReportCard(
-                                    'Today Lost Reports',
-                                    '387',
-                                    '45%',
-                                    Icons.report,
-                                    'assets/images/communication.png',
-                                    colorScheme,
-                                    () => LostPost())),
-                            SizedBox(width: 5),
-                            Expanded(
-                                child: _buildReportCard(
-                                    'Today Found Reports',
-                                    '314',
-                                    '38%',
-                                    Icons.person_search,
-                                    'assets/images/searching.png',
-                                    colorScheme,
-                                    () =>
-                                        FoundPost())), //There should be a FoundPost page
-                          ],
-                        ),
+                        FutureBuilder(
+                            future:
+                                _fireStoreService.getTodayLostAndFoundItemsCount(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                        child: _buildReportCard(
+                                            'Today Lost Reports',
+                                            '0',
+                                            '...',
+                                            Icons.report,
+                                            'assets/images/communication.png',
+                                            colorScheme,
+                                            () => LostPost())),
+                                    SizedBox(width: 5),
+                                    Expanded(
+                                        child: _buildReportCard(
+                                            'Today Found Reports',
+                                            '0',
+                                            '...',
+                                            Icons.person_search,
+                                            'assets/images/searching.png',
+                                            colorScheme,
+                                            () =>
+                                                LostPost())), //There should be a FoundPost page
+                                  ],
+                                );
+                              } else if (snapshot.hasData) {
+                                Map<String, int> _lostFoundCountMap =
+                                    snapshot.data as Map<String, int>;
+                                return Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                        child: _buildReportCard(
+                                            'Today Lost Reports',
+                                            '${_lostFoundCountMap['lostCount']!}',
+                                            '${_getPercentage(_lostFoundCountMap['lostCount']!, _lostFoundCountMap['wholeCount']!)}%',
+                                            Icons.report,
+                                            'assets/images/communication.png',
+                                            colorScheme,
+                                            () => LostPost())),
+                                    SizedBox(width: 5),
+                                    Expanded(
+                                        child: _buildReportCard(
+                                            'Today Found Reports',
+                                            '${_lostFoundCountMap['foundCount']!}',
+                                            '${_getPercentage(_lostFoundCountMap['foundCount']!, _lostFoundCountMap['wholeCount']!)}%',
+                                            Icons.person_search,
+                                            'assets/images/searching.png',
+                                            colorScheme,
+                                            () =>
+                                                LostPost())), //There should be a FoundPost page
+                                  ],
+                                );
+                              } else {
+                                return Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                        child: _buildReportCard(
+                                            'Today Lost Reports',
+                                            '-',
+                                            'No data',
+                                            Icons.report,
+                                            'assets/images/communication.png',
+                                            colorScheme,
+                                            () => LostPost())),
+                                    SizedBox(width: 5),
+                                    Expanded(
+                                        child: _buildReportCard(
+                                            'Today Found Reports',
+                                            '-',
+                                            'No data',
+                                            Icons.person_search,
+                                            'assets/images/searching.png',
+                                            colorScheme,
+                                            () =>
+                                                LostPost())), //There should be a FoundPost page
+                                  ],
+                                );
+                              }
+                            }),
                         SizedBox(height: 10),
                         Column(children: [
                           //pending verifications
                           FutureBuilder(
-                            future:
-                                _fireStoreService.getUsersNotApprovedWithLimit(5),
+                            future: _fireStoreService
+                                .getUsersNotApprovedWithLimit(5),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
-                                return Center(child: CircularProgressIndicator());
+                                return Center(
+                                    child: CircularProgressIndicator());
                               } else if (snapshot.hasError) {
                                 return _showEmptyCard(
                                     'error: ${snapshot.error}', colorScheme);
@@ -138,7 +202,6 @@ class _DashboardState extends State<Dashboard> {
                                   Provider.of<NavigationProvider>(context,
                                           listen: false)
                                       .navigateTo(1,
-
                                           data:
                                               'Pending'); // 1 is Users page with selected Pending option
                                 });
@@ -154,7 +217,8 @@ class _DashboardState extends State<Dashboard> {
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState ==
                                     ConnectionState.waiting) {
-                                  return Center(child: CircularProgressIndicator());
+                                  return Center(
+                                      child: CircularProgressIndicator());
                                 } else if (snapshot.hasError) {
                                   return Center(
                                       child: Text('error: ${snapshot.error}'));
@@ -163,30 +227,36 @@ class _DashboardState extends State<Dashboard> {
                                   Map<String, List<String>>? postedTimes =
                                       snapshot.data;
 
-                                  List<int> foundCountData = _countDatesInLast7Days(
-                                      postedTimes!['found']!);
+                                  List<int> foundCountData =
+                                      _countDatesInLast7Days(
+                                          postedTimes!['found']!);
                                   List<int> lostCountData =
-                                  _countDatesInLast7Days(postedTimes['lost']!);
+                                      _countDatesInLast7Days(
+                                          postedTimes['lost']!);
 
                                   // Generate found items data with loop
-                                  final foundItemsData = List.generate(7, (index) {
+                                  final foundItemsData =
+                                      List.generate(7, (index) {
                                     yAxisMax <= foundCountData[index]
                                         ? yAxisMax = foundCountData[index]
                                         : null;
                                     return FlSpot(
-                                      (index + 1).toDouble(), // Day number (1-7)
+                                      (index + 1)
+                                          .toDouble(), // Day number (1-7)
                                       foundCountData[index]
                                           .toDouble(), // Count value
                                     );
                                   });
 
                                   // Generate lost items data with loop
-                                  final lostItemsData = List.generate(7, (index) {
+                                  final lostItemsData =
+                                      List.generate(7, (index) {
                                     yAxisMax <= lostCountData[index]
                                         ? yAxisMax = lostCountData[index]
                                         : null;
                                     return FlSpot(
-                                      (index + 1).toDouble(), // Day number (1-7)
+                                      (index + 1)
+                                          .toDouble(), // Day number (1-7)
                                       lostCountData[index]
                                           .toDouble(), // Count value
                                     );
@@ -217,7 +287,8 @@ class _DashboardState extends State<Dashboard> {
                                       'error: ${snapshot.error}', colorScheme);
                                 } else if (snapshot.hasData) {
                                   List? allItemsList = snapshot.data;
-                                  final List<Map<String, dynamic>> finalList = [];
+                                  final List<Map<String, dynamic>> finalList =
+                                      [];
                                   for (var item in allItemsList!) {
                                     finalList.add(item.toFirestore());
                                   }
@@ -227,8 +298,9 @@ class _DashboardState extends State<Dashboard> {
                                     // Navigate to the Posts page on bottom navigation bar
                                     Provider.of<NavigationProvider>(context,
                                             listen: false)
-                                        .navigateTo(2,
-                                         ); // 2 is Posts page without any data for now
+                                        .navigateTo(
+                                      2,
+                                    ); // 2 is Posts page without any data for now
                                   });
                                 } else {
                                   return _showEmptyCard(
@@ -595,5 +667,10 @@ class _DashboardState extends State<Dashboard> {
     }
 
     return last7DaysCounts;
+  }
+
+  int _getPercentage(int count, int total) {
+    if (total == 0) return 0;
+    return ((count / total) * 100).round();
   }
 }
