@@ -56,10 +56,6 @@ class _SignupState extends State<Signup> {
         backgroundColor: colorScheme.surface,
         title: Text(
           "Sign Up",
-          style: TextStyle(
-              color: colorScheme.onSurface,
-              fontSize: FontProfile.extraLarge,
-              fontWeight: FontWeight.normal),
         ),
         centerTitle: true,
       ),
