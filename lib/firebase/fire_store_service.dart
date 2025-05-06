@@ -416,6 +416,7 @@ class FireStoreService {
       return {'lostCount': 0, 'foundCount': 0, 'wholeCount': 0};
     }
   }
+
   //---
 // Function to get today's lost items count
   Future<int> getTodayLostItemsCount() async {
@@ -427,7 +428,7 @@ class FireStoreService {
           .where('postedTime', isGreaterThanOrEqualTo: '$today/0/0')
           .get();
 
-      print( '${querySnapshot.docs.length}' );
+      print('${querySnapshot.docs.length}');
 
       final todayDocs = querySnapshot.docs.where((doc) {
         String postedTime = doc['postedTime'] as String;
@@ -445,7 +446,7 @@ class FireStoreService {
 // Function to get today's found items count
   Future<int> getTodayFoundItemsCount() async {
     try {
-      String today =  _readDate.getDateNow(countLength: 3);
+      String today = _readDate.getDateNow(countLength: 3);
       QuerySnapshot querySnapshot = await _fireStore
           .collection('foundItems')
           .where('postedTime', isGreaterThanOrEqualTo: '$today/0/0')
@@ -464,6 +465,7 @@ class FireStoreService {
       return 0;
     }
   }
+
   // Function to get today's lost and found items count
   Future<Map<String, int>> getTodayLostAndFoundItemsCount() async {
     try {
@@ -535,10 +537,16 @@ class FireStoreService {
   // Method to retrieve all lost and found items sorted by date with limit
   Future<List<dynamic>> getLostAndFoundItemsWithLimit(int limit) async {
     try {
-      QuerySnapshot lostItemsSnapshot =
-          await _fireStore.collection('lostItems').limit(limit).get();
-      QuerySnapshot foundItemsSnapshot =
-          await _fireStore.collection('foundItems').limit(limit).get();
+      QuerySnapshot lostItemsSnapshot = await _fireStore
+          .collection('lostItems')
+          .orderBy('postedTime', descending: true)
+          .limit(limit)
+          .get();
+      QuerySnapshot foundItemsSnapshot = await _fireStore
+          .collection('foundItems')
+          .orderBy('postedTime', descending: true)
+          .limit(limit)
+          .get();
 
       List<LostItem> lostItems = lostItemsSnapshot.docs.map((doc) {
         return LostItem.fromFirestore(
