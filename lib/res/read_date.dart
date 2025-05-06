@@ -24,8 +24,20 @@ class ReadDate {
     }
   }
 
-  String getDateNow() {
-    return "${_dateTime.year}/${_dateTime.month}/${_dateTime.day}/${_dateTime.hour}/${_dateTime.minute}";
+  String getDateNow({int countLength = 5}) {
+    if (countLength == 5) {
+      return "${_dateTime.year}/${_dateTime.month}/${_dateTime.day}/${_dateTime.hour}/${_dateTime.minute}";
+    } else if (countLength == 4) {
+      return "${_dateTime.year}/${_dateTime.month}/${_dateTime.day}/${_dateTime.hour}";
+    } else if (countLength == 3) {
+      return "${_dateTime.year}/${_dateTime.month}/${_dateTime.day}";
+    } else if (countLength == 2) {
+      return "${_dateTime.year}/${_dateTime.month}";
+    } else if (countLength == 1) {
+      return "${_dateTime.year}";
+    } else {
+      return "${_dateTime.year}/${_dateTime.month}/${_dateTime.day}/${_dateTime.hour}/${_dateTime.minute}";
+    }
   }
 
   List<int> calculateDate(List<String> parts) {
@@ -88,6 +100,7 @@ class ReadDate {
 
     return calculatedDate;
   }
+
   //"2025/3/27/20/13" to "2025 march 27"
   String getDateStringToDisplay(String dateTimeStr) {
     try {
@@ -99,8 +112,19 @@ class ReadDate {
       final day = int.parse(parts[2]);
 
       final monthNames = [
-        "", "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
+        "",
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
       ];
 
       return '$year ${monthNames[month]} $day';
@@ -108,6 +132,7 @@ class ReadDate {
       throw FormatException("Failed to parse date: $e");
     }
   }
+
   //"2025/3/27/20/13" to "08:13 PM"
   String getTimeStringToDisplay(String dateTimeStr) {
     try {
