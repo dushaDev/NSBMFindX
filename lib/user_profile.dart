@@ -80,7 +80,7 @@ class _UserProfileState extends State<UserProfile> {
                       child: Column(
                         children: [
                           CircleAvatar(
-                            radius: 70,
+                            radius: 60,
                             backgroundImage:
                                 AssetImage('assets/images/user.png'),
                             backgroundColor: Colors.transparent,
