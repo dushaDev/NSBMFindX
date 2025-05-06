@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:find_x/res/random.dart';
+import 'package:intl/intl.dart';
 
+import '../res/read_date.dart';
 import 'models/Faculty.dart';
 import 'models/Student.dart';
 import 'models/admin.dart';
@@ -17,6 +19,7 @@ class FireStoreService {
   final FirebaseFirestore _fireStore = FirebaseFirestore.instance;
 
   Random _random = Random();
+  ReadDate _readDate = ReadDate();
 
   Future<void> registerStudent(
     String id,
@@ -53,15 +56,16 @@ class FireStoreService {
   }
 
   Future<void> registerStaff(
-      String id,
-      String name,
-      String joinDate,
-      String email,
-      String contact,
-      String role,
-      bool isApproved,
-      String department,
-      String position,) async {
+    String id,
+    String name,
+    String joinDate,
+    String email,
+    String contact,
+    String role,
+    bool isApproved,
+    String department,
+    String position,
+  ) async {
     List<String> words = _random.splitName(name);
 
     await addUser(UserM(
@@ -373,7 +377,8 @@ class FireStoreService {
   Future<int> getLostItemsCount() async {
     try {
       // Query the lostItems collection
-      QuerySnapshot querySnapshot = await _fireStore.collection('lostItems').get();
+      QuerySnapshot querySnapshot =
+          await _fireStore.collection('lostItems').get();
       return querySnapshot.docs.length;
     } catch (e) {
       print("Error getting lost items count: $e");
@@ -385,13 +390,99 @@ class FireStoreService {
   Future<int> getFoundItemsCount() async {
     try {
       // Query the foundItems collection
-      QuerySnapshot querySnapshot = await _fireStore.collection('foundItems').get();
+      QuerySnapshot querySnapshot =
+          await _fireStore.collection('foundItems').get();
       return querySnapshot.docs.length;
     } catch (e) {
       print("Error getting found items count: $e");
       return 0;
     }
   }
+
+  //get Whole lost and found items count
+  Future<Map<String, int>> getLostAndFoundItemsCount() async {
+    try {
+      int lostCount = await getLostItemsCount();
+      int foundCount = await getFoundItemsCount();
+
+      // Combine the counts
+      return {
+        'lostCount': lostCount,
+        'foundCount': foundCount,
+        'wholeCount': lostCount + foundCount
+      };
+    } catch (e) {
+      print("Error getting lost and found items count: $e");
+      return {'lostCount': 0, 'foundCount': 0, 'wholeCount': 0};
+    }
+  }
+  //---
+// Function to get today's lost items count
+  Future<int> getTodayLostItemsCount() async {
+    try {
+      String today = _readDate.getDateNow(countLength: 3);
+      print(today);
+      QuerySnapshot querySnapshot = await _fireStore
+          .collection('lostItems')
+          .where('postedTime', isGreaterThanOrEqualTo: '$today/0/0')
+          .get();
+
+      print( '${querySnapshot.docs.length}' );
+
+      final todayDocs = querySnapshot.docs.where((doc) {
+        String postedTime = doc['postedTime'] as String;
+        String postedDate = postedTime.split('/').sublist(0, 3).join('/');
+        return postedDate == today;
+      });
+
+      return todayDocs.length;
+    } catch (e) {
+      print("Error getting today's lost items count: $e");
+      return 0;
+    }
+  }
+
+// Function to get today's found items count
+  Future<int> getTodayFoundItemsCount() async {
+    try {
+      String today =  _readDate.getDateNow(countLength: 3);
+      QuerySnapshot querySnapshot = await _fireStore
+          .collection('foundItems')
+          .where('postedTime', isGreaterThanOrEqualTo: '$today/0/0')
+          .get();
+
+      // Additional filtering
+      final todayDocs = querySnapshot.docs.where((doc) {
+        String postedTime = doc['postedTime'] as String;
+        String postedDate = postedTime.split('/').sublist(0, 3).join('/');
+        return postedDate == today;
+      });
+
+      return todayDocs.length;
+    } catch (e) {
+      print("Error getting today's found items count: $e");
+      return 0;
+    }
+  }
+  // Function to get today's lost and found items count
+  Future<Map<String, int>> getTodayLostAndFoundItemsCount() async {
+    try {
+      int lostCount = await getTodayLostItemsCount();
+      int foundCount = await getTodayFoundItemsCount();
+
+      // Combine the counts
+      return {
+        'lostCount': lostCount,
+        'foundCount': foundCount,
+        'wholeCount': lostCount + foundCount
+      };
+    } catch (e) {
+      print("Error getting today's lost and found items count: $e");
+      return {'lostCount': 0, 'foundCount': 0, 'wholeCount': 0};
+    }
+  }
+
+//----
 
   // Method to retrieve all lost and found items sorted by date
   Future<Map<String, List<dynamic>>> getLostAndFoundItems() async {
@@ -671,7 +762,8 @@ class FireStoreService {
   }
 
   // Function to write a notification to a user's subcollection
-  Future<void> addNotification(String userId, NotificationM notification) async {
+  Future<void> addNotification(
+      String userId, NotificationM notification) async {
     try {
       // Use the Firestore auto-generated ID for the notification
       DocumentReference docRef = await _fireStore
