@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:find_x/firebase/auth_service.dart';
 import 'package:find_x/firebase/fire_store_service.dart';
 import 'package:find_x/login.dart';
@@ -23,6 +25,8 @@ class UserProfileSettings extends StatefulWidget {
 class _UserProfileSettingsState extends State<UserProfileSettings> {
   FireStoreService _fireStoreService = FireStoreService();
   AuthService _authService = AuthService();
+  StreamController<bool> _badgeController = StreamController<bool>.broadcast();
+  StreamController<bool> _buttonController = StreamController<bool>.broadcast();
   final _readDate = ReadDate();
   final String _title = 'Profile';
 
@@ -146,29 +150,45 @@ class _UserProfileSettingsState extends State<UserProfileSettings> {
                                         ),
                                       ),
                                       const SizedBox(width: 10),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: mUser.isRestricted
-                                              ? _colorScheme.error
-                                              : mUser.isApproved
-                                                  ? _colorScheme.primary
-                                                  : _colorScheme.secondary,
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                        ),
-                                        child: Text(
-                                          mUser.isRestricted
-                                              ? 'Restricted'
-                                              : mUser.isApproved
-                                                  ? 'Verified'
-                                                  : 'Pending',
-                                          style: TextStyle(
-                                              color: _colorScheme
-                                                  .surfaceContainer),
-                                        ),
-                                      ),
+                                      StreamBuilder(
+                                          stream: _badgeController.stream,
+                                          builder: (context, snapshot) {
+                                            if (snapshot.hasData) {
+                                              if (snapshot.data == true) {
+                                                mUser.isApproved = true;
+                                              }
+                                              // mUser.isRestricted
+                                              //     ? mUser.isRestricted = false
+                                              //     : mUser.isRestricted = true;
+                                            }
+
+                                            return Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: mUser.isRestricted
+                                                    ? _colorScheme.error
+                                                    : mUser.isApproved
+                                                        ? _colorScheme.primary
+                                                        : _colorScheme
+                                                            .secondary,
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
+                                              ),
+                                              child: Text(
+                                                mUser.isRestricted
+                                                    ? 'Restricted'
+                                                    : mUser.isApproved
+                                                        ? 'Verified'
+                                                        : 'Pending',
+                                                style: TextStyle(
+                                                    color: _colorScheme
+                                                        .surfaceContainer),
+                                              ),
+                                            );
+                                          }),
                                     ],
                                   ),
                                 ],
@@ -207,39 +227,53 @@ class _UserProfileSettingsState extends State<UserProfileSettings> {
                                               width:
                                                   200, // Match your message button width
                                               child: OutlinedButton(
-                                                onPressed: () =>
-                                                    userRole == 'admin' &&
-                                                            mUser.isRestricted
-                                                        ? _fireStoreService
-                                                            .setUserRestriction(
-                                                                mUser.id, false)
-                                                        : _fireStoreService
-                                                            .setUserRestriction(
-                                                                mUser.id, true),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Icon(
-                                                      Icons
-                                                          .admin_panel_settings,
-                                                      color:
-                                                          _colorScheme.primary,
-                                                      size:
-                                                          20, // Adjust size to match your design
-                                                    ),
-                                                    const SizedBox(width: 8),
-                                                    Text(
-                                                      userRole == 'admin' &&
-                                                              mUser.isRestricted
-                                                          ? 'Unrestrict'
-                                                          : 'Restrict',
-                                                      style: TextStyle(
-                                                        color: _colorScheme
-                                                            .primary,
-                                                      ),
-                                                    ),
-                                                  ],
+                                                onPressed: () {
+                                                  if (userRole == 'admin' &&
+                                                      mUser.isRestricted) {
+                                                    _fireStoreService
+                                                        .setUserRestriction(
+                                                            mUser.id, false);
+                                                    mUser.isRestricted = false;
+                                                    _badgeController.sink.add(true);
+                                                    _buttonController.sink.add(true);
+                                                  } else {
+                                                    _fireStoreService
+                                                        .setUserRestriction(
+                                                            mUser.id, true);
+                                                   mUser.isRestricted = true;
+                                                    _badgeController.sink.add(true);
+                                                    _buttonController.sink.add(true);
+                                                  }
+                                                },
+                                                child: StreamBuilder(
+                                                  stream: _buttonController.stream,
+                                                  builder: (context, snapshot) {
+                                                    return Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment.center,
+                                                      children: [
+                                                        Icon(
+                                                          Icons
+                                                              .admin_panel_settings,
+                                                          color:
+                                                              _colorScheme.primary,
+                                                          size:
+                                                              20, // Adjust size to match your design
+                                                        ),
+                                                        const SizedBox(width: 8),
+                                                        Text(
+                                                          userRole == 'admin' &&
+                                                                  mUser.isRestricted
+                                                              ? 'Unrestrict'
+                                                              : 'Restrict',
+                                                          style: TextStyle(
+                                                            color: _colorScheme
+                                                                .primary,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    );
+                                                  }
                                                 ),
                                                 style: OutlinedButton.styleFrom(
                                                   padding: const EdgeInsets
@@ -264,35 +298,47 @@ class _UserProfileSettingsState extends State<UserProfileSettings> {
                                                   width:
                                                       200, // Match your message button width
                                                   child: OutlinedButton(
-                                                    onPressed: () =>
-                                                        userRole == 'admin'
-                                                            ? _fireStoreService
-                                                                .approveUser(
-                                                                    mUser.id)
-                                                            : null,
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Icon(
-                                                          Icons
-                                                              .admin_panel_settings,
-                                                          color: _colorScheme
-                                                              .primary,
-                                                          size:
-                                                              20, // Adjust size to match your design
-                                                        ),
-                                                        const SizedBox(
-                                                            width: 8),
-                                                        Text(
-                                                          'Approve User',
-                                                          style: TextStyle(
-                                                            color: _colorScheme
-                                                                .primary,
-                                                          ),
-                                                        ),
-                                                      ],
+                                                    onPressed: () {
+                                                      if (userRole == 'admin') {
+                                                        _fireStoreService
+                                                            .approveUser(
+                                                                mUser.id);
+                                                        mUser.isApproved = true;
+                                                        _badgeController.sink
+                                                            .add(true);
+                                                        _buttonController.sink.add(true);
+                                                      } else {
+                                                        null;
+                                                      }
+                                                    },
+                                                    child: StreamBuilder(
+                                                      stream: _buttonController.stream,
+                                                      builder: (context, snapshot) {
+                                                        return Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Icon(
+                                                              Icons
+                                                                  .admin_panel_settings,
+                                                              color: _colorScheme
+                                                                  .primary,
+                                                              size:
+                                                                  20, // Adjust size to match your design
+                                                            ),
+                                                            const SizedBox(
+                                                                width: 8),
+                                                            Text(
+                                                              'Approve User',
+                                                              style: TextStyle(
+                                                                color: _colorScheme
+                                                                    .primary,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        );
+                                                      }
                                                     ),
                                                     style: OutlinedButton
                                                         .styleFrom(

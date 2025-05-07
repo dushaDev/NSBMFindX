@@ -338,7 +338,7 @@ class _LostPostState extends State<LostPost> {
                           GestureDetector(
                             onTap: () async {
                               String imgUrl =
-                                  await _pickAndUploadImage(_controller1,1);
+                                  await _pickAndUploadImage(_controller1, 1);
                               _imageUrls.add(imgUrl);
                               _controller1.sink.add(imgUrl);
                             },
@@ -355,7 +355,8 @@ class _LostPostState extends State<LostPost> {
                                       child: Stack(children: [
                                         Image.file(_images[0]),
                                         Column(
-                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
                                           children: [
                                             LinearProgressIndicator(
                                               value: _uploadProgress1,
@@ -385,7 +386,7 @@ class _LostPostState extends State<LostPost> {
                           GestureDetector(
                             onTap: () async {
                               String imgUrl =
-                                  await _pickAndUploadImage(_controller2,2);
+                                  await _pickAndUploadImage(_controller2, 2);
                               _imageUrls.add(imgUrl);
                               _controller2.sink.add(imgUrl);
                             },
@@ -402,7 +403,8 @@ class _LostPostState extends State<LostPost> {
                                       child: Stack(children: [
                                         Image.file(_images[1]),
                                         Column(
-                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
                                           children: [
                                             LinearProgressIndicator(
                                               value: _uploadProgress2,
@@ -781,7 +783,7 @@ class _LostPostState extends State<LostPost> {
   }
 
   Future<String> _pickAndUploadImage(
-      StreamController<String> controller,int progressVersion) async {
+      StreamController<String> controller, int progressVersion) async {
     try {
       // 1. Pick an image
       final XFile? pickedFile =
@@ -806,9 +808,9 @@ class _LostPostState extends State<LostPost> {
         userId,
         (double progress) {
           // Optional: Send progress updates to stream
-          if(progressVersion==1){
+          if (progressVersion == 1) {
             _uploadProgress1 = progress;
-          }else{
+          } else {
             _uploadProgress2 = progress;
           }
           controller.sink.add('');
