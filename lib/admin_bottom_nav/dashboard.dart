@@ -1,7 +1,5 @@
-import 'dart:async';
-
 import 'package:find_x/res/charts/lost_found_week.dart';
-import 'package:find_x/res/items/build_shimmer_loading.dart';
+import 'package:find_x/user_profile_settings.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -10,12 +8,10 @@ import '../navigation_provider.dart';
 import '../firebase/auth_service.dart';
 import '../firebase/fire_store_service.dart';
 import '../firebase/models/user_m.dart';
-import '../found_post.dart';
 import '../lost_post.dart';
 import '../res/read_date.dart';
 import '../res/font_profile.dart';
 import '../res/widgets/build_updates_section.dart';
-import '../user_profile.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -29,7 +25,6 @@ class _DashboardState extends State<Dashboard> {
   AuthService _authService = AuthService();
   ReadDate _readDate = ReadDate();
   String _title = 'Dashboard';
-  int _lostFoundCount = 0;
   @override
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
@@ -51,7 +46,7 @@ class _DashboardState extends State<Dashboard> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => UserProfile(
+                          builder: (context) => UserProfileSettings(
                             userId: snapshot.data!,
                             myProf: true,
                             itemType: false,

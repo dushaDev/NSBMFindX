@@ -4,16 +4,13 @@ import 'package:find_x/found_post.dart';
 import 'package:find_x/lost_post.dart';
 import 'package:find_x/res/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
+import 'package:find_x/user_profile_settings.dart';
 import 'package:find_x/view_posts.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:shimmer/shimmer.dart';
 import '../firebase/models/found_item.dart';
 import '../firebase/models/lost_item.dart';
-import '../navigation_provider.dart';
 import '../res/items/build_shimmer_loading.dart';
 import '../res/widgets/build_updates_section.dart';
-import '../user_profile.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -54,7 +51,7 @@ class _HomeState extends State<Home> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => UserProfile(
+                          builder: (context) => UserProfileSettings(
                             userId: _getId['id']!,
                             myProf: true,
                             itemType: false,
