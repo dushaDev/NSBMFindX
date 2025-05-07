@@ -1,4 +1,5 @@
 import 'package:find_x/firebase/models/notification_m.dart';
+import 'package:find_x/res/font_profile.dart';
 import 'package:find_x/res/read_date.dart';
 import 'package:flutter/material.dart';
 import 'package:find_x/firebase/fire_store_service.dart'; // Assume this exists
@@ -73,10 +74,10 @@ class _NotificationsState extends State<Notifications> {
                       color: colorScheme.onSurface.withAlpha(150)),
                   const SizedBox(height: 16),
                   Text('No notifications yet',
-                      style: textTheme.titleMedium),
+                      style: TextStyle(fontSize: FontProfile.small,color: colorScheme.onSurfaceVariant)),
                   Text('All caught up!',
-                      style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurfaceVariant)),
+                      style: TextStyle(fontSize: FontProfile.small,color: colorScheme.onSurfaceVariant)
+                         ),
                 ],
               ),
             );
