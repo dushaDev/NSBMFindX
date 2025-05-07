@@ -30,7 +30,7 @@ class ItemPost extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => PostDetails(
-                    id: item.id, // Your LostItem or FoundItem object
+                    itemId: item.id, // Your LostItem or FoundItem object
                     isFoundItem: item.type=='lost'?false:true, // true for FoundItem, false for LostItem
                   ),
                 ),
@@ -87,7 +87,7 @@ class ItemPost extends StatelessWidget {
                 // Description
                 Text(
                   item.description,
-                  style: TextStyle(fontSize: FontProfile.small, color: colorScheme.onSurfaceVariant),
+                  style: TextStyle(fontSize: FontProfile.small, color: colorScheme.onSurfaceVariant,overflow: TextOverflow.ellipsis ),
                 ),
                 const SizedBox(height: 8),
 
