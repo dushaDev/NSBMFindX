@@ -70,14 +70,16 @@ class _NotificationsState extends State<Notifications> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.notifications_off,
-                      size: 48,
-                      color: colorScheme.onSurface.withAlpha(150)),
+                      size: 48, color: colorScheme.onSurface.withAlpha(150)),
                   const SizedBox(height: 16),
                   Text('No notifications yet',
-                      style: TextStyle(fontSize: FontProfile.small,color: colorScheme.onSurfaceVariant)),
+                      style: TextStyle(
+                          fontSize: FontProfile.small,
+                          color: colorScheme.onSurfaceVariant)),
                   Text('All caught up!',
-                      style: TextStyle(fontSize: FontProfile.small,color: colorScheme.onSurfaceVariant)
-                         ),
+                      style: TextStyle(
+                          fontSize: FontProfile.small,
+                          color: colorScheme.onSurfaceVariant)),
                 ],
               ),
             );
@@ -106,10 +108,10 @@ class _NotificationsState extends State<Notifications> {
   }
 
   Widget _buildNotificationCard(
-      NotificationM notification,
-      ColorScheme colorScheme,
-      TextTheme textTheme,
-      ) {
+    NotificationM notification,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       elevation: 0,
@@ -159,13 +161,13 @@ class _NotificationsState extends State<Notifications> {
         ),
         trailing: !notification.isRead
             ? Container(
-          width: 8,
-          height: 8,
-          decoration: BoxDecoration(
-            color: colorScheme.primary,
-            shape: BoxShape.circle,
-          ),
-        )
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: colorScheme.primary,
+                  shape: BoxShape.circle,
+                ),
+              )
             : null,
         onTap: () => _handleNotificationTap(notification),
       ),
@@ -182,13 +184,13 @@ class _NotificationsState extends State<Notifications> {
     // Handle notification tap based on type
     switch (notification.type) {
       case 'new_user':
-      // Navigate to user profile
+        // Navigate to user profile
         break;
       case 'report':
-      // Navigate to reported item
+        // Navigate to reported item
         break;
       case 'system':
-      // Show system alert
+        // Show system alert
         break;
     }
   }

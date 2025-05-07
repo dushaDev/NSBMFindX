@@ -55,7 +55,6 @@ class _HomeState extends State<Home> {
                         MaterialPageRoute(
                           builder: (context) => UserProfileSettings(
                             userId: _getId['id']!,
-                            myProf: true,
                             itemType: false,
                           ),
                         ),
@@ -126,15 +125,12 @@ class _HomeState extends State<Home> {
                                   readDate: _readDate,
                                   items: finalList,
                                   onPressed: () {
-
                                     // Navigate to the Posts page on bottom navigation bar
                                     Provider.of<NavigationProvider>(context,
-                                        listen: false)
+                                            listen: false)
                                         .navigateTo(
                                       1,
                                     ); // 1 is Posts page without any data for now // 1 in the user bottom nav bar
-
-
 
                                     // Navigator.push(
                                     //   context,

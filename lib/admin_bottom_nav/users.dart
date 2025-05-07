@@ -34,9 +34,9 @@ class _UsersState extends State<Users> {
     final navProvider = Provider.of<NavigationProvider>(
         context); // this use for get data from other page
 
-    if(navProvider.pageData != null) {
-      _currentFilter =
-          navProvider.pageData??'All'; // this use for get data from other page
+    if (navProvider.pageData != null) {
+      _currentFilter = navProvider.pageData ??
+          'All'; // this use for get data from other page
     }
     navProvider.pageData = null;
 
@@ -100,7 +100,8 @@ class _UsersState extends State<Users> {
                     if (_currentFilter == 'Approved') return user.isApproved;
                     if (_currentFilter == 'Pending')
                       return !user.isApproved && !user.isRestricted;
-                    if (_currentFilter == 'Restricted') return user.isRestricted;
+                    if (_currentFilter == 'Restricted')
+                      return user.isRestricted;
                     return true;
                   }).toList();
 
@@ -120,6 +121,7 @@ class _UsersState extends State<Users> {
                             itemBuilder: (context, index) {
                               final uModel = filteredModels[index];
                               return ItemUser(
+                                id: uModel.id,
                                 name: uModel.name,
                                 role: uModel.role,
                                 isApproved: uModel.isApproved,
@@ -147,7 +149,6 @@ class _UsersState extends State<Users> {
         padding: const EdgeInsets.only(bottom: 70.0),
         child: FloatingActionButton(
           onPressed: () {
-
             Navigator.push(
               context,
               MaterialPageRoute(

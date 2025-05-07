@@ -1,7 +1,10 @@
 import 'package:find_x/res/font_profile.dart';
 import 'package:flutter/material.dart';
 
+import '../../user_profile_settings.dart';
+
 class ItemUser extends StatefulWidget {
+  final String id;
   final String name;
   final String role;
   final bool isApproved;
@@ -9,6 +12,7 @@ class ItemUser extends StatefulWidget {
 
   const ItemUser({
     super.key,
+    required this.id,
     required this.name,
     required this.role,
     required this.isApproved,
@@ -31,8 +35,19 @@ class _ItemUserState extends State<ItemUser> {
             backgroundColor: Colors.transparent,
           )
           ,
-    title: Text(widget.name,
-              style: TextStyle(fontSize: FontProfile.medium,fontWeight: FontWeight.w600)),
+    title: GestureDetector(
+      onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UserProfileSettings(userId: widget.id, itemType: false),
+            ),
+          );
+        
+      },
+      child: Text(widget.name,
+                style: TextStyle(fontSize: FontProfile.medium,fontWeight: FontWeight.w600)),
+    ),
           subtitle: Row(
             children: [
               Text(widget.role),

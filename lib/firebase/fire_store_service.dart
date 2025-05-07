@@ -912,6 +912,47 @@ class FireStoreService {
     }
   }
 
+  // Function to change user's status from pending to approved
+  Future<void> approveUser(String userId) async {
+    try {
+      // Retrieve the user document to check current status
+      DocumentSnapshot doc = await _fireStore.collection('users').doc(userId).get();
+
+      if (doc.exists) {
+        bool currentStatus = doc.get('isApproved') as bool;
+
+        // Only update if the user is not already approved
+        if (!currentStatus) {
+          await _fireStore.collection('users').doc(userId).update({
+            'isApproved': true,
+          });
+          print("User approved successfully.");
+        } else {
+          print("User is already approved.");
+        }
+      } else {
+        print("User document does not exist.");
+      }
+    } catch (e) {
+      print("Error approving user: $e");
+    }
+  }
+
+// Function to set whether the user is restricted
+  Future<void> setUserRestriction(String userId, bool isRestricted) async {
+    try {
+      // Update the user's document in the 'users' collection
+      await _fireStore.collection('users').doc(userId).update({
+        'isRestricted': isRestricted,
+      });
+
+      print("User restriction status updated successfully.");
+    } catch (e) {
+      print("Error updating user restriction status: $e");
+    }
+  }
+
+
   // Helper method to parse the custom date format
   DateTime _parseCustomDate(String dateString) {
     List<int> dateParts = dateString.split('/').map(int.parse).toList();

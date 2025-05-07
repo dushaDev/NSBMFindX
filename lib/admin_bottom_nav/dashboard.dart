@@ -48,7 +48,6 @@ class _DashboardState extends State<Dashboard> {
                         MaterialPageRoute(
                           builder: (context) => UserProfileSettings(
                             userId: snapshot.data!,
-                            myProf: true,
                             itemType: false,
                           ),
                         ),

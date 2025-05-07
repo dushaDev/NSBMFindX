@@ -25,12 +25,11 @@ class _PostsState extends State<Posts> {
   Widget build(BuildContext context) {
     final navProvider = Provider.of<NavigationProvider>(context);
 
-    if(navProvider.pageData != null) {
-      _currentFilter =
-          navProvider.pageData??'All'; // this use for get data from other page
+    if (navProvider.pageData != null) {
+      _currentFilter = navProvider.pageData ??
+          'All'; // this use for get data from other page
     }
     navProvider.pageData = null;
-
 
     ColorScheme colorScheme = Theme.of(context).colorScheme;
 
@@ -86,7 +85,8 @@ class _PostsState extends State<Posts> {
                 } else if (snapshot.hasData) {
                   Map<String, List>? data = snapshot.data;
                   List<LostFoundUnified> unifiedItems =
-                  combineLostAndFoundItems(data!['userNames'], data['items']);
+                      combineLostAndFoundItems(
+                          data!['userNames'], data['items']);
 
                   // Apply filters
                   final filteredItems = unifiedItems.where((item) {
@@ -102,22 +102,23 @@ class _PostsState extends State<Posts> {
 
                   return filteredItems.isEmpty
                       ? Center(
-                    child: Text(
-                      'No ${_currentFilter.toLowerCase()} posts',
-                      style: TextStyle(color: colorScheme.onSurfaceVariant),
-                    ),
-                  )
+                          child: Text(
+                            'No ${_currentFilter.toLowerCase()} posts',
+                            style:
+                                TextStyle(color: colorScheme.onSurfaceVariant),
+                          ),
+                        )
                       : ListView.builder(
-                    padding: EdgeInsets.only(bottom: 80.0),
-                    itemCount: filteredItems.length,
-                    itemBuilder: (context, index) {
-                      final item = filteredItems[index];
-                      return ItemPost(
-                        item: item,
-                        colorScheme: colorScheme,
-                      );
-                    },
-                  );
+                          padding: EdgeInsets.only(bottom: 80.0),
+                          itemCount: filteredItems.length,
+                          itemBuilder: (context, index) {
+                            final item = filteredItems[index];
+                            return ItemPost(
+                              item: item,
+                              colorScheme: colorScheme,
+                            );
+                          },
+                        );
                 } else {
                   return Center(
                     child: Text(
@@ -134,7 +135,8 @@ class _PostsState extends State<Posts> {
     );
   }
 
-  List<LostFoundUnified> combineLostAndFoundItems(List<dynamic>? userNames, List<dynamic>? data) {
+  List<LostFoundUnified> combineLostAndFoundItems(
+      List<dynamic>? userNames, List<dynamic>? data) {
     List<LostFoundUnified> lostFoundUnified = [];
 
     if (data == null || data.isEmpty) return lostFoundUnified;

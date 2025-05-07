@@ -145,6 +145,7 @@ class _SearchState extends State<Search> {
               if (results['users']?.isNotEmpty ?? false) ...[
                 _buildSectionHeader('Users', colorScheme),
                 ...results['users']!.map((user) => ItemUser(
+                      id: user.id,
                       name: user.name,
                       role: user.role,
                       isRestricted: user.isRestricted,

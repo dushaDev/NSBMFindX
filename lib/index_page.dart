@@ -1,4 +1,3 @@
-
 import 'package:find_x/admin_bottom_nav/users.dart';
 import 'package:find_x/admin_bottom_navigation.dart';
 import 'package:find_x/firebase/auth_service.dart';
@@ -21,7 +20,12 @@ class IndexPage extends StatefulWidget {
 
 class _IndexPageState extends State<IndexPage> {
   // int _selectedIndex = 0;
-  final _tabs = [const Home(), const Posts(), const Search(), const Notifications()];
+  final _tabs = [
+    const Home(),
+    const Posts(),
+    const Search(),
+    const Notifications()
+  ];
   Future<String?> _userRole = Future.value('student');
   final _admin_tabs = [
     Dashboard(),
@@ -65,8 +69,9 @@ class _IndexPageState extends State<IndexPage> {
                     alignment: Alignment.bottomCenter,
                     child: AdminBottomNavigation(
                       selectedIndex: navProvider.currentIndex,
-                      onItemSelected: (index) =>
-                          navProvider.navigateTo(index, data: 'All'),//true use for indicate if the navigation is from another page.
+                      onItemSelected: (index) => navProvider.navigateTo(index,
+                          data:
+                              'All'), //true use for indicate if the navigation is from another page.
                       //that 'All' used for display data on Users page.
                     )),
               ]);
@@ -77,7 +82,7 @@ class _IndexPageState extends State<IndexPage> {
                   alignment: Alignment.bottomCenter,
                   child: UserBottomNavigation(
                     selectedIndex: navProvider.currentIndex,
-                    onItemSelected:  (index) =>
+                    onItemSelected: (index) =>
                         navProvider.navigateTo(index, data: 'All'),
                   ),
                 ),

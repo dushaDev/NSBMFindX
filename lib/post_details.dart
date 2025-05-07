@@ -62,7 +62,7 @@ class _PostDetailsState extends State<PostDetails> {
       future: _getLoggedUser(),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: Text('Please wait..'));
+          return Center(child: Text('Please wait..', style: TextStyle(fontSize: FontProfile.small,color: colorScheme.onSurface)));
         }
 
         if (snapshot.hasError) {
@@ -70,7 +70,7 @@ class _PostDetailsState extends State<PostDetails> {
         }
 
         if (!snapshot.hasData) {
-          return const Center(child: Text('User not found'));
+          return Center(child: Text('User not found', style: TextStyle(fontSize: FontProfile.small,color: colorScheme.onSurface)));
         }
 
         bool isThisUser = false;
@@ -226,7 +226,7 @@ class _PostDetailsState extends State<PostDetails> {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            Text('Posted by You',style: TextStyle(fontSize: FontProfile.small),),
+                            Text('Posted by You',style: TextStyle(fontSize: FontProfile.small,color: colorScheme.onSurface),),
                           ],
                         ),) :
                       _buildUserDetailsSection(user, colorScheme, context);
@@ -308,7 +308,7 @@ class _PostDetailsState extends State<PostDetails> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => UserProfileSettings(userId: userModel.id, myProf: false, itemType: false),
+                    builder: (context) => UserProfileSettings(userId: userModel.id, itemType: false),
                   ),
                 );
               },
