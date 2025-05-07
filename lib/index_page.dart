@@ -20,7 +20,7 @@ class IndexPage extends StatefulWidget {
 }
 
 class _IndexPageState extends State<IndexPage> {
-  int _selectedIndex = 0;
+  // int _selectedIndex = 0;
   final _tabs = [const Home(), const Posts(), const Search(), const Notifications()];
   Future<String?> _userRole = Future.value('student');
   final _admin_tabs = [
@@ -72,16 +72,13 @@ class _IndexPageState extends State<IndexPage> {
               ]);
             } else if (snapshot.data == 'student') {
               return Stack(children: [
-                _tabs[_selectedIndex],
+                _tabs[navProvider.currentIndex],
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: UserBottomNavigation(
-                    selectedIndex: _selectedIndex,
-                    onItemSelected: (int index) {
-                      setState(() {
-                        _selectedIndex = index;
-                      });
-                    },
+                    selectedIndex: navProvider.currentIndex,
+                    onItemSelected:  (index) =>
+                        navProvider.navigateTo(index, data: 'All'),
                   ),
                 ),
               ]);

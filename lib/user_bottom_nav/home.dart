@@ -7,8 +7,10 @@ import 'package:find_x/res/font_profile.dart';
 import 'package:find_x/user_profile_settings.dart';
 import 'package:find_x/view_posts.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../firebase/models/found_item.dart';
 import '../firebase/models/lost_item.dart';
+import '../navigation_provider.dart';
 import '../res/items/build_shimmer_loading.dart';
 import '../res/widgets/build_updates_section.dart';
 
@@ -124,15 +126,25 @@ class _HomeState extends State<Home> {
                                   readDate: _readDate,
                                   items: finalList,
                                   onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ViewPosts(
-                                          userId: '',
-                                          title: 'Updates',
-                                        ),
-                                      ),
-                                    );
+
+                                    // Navigate to the Posts page on bottom navigation bar
+                                    Provider.of<NavigationProvider>(context,
+                                        listen: false)
+                                        .navigateTo(
+                                      1,
+                                    ); // 1 is Posts page without any data for now // 1 in the user bottom nav bar
+
+
+
+                                    // Navigator.push(
+                                    //   context,
+                                    //   MaterialPageRoute(
+                                    //     builder: (context) => ViewPosts(
+                                    //       userId: '',
+                                    //       title: 'Updates',
+                                    //     ),
+                                    //   ),
+                                    // );
                                   },
                                 );
                               } else {
@@ -215,7 +227,7 @@ class _HomeState extends State<Home> {
             children: [
               Image.asset(
                 image,
-                height: 130.0,
+                height: 100.0,
                 fit: BoxFit.fitHeight,
                 scale: 1,
                 alignment: Alignment.center,
