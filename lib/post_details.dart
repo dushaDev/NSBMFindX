@@ -1,7 +1,7 @@
 import 'package:find_x/chat_page.dart';
 import 'package:find_x/res/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
-import 'package:find_x/user_profile.dart';
+import 'package:find_x/user_profile_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:find_x/firebase/fire_store_service.dart';
@@ -308,7 +308,7 @@ class _PostDetailsState extends State<PostDetails> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => UserProfile(userId: userModel.id, myProf: false, itemType: false),
+                    builder: (context) => UserProfileSettings(userId: userModel.id, myProf: false, itemType: false),
                   ),
                 );
               },
