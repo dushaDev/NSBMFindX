@@ -265,6 +265,26 @@ class FireStoreService {
     }
   }
 
+  Future<String?> getUserRole(String userId) async {
+    try {
+      // Retrieve the user document from the 'users' collection
+      DocumentSnapshot doc = await _fireStore.collection('users').doc(userId).get();
+
+      // Check if the document exists
+      if (doc.exists) {
+        // Extract the role from the document data
+        return doc.get('role') as String?;
+      } else {
+        // Return null if the user document does not exist
+        return null;
+      }
+    } catch (e) {
+      // Print the error and return null in case of an exception
+      print("Error fetching user role: $e");
+      return null;
+    }
+  }
+
   Future<Admin?> getAdmin(String adminId) async {
     try {
       DocumentSnapshot doc =
@@ -534,6 +554,55 @@ class FireStoreService {
     }
   }
 
+  // Method to retrieve lost and found items by userId
+  Future<Map<String, List<dynamic>>> getLostAndFoundItemsById(String userId) async {
+    try {
+      QuerySnapshot lostItemsSnapshot =
+      await _fireStore.collection('lostItems').where('userId', isEqualTo: userId).
+      get();
+      QuerySnapshot foundItemsSnapshot =
+      await _fireStore.collection('foundItems').where('userId', isEqualTo: userId).get();
+
+      List<LostItem> lostItems = lostItemsSnapshot.docs.map((doc) {
+        return LostItem.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id);
+      }).toList();
+
+      List<FoundItem> foundItems = foundItemsSnapshot.docs.map((doc) {
+        return FoundItem.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id);
+      }).toList();
+
+      // Combine the lists and sort by postedTime
+      List<dynamic> allItems = [...lostItems, ...foundItems];
+      allItems.sort((a, b) {
+        DateTime dateA = _parseCustomDate(a.postedTime);
+        DateTime dateB = _parseCustomDate(b.postedTime);
+        return dateB.compareTo(dateA); // Sort in descending order
+      });
+      //get userName using userId
+      List<String?> userNames = [];
+      List<String> userIds = [];
+
+      for (var item in allItems) {
+        userIds.add(item.userId);
+      }
+      userNames = await getUserNamesByIds(userIds);
+      Map<String, List<dynamic>> allItemsMap = {
+        'items': allItems,
+        'userNames': userNames,
+      };
+
+      return allItemsMap;
+    } catch (e) {
+      print("Error fetching lost and found items: $e");
+      return {
+        'items': [],
+        'userNames': [],
+      };
+    }
+  }
+
   // Method to retrieve all lost and found items sorted by date with limit
   Future<List<dynamic>> getLostAndFoundItemsWithLimit(int limit) async {
     try {
@@ -573,7 +642,7 @@ class FireStoreService {
     }
   }
 
-  Future<List<dynamic>> getLostAndFoundItemsById(
+  Future<List<dynamic>> getLostAndFoundItemsByIdWithLimit(
       String userId, int limit) async {
     try {
       QuerySnapshot lostItemsSnapshot = await _fireStore
@@ -805,6 +874,26 @@ class FireStoreService {
     } catch (e) {
       print("Error fetching notifications: $e");
       return [];
+    }
+  }
+
+  // Function to delete a lost item by its ID
+  Future<void> deleteLostItem(String lostItemId) async {
+    try {
+      await _fireStore.collection('lostItems').doc(lostItemId).delete();
+      print("Lost item deleted successfully.");
+    } catch (e) {
+      print("Error deleting lost item: $e");
+    }
+  }
+
+// Function to delete a found item by its ID
+  Future<void> deleteFoundItem(String foundItemId) async {
+    try {
+      await _fireStore.collection('foundItems').doc(foundItemId).delete();
+      print("Found item deleted successfully.");
+    } catch (e) {
+      print("Error deleting found item: $e");
     }
   }
 

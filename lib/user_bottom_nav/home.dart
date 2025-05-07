@@ -4,11 +4,15 @@ import 'package:find_x/found_post.dart';
 import 'package:find_x/lost_post.dart';
 import 'package:find_x/res/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
+import 'package:find_x/view_posts.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import '../firebase/models/found_item.dart';
 import '../firebase/models/lost_item.dart';
+import '../navigation_provider.dart';
 import '../res/items/build_shimmer_loading.dart';
+import '../res/widgets/build_updates_section.dart';
 import '../user_profile.dart';
 
 class Home extends StatefulWidget {
@@ -53,7 +57,7 @@ class _HomeState extends State<Home> {
                           builder: (context) => UserProfile(
                             userId: _getId['id']!,
                             myProf: true,
-                            item: false,
+                            itemType: false,
                           ),
                         ),
                       );
@@ -117,8 +121,23 @@ class _HomeState extends State<Home> {
                                   }
                                 }
 
-                                return _buildUpdatesSection(
-                                    'Updates', colorScheme, finalList);
+                                return BuildUpdatesSection(
+                                  title: 'Updates',
+                                  colorScheme: colorScheme,
+                                  readDate: _readDate,
+                                  items: finalList,
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ViewPosts(
+                                          userId: '',
+                                          title: 'Updates',
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
                               } else {
                                 return _showEmptyCard(
                                     'Data not found', colorScheme);
@@ -126,8 +145,9 @@ class _HomeState extends State<Home> {
                             }),
                         SizedBox(height: 10),
                         FutureBuilder(
-                            future: _fireStoreService.getLostAndFoundItemsById(
-                                _getId['id']!, 7),
+                            future: _fireStoreService
+                                .getLostAndFoundItemsByIdWithLimit(
+                                    _getId['id']!, 7),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
@@ -147,8 +167,23 @@ class _HomeState extends State<Home> {
                                   }
                                 }
 
-                                return _buildUpdatesSection(
-                                    'Your history', colorScheme, finalList);
+                                return BuildUpdatesSection(
+                                  title: 'Your history',
+                                  colorScheme: colorScheme,
+                                  readDate: _readDate,
+                                  items: finalList,
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ViewPosts(
+                                          userId: _getId['id']!,
+                                          title: 'History',
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
                               } else {
                                 return _showEmptyCard(
                                     'Data not found', colorScheme);
@@ -200,105 +235,6 @@ class _HomeState extends State<Home> {
             ],
           ),
         ));
-  }
-
-  Widget _buildUpdatesSection(
-      String title, ColorScheme colorScheme, List<Map<String, dynamic>> items) {
-    return Card(
-      color: colorScheme.surfaceContainer,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: Padding(
-        padding: const EdgeInsets.all(5.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(title,
-                    style: TextStyle(
-                        color: colorScheme.onSurface,
-                        fontSize: FontProfile.medium,
-                        fontWeight: FontWeight.bold)),
-                TextButton(
-                  onPressed: () {},
-                  style: TextButton.styleFrom(
-                    splashFactory: NoSplash
-                        .splashFactory, // This completely removes the splash effect
-                    // Alternatively, you can use:
-                    // splashColor: Colors.transparent,
-                    // highlightColor: Colors.transparent,
-                  ),
-                  child: Text(
-                    'View All',
-                    style: TextStyle(
-                      color: colorScheme.onSurfaceVariant,
-                      fontSize: FontProfile.medium,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                )
-              ],
-            ),
-            SizedBox(height: 5),
-            Container(
-              height: 250,
-              child: ListView.builder(
-                itemCount: items.length,
-                itemBuilder: (context, index) {
-                  final item = items[index];
-                  return Column(
-                    children: [
-                      ListTile(
-                        tileColor: colorScheme.surfaceContainer,
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 3,
-                        ),
-                        horizontalTitleGap: 10,
-                        isThreeLine: false,
-                        minTileHeight: 30,
-                        minLeadingWidth: 10,
-                        minVerticalPadding: 5,
-                        leading: Container(
-                          alignment: Alignment.center,
-                          width: 38,
-                          height: 18,
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 1, vertical: 1),
-                          decoration: BoxDecoration(
-                            color: item['type']
-                                ? colorScheme.primary
-                                : colorScheme.secondary,
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                          child: Text(item['type'] ? 'found' : 'lost',
-                              style: TextStyle(color: colorScheme.onPrimary)),
-                        ),
-                        title: Text(item['itemName']!,
-                            style: TextStyle(fontWeight: FontWeight.normal)),
-                        subtitle: Text(
-                          item['description']!,
-                          style: TextStyle(overflow: TextOverflow.ellipsis),
-                        ),
-                        trailing: Text(
-                            _readDate.getDuration(item['postedTime']),
-                            style: TextStyle(color: Colors.grey)),
-                      ),
-                      Divider(
-                        height: 0,
-                        thickness: 1,
-                        indent: 10.0,
-                        endIndent: 5.0,
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   Widget _showEmptyCard(String message, ColorScheme colorScheme) {

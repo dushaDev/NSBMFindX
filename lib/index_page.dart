@@ -1,17 +1,16 @@
-import 'package:find_x/admin_bottom_nav/admin_notifications.dart';
-import 'package:find_x/admin_bottom_nav/admin_search.dart';
-import 'package:find_x/admin_bottom_nav/posts.dart';
+
 import 'package:find_x/admin_bottom_nav/users.dart';
 import 'package:find_x/admin_bottom_navigation.dart';
-import 'package:find_x/bottom_nav/notifications.dart';
 import 'package:find_x/firebase/auth_service.dart';
+import 'package:find_x/user_bottom_nav/home.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'bottom_nav/notifications.dart';
+import 'bottom_nav/posts.dart';
+import 'bottom_nav/search.dart';
 import 'navigation_provider.dart';
 import 'admin_bottom_nav/dashboard.dart';
-import 'bottom_nav/search.dart';
-import 'bottom_nav/home.dart';
-import 'bottom_navigation.dart';
+import 'user_bottom_navigation.dart';
 
 class IndexPage extends StatefulWidget {
   const IndexPage({super.key});
@@ -22,14 +21,14 @@ class IndexPage extends StatefulWidget {
 
 class _IndexPageState extends State<IndexPage> {
   int _selectedIndex = 0;
-  final _tabs = [const Home(), const Search(), const Notifications()];
+  final _tabs = [const Home(), const Posts(), const Search(), const Notifications()];
   Future<String?> _userRole = Future.value('student');
   final _admin_tabs = [
     Dashboard(),
     Users(),
     Posts(),
-    AdminSearch(),
-    AdminNotifications()
+    Search(),
+    Notifications()
   ];
   AuthService _authService = AuthService();
   @override
@@ -76,7 +75,7 @@ class _IndexPageState extends State<IndexPage> {
                 _tabs[_selectedIndex],
                 Align(
                   alignment: Alignment.bottomCenter,
-                  child: BottomNavigation(
+                  child: UserBottomNavigation(
                     selectedIndex: _selectedIndex,
                     onItemSelected: (int index) {
                       setState(() {

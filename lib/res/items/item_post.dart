@@ -31,7 +31,9 @@ class ItemPost extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => PostDetails(
                     itemId: item.id, // Your LostItem or FoundItem object
-                    isFoundItem: item.type=='lost'?false:true, // true for FoundItem, false for LostItem
+                    isFoundItem: item.type == 'lost'
+                        ? false
+                        : true, // true for FoundItem, false for LostItem
                   ),
                 ),
               );
@@ -46,8 +48,8 @@ class ItemPost extends StatelessWidget {
                       alignment: Alignment.center,
                       width: 38,
                       height: 18,
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 1, vertical: 1),
                       decoration: BoxDecoration(
                         color: item.type == 'found'
                             ? colorScheme.primary
@@ -87,7 +89,10 @@ class ItemPost extends StatelessWidget {
                 // Description
                 Text(
                   item.description,
-                  style: TextStyle(fontSize: FontProfile.small, color: colorScheme.onSurfaceVariant,overflow: TextOverflow.ellipsis ),
+                  style: TextStyle(
+                      fontSize: FontProfile.small,
+                      color: colorScheme.onSurfaceVariant,
+                      overflow: TextOverflow.ellipsis),
                 ),
                 const SizedBox(height: 8),
 
@@ -103,14 +108,12 @@ class ItemPost extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '${_readDate.getDuration(item.postedTime)} ago'
-                      ,
+                      '${_readDate.getDuration(item.postedTime)} ago',
                       style: TextStyle(
                         color: colorScheme.onSurfaceVariant,
                         fontSize: FontProfile.extraSmall,
                       ),
                     ),
-
                   ],
                 ),
               ],

@@ -8,14 +8,14 @@ import 'package:flutter/material.dart';
 
 class UserProfile extends StatefulWidget {
   final String userId;
-  final bool myProf;
-  final bool item;
+  final bool myProf; // true for my profile, false for other user profile
+  final bool itemType;// true for found item, false for lost item
 
   const UserProfile({
     super.key,
     required this.userId,
     required this.myProf,
-    required this.item,
+    required this.itemType,
   });
 
   @override
@@ -226,14 +226,14 @@ class _UserProfileState extends State<UserProfile> {
                                   padding: EdgeInsets.symmetric(
                                       horizontal: 1, vertical: 1),
                                   decoration: BoxDecoration(
-                                    color: widget.item
+                                    color: widget.itemType
                                         ? Theme.of(context).colorScheme.primary
                                         : Theme.of(context)
                                             .colorScheme
                                             .secondary,
                                     borderRadius: BorderRadius.circular(2),
                                   ),
-                                  child: Text(widget.item ? 'found' : 'lost',
+                                  child: Text(widget.itemType ? 'found' : 'lost',
                                       style: TextStyle(
                                           color: Theme.of(context)
                                               .colorScheme
