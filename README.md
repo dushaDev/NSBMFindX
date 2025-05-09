@@ -28,7 +28,11 @@ description, location, and date.
 Browse Found Items: View a list of found items reported by others in the 
 NSBM community.
 
+ML model integration
 
+## Model Setup
+    1. Get `mobilenetv2.tflite` that i given to you or using given drive link().
+    2. Place it in `assets/models/`.
 
 git clone https://github.com/dushaDev/NSBMFindX.git
 

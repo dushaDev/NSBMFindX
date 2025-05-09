@@ -1,7 +1,11 @@
 #my added
 .env
+
 android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
+
+# Exclude TFLite models
+assets/models/*.tflite
 
 # Miscellaneous
 *.class
