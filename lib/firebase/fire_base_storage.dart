@@ -8,9 +8,10 @@ class FireBaseStorage {
       : _storage = storage ?? FirebaseStorage.instance;
 
   // Function to upload an image to Firebase Storage and get the image URL
-  Future<String> uploadImage(File imageFile, String userId, Function(double) progressCallback) async {
+  Future<Map<String,String>> uploadImage(File imageFile, String userId, Function(double) progressCallback) async {
     try {
-      Reference storageRef = _storage.ref().child('images/$userId/${DateTime.now().millisecondsSinceEpoch}.jpg');
+      final imgRename = DateTime.now().millisecondsSinceEpoch.toString();
+      Reference storageRef = _storage.ref().child('images/$userId/$imgRename.jpg');
 
       UploadTask uploadTask = storageRef.putFile(imageFile);
 
@@ -25,7 +26,7 @@ class FireBaseStorage {
       TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() {});
 
       String downloadUrl = await taskSnapshot.ref.getDownloadURL();
-      return downloadUrl;
+      return {"url":downloadUrl,"name":imgRename};
     } catch (e) {
       print("Error uploading image: $e");
       rethrow;

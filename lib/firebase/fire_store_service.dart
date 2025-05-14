@@ -1,13 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:find_x/res/random.dart';
-import 'package:intl/intl.dart';
-
 import '../res/read_date.dart';
 import 'models/Faculty.dart';
 import 'models/Student.dart';
 import 'models/admin.dart';
 import 'models/degree_program.dart';
 import 'models/found_item.dart';
+import 'models/image_m.dart';
 import 'models/lost_found_unified.dart';
 import 'models/lost_item.dart';
 import 'models/notification_m.dart';
@@ -158,6 +157,10 @@ class FireStoreService {
         await _fireStore.collection('foundItems').add(foundItem.toFirestore());
     // update the foundItem object with the generated ID
     foundItem.id = docRef.id;
+  }
+
+  Future<void> addImage(ImageM imageM) async {
+    await _fireStore.collection('images').add(imageM.toFirestore());
   }
 
   // Method to retrieve all users from FireStore

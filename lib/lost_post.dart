@@ -6,6 +6,7 @@ import 'package:find_x/firebase/models/lost_item.dart';
 import 'package:find_x/res/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
 import 'package:find_x/res/utils.dart';
+import 'package:find_x/services/ai_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -37,16 +38,18 @@ class _LostPostState extends State<LostPost> {
   String _amPm = '';
   String _contactNumber = '';
   List<File> _images = [];
-  List<String> _imageUrls = [];
+  List<String> _imgIds = [];
   int _hour24 = 0;
   int _minute = 0;
   double _uploadProgress1 = 0.0;
   double _uploadProgress2 = 0.0;
   late Future<DateTime?> _selectedDate;
   late Future<TimeOfDay?> _selectedTime;
-  FireStoreService _fireStoreService = FireStoreService();
+  final FireStoreService _fireStoreService = FireStoreService();
   final FireBaseStorage _storageService = FireBaseStorage();
-  AuthService _authService = AuthService();
+  final AuthService _authService = AuthService();
+  final AIService _aiService = AIService();
+
   final TextEditingController _lostTextController = TextEditingController();
   final TextEditingController _descriptionTextController =
       TextEditingController();
@@ -337,10 +340,10 @@ class _LostPostState extends State<LostPost> {
                         children: [
                           GestureDetector(
                             onTap: () async {
-                              String imgUrl =
+                              String imgId =
                                   await _pickAndUploadImage(_controller1, 1);
-                              _imageUrls.add(imgUrl);
-                              _controller1.sink.add(imgUrl);
+                              _imgIds.add(imgId);
+                              _controller1.sink.add(imgId);
                             },
                             child: StreamBuilder(
                                 stream: _controller1.stream,
@@ -387,7 +390,7 @@ class _LostPostState extends State<LostPost> {
                             onTap: () async {
                               String imgUrl =
                                   await _pickAndUploadImage(_controller2, 2);
-                              _imageUrls.add(imgUrl);
+                              _imgIds.add(imgUrl);
                               _controller2.sink.add(imgUrl);
                             },
                             child: StreamBuilder(
@@ -502,7 +505,7 @@ class _LostPostState extends State<LostPost> {
                                               description:
                                                   _descriptionTextController
                                                       .text,
-                                              images: _imageUrls,
+                                              images: _imgIds,
                                               agreedToTerms: _agreeTerms,
                                               userId: userId,
                                               isCompleted: false))
@@ -803,7 +806,7 @@ class _LostPostState extends State<LostPost> {
       if (userId == null) throw Exception('User not authenticated');
 
       // 5. Upload with progress (using your FirebaseStorage class)
-      String imageUrl = await _storageService.uploadImage(
+      Map<String, String> imageData = await _storageService.uploadImage(
         compressedFile,
         userId,
         (double progress) {
@@ -816,10 +819,11 @@ class _LostPostState extends State<LostPost> {
           controller.sink.add('');
         },
       );
+      await _aiService.processAndAddImage(compressedFile, imageData['name']!, imageData['url']!);
 
       // 6. Send final URL to stream
-      controller.sink.add(imageUrl);
-      return imageUrl;
+      controller.sink.add(imageData['url']!);
+      return imageData['name']!;
     } catch (e) {
       // 7. Handle errors
       controller.sink.addError('Error: ${e.toString()}');

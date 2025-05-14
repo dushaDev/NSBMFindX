@@ -103,7 +103,7 @@ class _PostsState extends State<Posts> {
                   return filteredItems.isEmpty
                       ? Center(
                           child: Text(
-                            'No ${_currentFilter.toLowerCase()} posts',
+                            'No ${_currentFilter.toLowerCase()!='all'?_currentFilter.toLowerCase():''} posts to show',
                             style:
                                 TextStyle(color: colorScheme.onSurfaceVariant),
                           ),

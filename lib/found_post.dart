@@ -1098,7 +1098,7 @@ class _FoundPostState extends State<FoundPost> {
       if (userId == null) throw Exception('User not authenticated');
 
       // 5. Upload with progress (using your FirebaseStorage class)
-      String imageUrl = await _storageService.uploadImage(
+      Map<String,String> imageData = await _storageService.uploadImage(
         compressedFile,
         userId,
         (double progress) {
@@ -1113,8 +1113,8 @@ class _FoundPostState extends State<FoundPost> {
       );
 
       // 6. Send final URL to stream
-      controller.sink.add(imageUrl);
-      return imageUrl;
+      controller.sink.add(imageData['url']!);
+      return imageData['url']!;
     } catch (e) {
       // 7. Handle errors
       controller.sink.addError('Error: ${e.toString()}');
