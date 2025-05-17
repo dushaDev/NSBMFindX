@@ -1,19 +1,44 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
+admin.initializeApp();
+const vision = require('@google-cloud/vision');
+const client = new vision.ImageAnnotatorClient();
 
-const {onRequest} = require("firebase-functions/v2/https");
-const logger = require("firebase-functions/logger");
-
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
-
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+exports.analyzeImage = functions
+  .https.onCall(
+    {
+      enforceAppCheck: false,
+    },
+    async request => {
+      const imageUrl = request.data.imageUrl;
+      if (!imageUrl) {
+        throw new functions.https.HttpsError(
+          'invalid-argument',
+          'The image URL is required.',
+        );
+      }
+      try {
+        const [labelResult] = await client.labelDetection(imageUrl);
+        const labels =
+             labelResult.labelAnnotations.map(label => label.description);
+        const [objectResult] = await client.objectLocalization(imageUrl);
+        const objects =
+             objectResult.localizedObjectAnnotations.map(obj => obj.name);
+        const [textResult] = await client.textDetection(imageUrl);
+        const fullText =
+             textResult.fullTextAnnotation ? textResult.fullTextAnnotation.text : '';
+        return {
+          labels: labels,
+          objects: objects,
+          fullText: fullText,
+          message: 'Image analysis successful.',
+        };
+      } catch (error) {
+        console.error('Error analyzing image:', error);
+        throw new functions.https.HttpsError(
+          'internal',
+          'Failed to analyze image.',
+          error.message,
+        );
+      }
+    });

@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:find_x/firebase/fire_store_service.dart';
 import 'package:find_x/firebase/models/lost_item.dart';
 import 'package:find_x/res/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
 import 'package:find_x/res/utils.dart';
 import 'package:find_x/services/ai_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -39,6 +41,7 @@ class _LostPostState extends State<LostPost> {
   String _contactNumber = '';
   List<File> _images = [];
   List<String> _imgIds = [];
+  List<String> _imgUrls = ['', ''];
   int _hour24 = 0;
   int _minute = 0;
   double _uploadProgress1 = 0.0;
@@ -344,6 +347,8 @@ class _LostPostState extends State<LostPost> {
                                   await _pickAndUploadImage(_controller1, 1);
                               _imgIds.add(imgId);
                               _controller1.sink.add(imgId);
+                              await _aiService
+                                  .analyzeImageWithVision(_imgUrls[0]);
                             },
                             child: StreamBuilder(
                                 stream: _controller1.stream,
@@ -388,10 +393,12 @@ class _LostPostState extends State<LostPost> {
                           SizedBox(width: 10),
                           GestureDetector(
                             onTap: () async {
-                              String imgUrl =
+                              String imgId =
                                   await _pickAndUploadImage(_controller2, 2);
-                              _imgIds.add(imgUrl);
-                              _controller2.sink.add(imgUrl);
+                              _imgIds.add(imgId);
+                              _controller2.sink.add(imgId);
+                              await _aiService
+                                  .analyzeImageWithVision(_imgUrls[1]);
                             },
                             child: StreamBuilder(
                                 stream: _controller2.stream,
@@ -819,10 +826,9 @@ class _LostPostState extends State<LostPost> {
           controller.sink.add('');
         },
       );
-      await _aiService.processAndAddImage(compressedFile, imageData['name']!, imageData['url']!);
-
       // 6. Send final URL to stream
       controller.sink.add(imageData['url']!);
+      _imgUrls[progressVersion - 1] = imageData['url']!;
       return imageData['name']!;
     } catch (e) {
       // 7. Handle errors
