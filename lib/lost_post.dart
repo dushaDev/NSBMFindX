@@ -1,20 +1,16 @@
 import 'dart:async';
 import 'dart:io';
-
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:find_x/firebase/fire_store_service.dart';
 import 'package:find_x/firebase/models/lost_item.dart';
 import 'package:find_x/res/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
 import 'package:find_x/res/utils.dart';
 import 'package:find_x/services/ai_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'res/compress_file.dart';
 import 'firebase/auth_service.dart';
 import 'firebase/fire_base_storage.dart';

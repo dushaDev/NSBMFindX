@@ -1,5 +1,6 @@
 #my added
 .env
+functions/.env
 android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
 
