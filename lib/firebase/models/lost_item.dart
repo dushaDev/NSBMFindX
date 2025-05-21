@@ -2,7 +2,7 @@ class LostItem {
   String id; // Unique ID to identify the post
   String itemName;
   String itemName_lc; // Lowercase version of itemName for easier search
-  bool type;//type for found item-1,lost item-0
+  bool type; //type for found item-1,lost item-0
   String lostTime; //yyyy/mm/dd/hh/mm
   String postedTime; //yyyy/mm/dd/hh/mm
   String lastKnownLocation;
@@ -12,6 +12,7 @@ class LostItem {
   bool agreedToTerms;
   String userId; // User ID of the person who posted the item
   bool isCompleted; // Status indicating if the item has been found or not
+  String reference; // this reference for embeddings
 
   LostItem({
     required this.id,
@@ -27,6 +28,7 @@ class LostItem {
     required this.agreedToTerms,
     required this.userId,
     required this.isCompleted,
+    this.reference = '',
   });
 
   // Factory method to create a LostItem instance from a Firestore document
@@ -45,6 +47,7 @@ class LostItem {
       agreedToTerms: json['agreedToTerms'],
       userId: json['userId'],
       isCompleted: json['isCompleted'],
+      reference: json['reference'],
     );
   }
 
@@ -63,6 +66,7 @@ class LostItem {
       'agreedToTerms': agreedToTerms,
       'userId': userId,
       'isCompleted': isCompleted,
+      'reference': reference,
     };
   }
 }

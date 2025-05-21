@@ -2,7 +2,7 @@ class FoundItem {
   String id; // Unique ID to identify the post
   String itemName;
   String itemName_lc; // Lowercase version of itemName for easier search
-  bool type;//type for found item-1,lost item-0
+  bool type; //type for found item-1,lost item-0
   String foundTime;
   String postedTime;
   String contactNumber;
@@ -16,6 +16,7 @@ class FoundItem {
   String? restrictedDegreeProgramId; // Degree Program ID for restricted privacy
   String? privateUserId; // User ID for private privacy
   bool isCompleted; // Status indicating if the item has been claimed or not
+  String reference; // this reference for embeddings
 
   FoundItem({
     required this.id,
@@ -35,29 +36,30 @@ class FoundItem {
     this.restrictedDegreeProgramId,
     this.privateUserId,
     required this.isCompleted,
+    this.reference='',
   });
 
   // Factory method to create a FoundItem instance from a Firestore document
   factory FoundItem.fromFirestore(Map<String, dynamic> json, String id) {
     return FoundItem(
-      id: id,
-      itemName: json['itemName'],
-      itemName_lc: json['itemName'].toString().toLowerCase(),
-      type: json['type'],
-      foundTime: json['foundTime'],
-      postedTime: json['postedTime'],
-      contactNumber: json['contactNumber'],
-      description: json['description'],
-      currentLocation: json['currentLocation'],
-      images: List<String>.from(json['images']),
-      agreedToTerms: json['agreedToTerms'],
-      userId: json['userId'],
-      privacy: json['privacy'],
-      restrictedFacultyId: json['restrictedFacultyId'],
-      restrictedDegreeProgramId: json['restrictedDegreeProgramId'],
-      privateUserId: json['privateUserId'],
-      isCompleted: json['isCompleted'],
-    );
+        id: id,
+        itemName: json['itemName'],
+        itemName_lc: json['itemName'].toString().toLowerCase(),
+        type: json['type'],
+        foundTime: json['foundTime'],
+        postedTime: json['postedTime'],
+        contactNumber: json['contactNumber'],
+        description: json['description'],
+        currentLocation: json['currentLocation'],
+        images: List<String>.from(json['images']),
+        agreedToTerms: json['agreedToTerms'],
+        userId: json['userId'],
+        privacy: json['privacy'],
+        restrictedFacultyId: json['restrictedFacultyId'],
+        restrictedDegreeProgramId: json['restrictedDegreeProgramId'],
+        privateUserId: json['privateUserId'],
+        isCompleted: json['isCompleted'],
+        reference: json['reference']);
   }
 
   // Method to convert a FoundItem instance to a Firestore document
@@ -79,6 +81,7 @@ class FoundItem {
       'restrictedDegreeProgramId': restrictedDegreeProgramId,
       'privateUserId': privateUserId,
       'isCompleted': isCompleted,
+      'reference': reference,
     };
   }
 }

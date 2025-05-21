@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:find_x/firebase/fire_store_service.dart';
+import 'package:find_x/firebase/models/embeddings.dart';
 import 'package:find_x/firebase/models/lost_item.dart';
 import 'package:find_x/res/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
@@ -25,6 +26,7 @@ class LostPost extends StatefulWidget {
 class _LostPostState extends State<LostPost> {
   bool _useOwnNumber = true;
   bool _agreeTerms = false;
+  bool _isImageUploaded = true;
   bool _selectDate = true;
   bool _isSpinKitLoaded = false;
   double _wholePadding = 10.0;
@@ -36,8 +38,9 @@ class _LostPostState extends State<LostPost> {
   String _amPm = '';
   String _contactNumber = '';
   List<File> _images = [];
-  List<String> _imgIds = [];
   List<String> _imgUrls = ['', ''];
+
+  List<List<double>> _imageEmbeddings = [[], []];
   int _hour24 = 0;
   int _minute = 0;
   double _uploadProgress1 = 0.0;
@@ -339,12 +342,18 @@ class _LostPostState extends State<LostPost> {
                         children: [
                           GestureDetector(
                             onTap: () async {
-                              String imgId =
+                              String imgUrl =
                                   await _pickAndUploadImage(_controller1, 1);
-                              _imgIds.add(imgId);
-                              _controller1.sink.add(imgId);
-                              await _aiService
-                                  .analyzeImageWithVision(_imgUrls[0]);
+                              if (imgUrl != '') {
+                                _imgUrls[0] = imgUrl;
+                                _controller1.sink.add(imgUrl);
+                                _imageEmbeddings[0] =
+                                    await getImageEmbedding(imgUrl);
+                              } else {
+                                _isImageUploaded = true;
+                                _showSnackBar(
+                                    'Image not selected', colorScheme, true);
+                              }
                             },
                             child: StreamBuilder(
                                 stream: _controller1.stream,
@@ -389,12 +398,19 @@ class _LostPostState extends State<LostPost> {
                           SizedBox(width: 10),
                           GestureDetector(
                             onTap: () async {
-                              String imgId =
+                              String imgUrl =
                                   await _pickAndUploadImage(_controller2, 2);
-                              _imgIds.add(imgId);
-                              _controller2.sink.add(imgId);
-                              await _aiService
-                                  .analyzeImageWithVision(_imgUrls[1]);
+                              if (imgUrl != '') {
+                                _imgUrls[1] = imgUrl;
+                                _controller2.sink.add(imgUrl);
+                                await _aiService.analyzeImageWithVision(imgUrl);
+                                _imageEmbeddings
+                                    .add(await getImageEmbedding(imgUrl));
+                              } else {
+                                _isImageUploaded = true;
+                                _showSnackBar(
+                                    'Image not selected', colorScheme, true);
+                              }
                             },
                             child: StreamBuilder(
                                 stream: _controller2.stream,
@@ -465,11 +481,14 @@ class _LostPostState extends State<LostPost> {
                         onTap: _agreeTerms
                             ? null
                             : () {
-                                _showSnackBar(
-                                    'Agree to T&C', colorScheme, true);
+                                _isImageUploaded
+                                    ? _showSnackBar(
+                                        'Agree to T&C', colorScheme, true)
+                                    : _showSnackBar('Images Uploading..',
+                                        colorScheme, true);
                               },
                         child: FilledButton(
-                          onPressed: _agreeTerms
+                          onPressed: _agreeTerms && _isImageUploaded
                               ? () async {
                                   if (_formKey.currentState!.validate()) {
                                     if (_displayDate == '-' && !_selectDate ||
@@ -482,6 +501,10 @@ class _LostPostState extends State<LostPost> {
                                     } else {
                                       _isSpinKitLoaded =
                                           true; // show loading spinner
+                                      var textEmbedding =
+                                          await getTextEmbedding(
+                                              _lostTextController.text,
+                                              _descriptionTextController.text);
                                       String? userId =
                                           await _authService.getUserId();
                                       _selectDate
@@ -489,29 +512,34 @@ class _LostPostState extends State<LostPost> {
                                           : _lostTime = '$_date$_displayTime';
 
                                       await _fireStoreService
-                                          .addLostItem(LostItem(
-                                              id: userId!,
-                                              itemName:
-                                                  _lostTextController.text,
-                                              itemName_lc: _lostTextController
-                                                  .text
-                                                  .toLowerCase(),
-                                              type: false,
-                                              lostTime: _lostTime,
-                                              postedTime:
-                                                  ReadDate().getDateNow(),
-                                              lastKnownLocation:
-                                                  _locationTextController.text,
-                                              contactNumber: _useOwnNumber
-                                                  ? _contactNumber
-                                                  : _contactTextController.text,
-                                              description:
-                                                  _descriptionTextController
-                                                      .text,
-                                              images: _imgIds,
-                                              agreedToTerms: _agreeTerms,
-                                              userId: userId,
-                                              isCompleted: false))
+                                          .addLostItem(
+                                        LostItem(
+                                          id: userId!,
+                                          itemName: _lostTextController.text,
+                                          itemName_lc: _lostTextController.text
+                                              .toLowerCase(),
+                                          type: false,
+                                          lostTime: _lostTime,
+                                          postedTime: ReadDate().getDateNow(),
+                                          lastKnownLocation:
+                                              _locationTextController.text,
+                                          contactNumber: _useOwnNumber
+                                              ? _contactNumber
+                                              : _contactTextController.text,
+                                          description:
+                                              _descriptionTextController.text,
+                                          images: _imgUrls,
+                                          agreedToTerms: _agreeTerms,
+                                          userId: userId,
+                                          isCompleted: false,
+                                        ),
+                                        Embeddings(
+                                            textEmbedding: textEmbedding,
+                                            imageEmbedding1:
+                                                _imageEmbeddings[0],
+                                            imageEmbedding2:
+                                                _imageEmbeddings[1]),
+                                      )
                                           .whenComplete(() {
                                         _showSnackBar(
                                             'Lost item posted successfully',
@@ -525,6 +553,7 @@ class _LostPostState extends State<LostPost> {
                                     _showSnackBar('Please fill all fields',
                                         colorScheme, true);
                                   }
+                                  _isSpinKitLoaded=false;
                                 }
                               : null,
                           style: FilledButton.styleFrom(
@@ -790,11 +819,14 @@ class _LostPostState extends State<LostPost> {
 
   Future<String> _pickAndUploadImage(
       StreamController<String> controller, int progressVersion) async {
+    _isImageUploaded = false;
     try {
       // 1. Pick an image
       final XFile? pickedFile =
           await _picker.pickImage(source: ImageSource.gallery);
-      if (pickedFile == null) return '';
+      if (pickedFile == null) {
+        return '';
+      }
 
       // 2. Compress the image
       File imageFile = File(pickedFile.path);
@@ -823,13 +855,42 @@ class _LostPostState extends State<LostPost> {
         },
       );
       // 6. Send final URL to stream
+      _isImageUploaded = true;
       controller.sink.add(imageData['url']!);
       _imgUrls[progressVersion - 1] = imageData['url']!;
-      return imageData['name']!;
+      return imageData['url']!;
     } catch (e) {
       // 7. Handle errors
       controller.sink.addError('Error: ${e.toString()}');
       rethrow;
     }
+  }
+
+  String _getImageDataToSingleParameter(Map<String, dynamic> imageTexts) {
+    return "labels:${imageTexts['labels'].toString()}, objects:${imageTexts['objects'].toString()},fullText:${imageTexts['fullText']}";
+  }
+
+  String _getTextDataToSingleParameter(String heading, String description) {
+    return "heading:$heading,description:$description";
+  }
+
+  Future<List<double>> getImageEmbedding(String url) async {
+    if (url.isEmpty || url == '') {
+      return [];
+    }
+    var textToEmbed = await _aiService.analyzeImageWithVision(url);
+
+    List<double> embedded = await _aiService
+        .runGenAIEmbeddingTest(_getImageDataToSingleParameter(textToEmbed));
+
+    return embedded;
+  }
+
+  Future<List<double>> getTextEmbedding(
+      String heading, String description) async {
+    var embedded = await _aiService.runGenAIEmbeddingTest(
+        _getTextDataToSingleParameter(heading, description));
+
+    return embedded;
   }
 }

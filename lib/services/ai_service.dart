@@ -9,10 +9,6 @@ class AIService {
         'imageUrl': imageUrl,
       });
       final Map<String, dynamic> data = result.data;
-      print('Labels: ${data['labels']}');
-      print('Objects: ${data['objects']}');
-      print('Text: ${data['fullText']}');
-
       return data;
     } on FirebaseFunctionsException catch (e) {
       print(
@@ -25,8 +21,7 @@ class AIService {
     }
   }
 
-  Future<Map<String, dynamic>?> runGenAIEmbeddingTest(
-      String textToEmbed) async {
+  Future<List<double>> runGenAIEmbeddingTest(String textToEmbed) async {
     try {
       final HttpsCallable callable =
           FirebaseFunctions.instance.httpsCallable('simpleGenAIEmbeddingTest');
@@ -40,12 +35,12 @@ class AIService {
       if (responseData != null) {
         final String? status = responseData['status'] as String?;
         if (status == 'success') {
-          return responseData;
+          return responseData['values'].cast<double>();
         } else {
-          return null;
+          return [];
         }
       } else {
-        return null;
+        return [];
       }
     } on FirebaseFunctionsException catch (e) {
       print('Code: ${e.code}');
@@ -56,6 +51,6 @@ class AIService {
       print('  Type: ${e.runtimeType}');
       print('  Details: $e');
     }
-    return null;
+    return [];
   }
 }
