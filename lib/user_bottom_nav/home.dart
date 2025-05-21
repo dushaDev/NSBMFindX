@@ -81,7 +81,6 @@ class _HomeState extends State<Home> {
                               child: _buildReportCard(
                                   'Lost Report',
                                   colorScheme,
-                                  Icons.report,
                                   'assets/images/communication.png',
                                   () => LostPost())),
                           SizedBox(width: 5),
@@ -89,7 +88,6 @@ class _HomeState extends State<Home> {
                               child: _buildReportCard(
                                   'Found Report',
                                   colorScheme,
-                                  Icons.person_search,
                                   'assets/images/searching.png',
                                   () =>
                                       FoundPost())), //There should be a FoundPost page
@@ -108,6 +106,9 @@ class _HomeState extends State<Home> {
                               } else if (snapshot.hasError) {
                                 return Center(
                                     child: Text('error: ${snapshot.error}'));
+                              } else if (snapshot.data!.isEmpty) {
+                                return _showEmptyCard(
+                                    'No data to show', colorScheme);
                               } else if (snapshot.hasData) {
                                 List? allItemsList = snapshot.data;
                                 final List<Map<String, dynamic>> finalList = [];
@@ -161,6 +162,9 @@ class _HomeState extends State<Home> {
                               } else if (snapshot.hasError) {
                                 return Center(
                                     child: Text('error: ${snapshot.error}'));
+                              } else if (snapshot.data!.isEmpty) {
+                                return _showEmptyCard(
+                                    'No data to show', colorScheme);
                               } else if (snapshot.hasData) {
                                 List? allItemsList = snapshot.data;
                                 final List<Map<String, dynamic>> finalList = [];
@@ -207,8 +211,8 @@ class _HomeState extends State<Home> {
         });
   }
 
-  Widget _buildReportCard(String title, ColorScheme colorScheme, IconData icon,
-      String image, Widget Function() myPageHere) {
+  Widget _buildReportCard(String title, ColorScheme colorScheme, String image,
+      Widget Function() myPageHere) {
     return Card(
         color: colorScheme.surfaceContainer,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),

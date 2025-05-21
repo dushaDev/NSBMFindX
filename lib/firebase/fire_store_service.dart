@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:find_x/firebase/models/embeddings.dart';
 import 'package:find_x/res/random.dart';
-import 'package:intl/intl.dart';
-
 import '../res/read_date.dart';
 import 'models/Faculty.dart';
 import 'models/Student.dart';
 import 'models/admin.dart';
 import 'models/degree_program.dart';
 import 'models/found_item.dart';
+import 'models/image_m.dart';
 import 'models/lost_found_unified.dart';
 import 'models/lost_item.dart';
 import 'models/notification_m.dart';
@@ -146,18 +146,30 @@ class FireStoreService {
         .set(program.toFirestore());
   }
 
-  Future<void> addLostItem(LostItem lostItem) async {
+  Future<void> addLostItem(
+      LostItem lostItem,Embeddings vectors) async {
     DocumentReference docRef =
         await _fireStore.collection('lostItems').add(lostItem.toFirestore());
-    // update the lostItem object with the generated ID
+    lostItem.reference = 'embeddings/${docRef.id}';
+    await _fireStore.collection('lostItems').doc(docRef.id).set(lostItem.toFirestore());
+    // update the lostItem reference with embeddings
+    await addVector(vectors, docRef.id);
     lostItem.id = docRef.id;
   }
 
-  Future<void> addFoundItem(FoundItem foundItem) async {
+  Future<void> addFoundItem(
+      FoundItem foundItem, Embeddings vectors) async {
     DocumentReference docRef =
         await _fireStore.collection('foundItems').add(foundItem.toFirestore());
-    // update the foundItem object with the generated ID
+    foundItem.reference = 'embeddings/${docRef.id}';
+    await _fireStore.collection('foundItems').doc(docRef.id).set(foundItem.toFirestore());
+    // update the foundItem reference with embeddings
+    await addVector(vectors, docRef.id);
     foundItem.id = docRef.id;
+  }
+
+  Future<void> addImage(ImageM imageM) async {
+    await _fireStore.collection('images').add(imageM.toFirestore());
   }
 
   // Method to retrieve all users from FireStore
@@ -268,7 +280,8 @@ class FireStoreService {
   Future<String?> getUserRole(String userId) async {
     try {
       // Retrieve the user document from the 'users' collection
-      DocumentSnapshot doc = await _fireStore.collection('users').doc(userId).get();
+      DocumentSnapshot doc =
+          await _fireStore.collection('users').doc(userId).get();
 
       // Check if the document exists
       if (doc.exists) {
@@ -555,13 +568,17 @@ class FireStoreService {
   }
 
   // Method to retrieve lost and found items by userId
-  Future<Map<String, List<dynamic>>> getLostAndFoundItemsById(String userId) async {
+  Future<Map<String, List<dynamic>>> getLostAndFoundItemsById(
+      String userId) async {
     try {
-      QuerySnapshot lostItemsSnapshot =
-      await _fireStore.collection('lostItems').where('userId', isEqualTo: userId).
-      get();
-      QuerySnapshot foundItemsSnapshot =
-      await _fireStore.collection('foundItems').where('userId', isEqualTo: userId).get();
+      QuerySnapshot lostItemsSnapshot = await _fireStore
+          .collection('lostItems')
+          .where('userId', isEqualTo: userId)
+          .get();
+      QuerySnapshot foundItemsSnapshot = await _fireStore
+          .collection('foundItems')
+          .where('userId', isEqualTo: userId)
+          .get();
 
       List<LostItem> lostItems = lostItemsSnapshot.docs.map((doc) {
         return LostItem.fromFirestore(
@@ -916,7 +933,8 @@ class FireStoreService {
   Future<void> approveUser(String userId) async {
     try {
       // Retrieve the user document to check current status
-      DocumentSnapshot doc = await _fireStore.collection('users').doc(userId).get();
+      DocumentSnapshot doc =
+          await _fireStore.collection('users').doc(userId).get();
 
       if (doc.exists) {
         bool currentStatus = doc.get('isApproved') as bool;
@@ -954,6 +972,11 @@ class FireStoreService {
   //____________________________________________________________________________________________
 
 
+// Methods to add a vectors to Firestore
+// this map contain {'0': textVector, '1': imageVector1, '2': imageVector2}
+  Future<void> addVector(Embeddings embeddings, String id) async {
+    await _fireStore.collection('embeddings').doc(id).set(embeddings.toFirestore());
+  }
 
   // Helper method to parse the custom date format
   DateTime _parseCustomDate(String dateString) {

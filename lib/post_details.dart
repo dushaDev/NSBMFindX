@@ -62,7 +62,11 @@ class _PostDetailsState extends State<PostDetails> {
       future: _getLoggedUser(),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: Text('Please wait..', style: TextStyle(fontSize: FontProfile.small,color: colorScheme.onSurface)));
+          return Center(
+              child: Text('Please wait..',
+                  style: TextStyle(
+                      fontSize: FontProfile.small,
+                      color: colorScheme.onSurface)));
         }
 
         if (snapshot.hasError) {
@@ -70,7 +74,11 @@ class _PostDetailsState extends State<PostDetails> {
         }
 
         if (!snapshot.hasData) {
-          return Center(child: Text('User not found', style: TextStyle(fontSize: FontProfile.small,color: colorScheme.onSurface)));
+          return Center(
+              child: Text('User not found',
+                  style: TextStyle(
+                      fontSize: FontProfile.small,
+                      color: colorScheme.onSurface)));
         }
 
         bool isThisUser = false;
@@ -213,28 +221,37 @@ class _PostDetailsState extends State<PostDetails> {
 
                     final user = snapshot.data!;
 
-                    return isThisUser?
-                        Container(child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'User Details',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: colorScheme.onSurface,
-                                fontSize: FontProfile.medium,
-                              ),
+                    return isThisUser
+                        ? Container(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'User Details',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: colorScheme.onSurface,
+                                    fontSize: FontProfile.medium,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Posted by You',
+                                  style: TextStyle(
+                                      fontSize: FontProfile.small,
+                                      color: colorScheme.onSurface),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 8),
-                            Text('Posted by You',style: TextStyle(fontSize: FontProfile.small,color: colorScheme.onSurface),),
-                          ],
-                        ),) :
-                      _buildUserDetailsSection(user, colorScheme, context);
+                          )
+                        : _buildUserDetailsSection(user, colorScheme, context);
                   }),
               const SizedBox(height: 20),
 
-              isThisUser ? Container() :
-              _buildContactSection(post.contactNumber, colorScheme, context),
+              isThisUser
+                  ? Container()
+                  : _buildContactSection(
+                      post.contactNumber, colorScheme, context),
               const SizedBox(height: 20),
 
               userRole == 'admin'
@@ -308,7 +325,8 @@ class _PostDetailsState extends State<PostDetails> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => UserProfileSettings(userId: userModel.id, itemType: false),
+                    builder: (context) => UserProfileSettings(
+                        userId: userModel.id, itemType: false),
                   ),
                 );
               },
@@ -410,7 +428,6 @@ class _PostDetailsState extends State<PostDetails> {
     );
   }
 
-
   void _deletePost() async {
     try {
       if (widget.isFoundItem) {
@@ -499,18 +516,30 @@ class _PostDetailsState extends State<PostDetails> {
 
   Widget _buildImageGallery(
       List<String> images, ColorScheme colorScheme, BuildContext context) {
-    if (images.isEmpty) {
-      return Container(
-        height: 200,
-        decoration: BoxDecoration(
-          color: colorScheme.onSurfaceVariant,
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Icon(
-          Icons.image,
-          size: 60,
-          color: colorScheme.onSurfaceVariant,
-        ),
+    if (images[0] == "" && images[1] == "") {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            height: 100,
+            child: Center(
+              child: Column(
+                children: [
+                  Text('No images to show',
+                      style: TextStyle(
+                          color: colorScheme.onSurface,
+                          fontSize: FontProfile.small)),
+                  const SizedBox(height: 8),
+                  Icon(
+                    Icons.sentiment_dissatisfied_rounded,
+                    size: 50,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       );
     }
 
@@ -521,6 +550,9 @@ class _PostDetailsState extends State<PostDetails> {
         controller: PageController(viewportFraction: 0.85),
         itemCount: images.length,
         itemBuilder: (context, index) {
+          if (images[index] == '' || images[index] == "") {
+            return null;
+          }
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
             child: ClipRRect(
@@ -552,27 +584,28 @@ class _PostDetailsState extends State<PostDetails> {
 
                   // Image Counter
                   if (images.length > 1)
-                    Positioned(
-                      bottom: 10,
-                      right: 10,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black54,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          '${index + 1}/${images.length}',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: FontProfile.extraSmall,
+                    if (images[0] != "" && images[1] != "")
+                      Positioned(
+                        bottom: 10,
+                        right: 10,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black54,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            '${index + 1}/${images.length}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: FontProfile.extraSmall,
+                            ),
                           ),
                         ),
                       ),
-                    ),
                 ],
               ),
             ),

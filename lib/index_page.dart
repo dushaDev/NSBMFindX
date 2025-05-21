@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'bottom_nav/notifications.dart';
 import 'bottom_nav/posts.dart';
 import 'bottom_nav/search.dart';
+import 'login.dart';
 import 'navigation_provider.dart';
 import 'admin_bottom_nav/dashboard.dart';
 import 'user_bottom_navigation.dart';
@@ -38,6 +39,7 @@ class _IndexPageState extends State<IndexPage> {
   @override
   Widget build(BuildContext context) {
     _authService.getSignedUser();
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     // provider for manage navigation
     // this provider use for manage pages customly when click button on any page.
@@ -54,12 +56,34 @@ class _IndexPageState extends State<IndexPage> {
                 child: CircularProgressIndicator(),
               );
             } else if (snapshot.hasError) {
-              return const Center(
-                child: Text('An error occurred'),
+              return Center(
+                child: Text('An error occurred',
+                    style: TextStyle(color: colorScheme.onSurface)),
               );
             } else if (snapshot.data == null) {
-              return const Center(
-                child: Text('User not signed in'),
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('User not signed in or User not found',
+                        style: TextStyle(color: colorScheme.onSurface)),
+                    const SizedBox(height: 20),
+                    OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                            foregroundColor: colorScheme.onPrimary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 24)),
+                        onPressed: () async {
+                          _authService.signOut().whenComplete(() {
+                            setState(() {});
+                          });
+                        },
+                        child: Text(' Try Cleaning Cache and Login Again')),
+                  ],
+                ),
               );
             } else if (snapshot.data == 'admin' || snapshot.data == 'staff') {
               return Stack(children: [
@@ -88,8 +112,29 @@ class _IndexPageState extends State<IndexPage> {
                 ),
               ]);
             } else {
-              return const Center(
-                child: Text('User role not recognized'),
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('User role not recognized',
+                        style: TextStyle(color: colorScheme.onSurface)),
+                    const SizedBox(height: 20),
+                    OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                            foregroundColor: colorScheme.onPrimary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 24)),
+                        onPressed: () async {
+                          _authService.signOut().whenComplete(() {
+                            setState(() {});
+                          });
+                        },
+                        child: Text(' Try Cleaning Cache and Login Again')),
+                  ],
+                ),
               );
             }
           },
