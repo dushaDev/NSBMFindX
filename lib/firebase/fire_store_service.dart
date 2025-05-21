@@ -969,6 +969,8 @@ class FireStoreService {
       print("Error updating user restriction status: $e");
     }
   }
+  //____________________________________________________________________________________________
+
 
 // Methods to add a vectors to Firestore
 // this map contain {'0': textVector, '1': imageVector1, '2': imageVector2}
