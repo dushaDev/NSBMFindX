@@ -20,32 +20,47 @@ class _SignupState extends State<Signup> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _repeatPasswordController =
-  TextEditingController();
+      TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _contactNumberController =
-  TextEditingController();
+      TextEditingController();
   StreamController<List<String>> _degreeController =
-  StreamController<List<String>>.broadcast();
+      StreamController<List<String>>.broadcast();
 
   final List<String> _faculties = [
-    'Degree sample 1',
+    'Faculty of Business',
+    'Faculty of Computing',
+    'Faculty of Engineering'
   ];
   String? _selectedFaculty;
 
   final List<String> _public_degrees = [
-    'Degree sample 1',
+    'Data Science',
+    'Computer Networks',
+    'Software Engineering',
+    'Business Analytics',
+    'Applied Economics',
+    'Accounting and Finance',
+    'Computer Engineering',
+    'Electrical and Electronic Engineering',
+    'Interior Design'
   ];
 
   final List<String> _computing_degrees = [
-    'Degree sample 1',
-
+    'Data Science',
+    'Computer Networks',
+    'Software Engineering'
   ];
   final List<String> _management_degrees = [
-    'Degree sample 1',
+    'Business Analytics',
+    'Applied Economics',
+    'Accounting and Finance'
   ];
   final List<String> _engineering_degrees = [
-    'Degree sample 1',
+    'Computer Engineering',
+    'Electrical and Electronic Engineering',
+    'Interior Design'
   ];
 
   String? _selectedDegree;
@@ -79,7 +94,7 @@ class _SignupState extends State<Signup> {
             ),
             child: Padding(
               padding:
-              const EdgeInsets.only(bottom: 8.0, left: 8.0, right: 8.0),
+                  const EdgeInsets.only(bottom: 8.0, left: 8.0, right: 8.0),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -90,14 +105,14 @@ class _SignupState extends State<Signup> {
                       children: [
                         _buildText('Name on ID', colorScheme),
                         _buildTextFormField(_nameController, 'SDN Perera',
-                                (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Name is required.';
-                              } else if (value.length < 8) {
-                                return 'Name must be at least 8 characters.';
-                              }
-                              return null;
-                            }, colorScheme)
+                            (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Name is required.';
+                          } else if (value.length < 8) {
+                            return 'Name must be at least 8 characters.';
+                          }
+                          return null;
+                        }, colorScheme)
                       ],
                     ),
                     Column(
@@ -122,7 +137,7 @@ class _SignupState extends State<Signup> {
                             _faculties,
                             'Select Faculty',
                             _selectedFaculty,
-                                (value) {
+                            (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Faculty is required.';
                               }
@@ -157,7 +172,7 @@ class _SignupState extends State<Signup> {
                                   snapshot.data ?? _public_degrees,
                                   "Select Degree",
                                   _selectedDegree,
-                                      (value) {
+                                  (value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Degree is required.';
                                     }
@@ -179,7 +194,7 @@ class _SignupState extends State<Signup> {
                         _buildTextFormField(
                           _contactNumberController,
                           '0712345678',
-                              (value) {
+                          (value) {
                             if (value == null || value.isEmpty) {
                               return 'Contact Number is required.';
                             } else if (value.length != 10) {
@@ -198,16 +213,16 @@ class _SignupState extends State<Signup> {
                         _buildText('Email', colorScheme),
                         _buildTextFormField(
                             _emailController, 'your.student.maail@email.com',
-                                (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Email is required.';
-                              }
-                              final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
-                              if (!emailRegex.hasMatch(value)) {
-                                return 'Invalid email format.';
-                              }
-                              return null;
-                            }, colorScheme)
+                            (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Email is required.';
+                          }
+                          final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+                          if (!emailRegex.hasMatch(value)) {
+                            return 'Invalid email format.';
+                          }
+                          return null;
+                        }, colorScheme)
                       ],
                     ),
                     Column(
@@ -217,7 +232,7 @@ class _SignupState extends State<Signup> {
                         _buildTextFormField(
                           _passwordController,
                           '********',
-                              (value) {
+                          (value) {
                             if (value == null || value.isEmpty) {
                               return 'Password is required.';
                             }
@@ -296,11 +311,11 @@ class _SignupState extends State<Signup> {
                                 });
                                 await authService
                                     .signUpWithEmailPassword(
-                                    _emailController.text,
-                                    _passwordController.text)
+                                        _emailController.text,
+                                        _passwordController.text)
                                     .whenComplete(() async {
                                   User? user =
-                                  await authService.getSignedUser();
+                                      await authService.getSignedUser();
                                   if (user == null) {
                                     setState(() {
                                       _isSpinKitLoaded = false;
@@ -311,18 +326,18 @@ class _SignupState extends State<Signup> {
                                   } else {
                                     await firestoreService
                                         .registerStudent(
-                                        _idController.text,
-                                        _nameController.text,
-                                        _readDate.getDateNow(),
-                                        _emailController.text,
-                                        _contactNumberController.text,
-                                        'student',
-                                        _selectedFaculty!,
-                                        _selectedDegree!,
-                                        _bioController.text)
+                                            _idController.text,
+                                            _nameController.text,
+                                            _readDate.getDateNow(),
+                                            _emailController.text,
+                                            _contactNumberController.text,
+                                            'student',
+                                            _selectedFaculty!,
+                                            _selectedDegree!,
+                                            _bioController.text)
                                         .whenComplete(() async {
                                       User? user =
-                                      await authService.getSignedUser();
+                                          await authService.getSignedUser();
                                       setState(() {
                                         _isSpinKitLoaded = false;
                                       });
@@ -397,12 +412,12 @@ class _SignupState extends State<Signup> {
         ),
         _isSpinKitLoaded
             ? Align(
-          alignment: Alignment.bottomCenter,
-          child: SpinKitThreeBounce(
-            color: colorScheme.primary,
-            size: 25.0,
-          ),
-        )
+                alignment: Alignment.bottomCenter,
+                child: SpinKitThreeBounce(
+                  color: colorScheme.primary,
+                  size: 25.0,
+                ),
+              )
             : Container(),
       ]),
     );
@@ -446,13 +461,13 @@ class _SignupState extends State<Signup> {
   }
 
   Widget _buildDropdown(
-      List<String> items,
-      String text,
-      selectedVariable,
-      FormFieldValidator validator,
-      ColorScheme colorScheme, {
-        required Function(dynamic) onChanged,
-      }) {
+    List<String> items,
+    String text,
+    selectedVariable,
+    FormFieldValidator validator,
+    ColorScheme colorScheme, {
+    required Function(dynamic) onChanged,
+  }) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: DropdownButtonFormField<String>(
@@ -548,10 +563,10 @@ class _SignupState extends State<Signup> {
   }
 
   Widget _buildBioField(
-      String text,
-      FormFieldValidator validator,
-      ColorScheme colorScheme,
-      ) {
+    String text,
+    FormFieldValidator validator,
+    ColorScheme colorScheme,
+  ) {
     return Padding(
         padding: const EdgeInsets.all(8.0),
         child: TextFormField(
