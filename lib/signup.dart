@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:find_x/login.dart';
 import 'package:find_x/res/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
@@ -19,27 +20,34 @@ class _SignupState extends State<Signup> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _repeatPasswordController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _contactNumberController =
-      TextEditingController();
+  TextEditingController();
+  StreamController<List<String>> _degreeController =
+  StreamController<List<String>>.broadcast();
 
   final List<String> _faculties = [
-    'Faculty of Computing',
-    'Faculty of Business',
-    'Faculty of Engineering'
+    'Degree sample 1',
   ];
   String? _selectedFaculty;
-  final List<String> _degrees = [
-    'BSc(Hons) in Computer Science',
-    'BSc(Hons) in Software Engineering',
-    'BSc(Hons) in Computer Networks',
-    'BSc(Hons) in Management Information Systems',
-    'BSc(Hons) in Data Science',
-    'BBA(Hons) in Business Administration',
-    'BEng(Hons) in Civil Engineering'
+
+  final List<String> _public_degrees = [
+    'Degree sample 1',
   ];
+
+  final List<String> _computing_degrees = [
+    'Degree sample 1',
+
+  ];
+  final List<String> _management_degrees = [
+    'Degree sample 1',
+  ];
+  final List<String> _engineering_degrees = [
+    'Degree sample 1',
+  ];
+
   String? _selectedDegree;
   bool _isSpinKitLoaded = false;
   final _formKey = GlobalKey<FormState>();
@@ -71,7 +79,7 @@ class _SignupState extends State<Signup> {
             ),
             child: Padding(
               padding:
-                  const EdgeInsets.only(bottom: 8.0, left: 8.0, right: 8.0),
+              const EdgeInsets.only(bottom: 8.0, left: 8.0, right: 8.0),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -82,14 +90,14 @@ class _SignupState extends State<Signup> {
                       children: [
                         _buildText('Name on ID', colorScheme),
                         _buildTextFormField(_nameController, 'SDN Perera',
-                            (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Name is required.';
-                          } else if (value.length < 8) {
-                            return 'Name must be at least 8 characters.';
-                          }
-                          return null;
-                        }, colorScheme)
+                                (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Name is required.';
+                              } else if (value.length < 8) {
+                                return 'Name must be at least 8 characters.';
+                              }
+                              return null;
+                            }, colorScheme)
                       ],
                     ),
                     Column(
@@ -114,7 +122,7 @@ class _SignupState extends State<Signup> {
                             _faculties,
                             'Select Faculty',
                             _selectedFaculty,
-                            (value) {
+                                (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Faculty is required.';
                               }
@@ -125,6 +133,16 @@ class _SignupState extends State<Signup> {
                               setState(() {
                                 _selectedFaculty = value;
                               });
+                              if (_selectedFaculty == 'Faculty of Computing') {
+                                _degreeController.sink.add(_computing_degrees);
+                              } else if (_selectedFaculty ==
+                                  'Faculty of Business') {
+                                _degreeController.sink.add(_management_degrees);
+                              } else {
+                                _degreeController.sink
+                                    .add(_engineering_degrees);
+                              }
+                              _selectedDegree = null;
                             }),
                       ],
                     ),
@@ -132,21 +150,25 @@ class _SignupState extends State<Signup> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildText('Degree Program', colorScheme),
-                        _buildDropdown(
-                            _degrees,
-                            "Select Degree",
-                            _selectedDegree,
-                            (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Degree is required.';
-                              }
-                              return null;
-                            },
-                            colorScheme,
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedDegree = value;
-                              });
+                        StreamBuilder<List<String>>(
+                            stream: _degreeController.stream,
+                            builder: (context, snapshot) {
+                              return _buildDropdown(
+                                  snapshot.data ?? _public_degrees,
+                                  "Select Degree",
+                                  _selectedDegree,
+                                      (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Degree is required.';
+                                    }
+                                    return null;
+                                  },
+                                  colorScheme,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _selectedDegree = value;
+                                    });
+                                  });
                             }),
                       ],
                     ),
@@ -157,7 +179,7 @@ class _SignupState extends State<Signup> {
                         _buildTextFormField(
                           _contactNumberController,
                           '0712345678',
-                          (value) {
+                              (value) {
                             if (value == null || value.isEmpty) {
                               return 'Contact Number is required.';
                             } else if (value.length != 10) {
@@ -176,16 +198,16 @@ class _SignupState extends State<Signup> {
                         _buildText('Email', colorScheme),
                         _buildTextFormField(
                             _emailController, 'your.student.maail@email.com',
-                            (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Email is required.';
-                          }
-                          final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
-                          if (!emailRegex.hasMatch(value)) {
-                            return 'Invalid email format.';
-                          }
-                          return null;
-                        }, colorScheme)
+                                (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Email is required.';
+                              }
+                              final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+                              if (!emailRegex.hasMatch(value)) {
+                                return 'Invalid email format.';
+                              }
+                              return null;
+                            }, colorScheme)
                       ],
                     ),
                     Column(
@@ -195,7 +217,7 @@ class _SignupState extends State<Signup> {
                         _buildTextFormField(
                           _passwordController,
                           '********',
-                          (value) {
+                              (value) {
                             if (value == null || value.isEmpty) {
                               return 'Password is required.';
                             }
@@ -274,45 +296,47 @@ class _SignupState extends State<Signup> {
                                 });
                                 await authService
                                     .signUpWithEmailPassword(
-                                        _emailController.text,
-                                        _passwordController.text)
+                                    _emailController.text,
+                                    _passwordController.text)
                                     .whenComplete(() async {
                                   User? user =
-                                      await authService.getSignedUser();
+                                  await authService.getSignedUser();
                                   if (user == null) {
                                     setState(() {
                                       _isSpinKitLoaded = false;
                                     });
                                     _showSnackBar(
-                                        'Email already in use.Try another one',true);
+                                        'Email already in use.Try another one',
+                                        true);
                                   } else {
                                     await firestoreService
                                         .registerStudent(
-                                            _idController.text,
-                                            _nameController.text,
-                                            _readDate.getDateNow(),
-                                            _emailController.text,
-                                            _contactNumberController.text,
-                                            'student',
-                                            _selectedFaculty!,
-                                            _selectedDegree!,
-                                            _bioController.text)
+                                        _idController.text,
+                                        _nameController.text,
+                                        _readDate.getDateNow(),
+                                        _emailController.text,
+                                        _contactNumberController.text,
+                                        'student',
+                                        _selectedFaculty!,
+                                        _selectedDegree!,
+                                        _bioController.text)
                                         .whenComplete(() async {
                                       User? user =
-                                          await authService.getSignedUser();
+                                      await authService.getSignedUser();
                                       setState(() {
                                         _isSpinKitLoaded = false;
                                       });
                                       authService.signOut().whenComplete(() {
                                         _showSnackBar(
-                                            'Registration successfully. use Login',false);
+                                            'Registration successfully. use Login',
+                                            false);
                                         navigate(user);
                                       });
                                     });
                                   }
                                 });
                               } else {
-                                _showSnackBar('Verification failed',true);
+                                _showSnackBar('Verification failed', true);
                               }
                             },
                             style: FilledButton.styleFrom(
@@ -373,12 +397,12 @@ class _SignupState extends State<Signup> {
         ),
         _isSpinKitLoaded
             ? Align(
-                alignment: Alignment.bottomCenter,
-                child: SpinKitThreeBounce(
-                  color: colorScheme.primary,
-                  size: 25.0,
-                ),
-              )
+          alignment: Alignment.bottomCenter,
+          child: SpinKitThreeBounce(
+            color: colorScheme.primary,
+            size: 25.0,
+          ),
+        )
             : Container(),
       ]),
     );
@@ -388,7 +412,7 @@ class _SignupState extends State<Signup> {
     if (user != null) {
       Navigator.of(context).pop();
     } else {
-      _showSnackBar('Something went wrong. Signup failed.',true);
+      _showSnackBar('Something went wrong. Signup failed.', true);
     }
   }
 
@@ -422,13 +446,13 @@ class _SignupState extends State<Signup> {
   }
 
   Widget _buildDropdown(
-    List<String> items,
-    String text,
-    selectedVariable,
-    FormFieldValidator validator,
-    ColorScheme colorScheme, {
-    required Function(dynamic) onChanged,
-  }) {
+      List<String> items,
+      String text,
+      selectedVariable,
+      FormFieldValidator validator,
+      ColorScheme colorScheme, {
+        required Function(dynamic) onChanged,
+      }) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: DropdownButtonFormField<String>(
@@ -524,10 +548,10 @@ class _SignupState extends State<Signup> {
   }
 
   Widget _buildBioField(
-    String text,
-    FormFieldValidator validator,
-    ColorScheme colorScheme,
-  ) {
+      String text,
+      FormFieldValidator validator,
+      ColorScheme colorScheme,
+      ) {
     return Padding(
         padding: const EdgeInsets.all(8.0),
         child: TextFormField(
