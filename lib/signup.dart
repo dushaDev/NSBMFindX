@@ -40,7 +40,7 @@ class _SignupState extends State<Signup> {
     'Computer Networks',
     'Software Engineering',
     'Management Information Systems'
-    'Business Analytics',
+        'Business Analytics',
     'Applied Economics',
     'Accounting and Finance',
     'Computer Engineering',
