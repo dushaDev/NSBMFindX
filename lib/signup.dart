@@ -39,6 +39,7 @@ class _SignupState extends State<Signup> {
     'Data Science',
     'Computer Networks',
     'Software Engineering',
+    'Management Information Systems'
     'Business Analytics',
     'Applied Economics',
     'Accounting and Finance',
@@ -50,7 +51,8 @@ class _SignupState extends State<Signup> {
   final List<String> _computing_degrees = [
     'Data Science',
     'Computer Networks',
-    'Software Engineering'
+    'Software Engineering',
+    'Management Information Systems'
   ];
   final List<String> _management_degrees = [
     'Business Analytics',
