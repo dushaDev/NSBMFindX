@@ -42,7 +42,7 @@ class _FoundPostState extends State<FoundPost> {
   String? _selectedFaculty;
   String? _selectedDegree;
   List<File> _images = [];
-  List<String> _imageUrls = [];
+  List<String> _imgUrls = ['', ''];
   List<List<double>> _imageEmbeddings = [[], []];
   int _hour24 = 0; //to store the selected hour in 24 hours format
   int _minute = 0;
@@ -116,7 +116,7 @@ class _FoundPostState extends State<FoundPost> {
                             String imgUrl =
                                 await _pickAndUploadImage(_controller1, 1);
                             if (imgUrl != '') {
-                              _imageUrls.add(imgUrl);
+                              _imgUrls[0] = imgUrl;
                               _controller1.sink.add(imgUrl);
                               _imageEmbeddings[0] =
                                   await getImageEmbedding(imgUrl);
@@ -129,7 +129,7 @@ class _FoundPostState extends State<FoundPost> {
                           child: StreamBuilder(
                               stream: _controller1.stream,
                               builder: (context, snapshot) {
-                                if (snapshot.hasData) {
+                                if (_images.length > 0) {
                                   return Container(
                                     height: 70,
                                     width: 100,
@@ -172,10 +172,10 @@ class _FoundPostState extends State<FoundPost> {
                             String imgUrl =
                                 await _pickAndUploadImage(_controller2, 2);
                             if (imgUrl != '') {
-                              _imageUrls.add(imgUrl);
+                              _imgUrls[1] = imgUrl;
                               _controller2.sink.add(imgUrl);
-                              _imageEmbeddings
-                                  .add(await getImageEmbedding(imgUrl));
+                              _imageEmbeddings[1] =
+                                  await getImageEmbedding(imgUrl);
                             } else {
                               _isImageUploaded = true;
                               _showSnackBar(
@@ -185,7 +185,7 @@ class _FoundPostState extends State<FoundPost> {
                           child: StreamBuilder(
                               stream: _controller2.stream,
                               builder: (context, snapshot) {
-                                if (snapshot.hasData) {
+                                if (_images.length > 1) {
                                   return Container(
                                     height: 70,
                                     width: 100,
@@ -852,7 +852,7 @@ class _FoundPostState extends State<FoundPost> {
                                             _descriptionTextController.text,
                                         currentLocation:
                                             _locationTextController.text,
-                                        images: _imageUrls,
+                                        images: _imgUrls,
                                         agreedToTerms: _agreeTerms,
                                         userId: userId,
                                         privacy: _selectedPrivacy!,
@@ -871,6 +871,7 @@ class _FoundPostState extends State<FoundPost> {
                                         isCompleted: false,
                                       ),
                                       Embeddings(
+                                          type: true,
                                           textEmbedding: textEmbedding,
                                           imageEmbedding1: _imageEmbeddings[0],
                                           imageEmbedding2: _imageEmbeddings[1]),
@@ -888,7 +889,7 @@ class _FoundPostState extends State<FoundPost> {
                                   _showSnackBar('Please fill all fields',
                                       colorScheme, true);
                                 }
-                                _isSpinKitLoaded=false;
+                                _isSpinKitLoaded = false;
                               }
                             : null,
                         style: FilledButton.styleFrom(
