@@ -55,7 +55,6 @@ dependencies:
   http: ^1.3.0
   provider: ^6.1.4
   cached_network_image: ^3.4.1
-  firebase_storage: ^12.4.5
   tflite_flutter: ^0.11.0
   cloud_functions: ^5.5.0
   firebase_vertexai: ^1.6.0
