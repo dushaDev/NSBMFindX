@@ -68,7 +68,7 @@ class _ChatPageState extends State<ChatPage> {
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
+                    color: Colors.grey.withAlpha(10),
                     spreadRadius: 1,
                     blurRadius: 1,
                   ),
@@ -121,13 +121,10 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ],
         ),
-        actions: [
-
-        ],
+        actions: [],
       ),
       body: Column(
         children: [
-
           // Chat messages
           Expanded(
             child: ListView.builder(
@@ -171,7 +168,7 @@ class _ChatPageState extends State<ChatPage> {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.2),
+                  color: Colors.grey.withAlpha(20),
                   spreadRadius: 1,
                   blurRadius: 2,
                   offset: Offset(0, -1),
