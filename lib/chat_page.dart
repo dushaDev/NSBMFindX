@@ -56,16 +56,17 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.surface,
         elevation: 0,
         title: Row(
           children: [
             Container(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: colorScheme.onSurfaceVariant,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withAlpha(10),
@@ -165,7 +166,7 @@ class _ChatPageState extends State<ChatPage> {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: colorScheme.onSurfaceVariant,
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withAlpha(20),
@@ -210,7 +211,7 @@ class _ChatPageState extends State<ChatPage> {
                 SizedBox(width: 8),
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.green,
+                    color: colorScheme.primary,
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
