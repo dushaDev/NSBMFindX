@@ -171,6 +171,8 @@ class _DashboardState extends State<Dashboard> {
                         } else if (snapshot.hasError) {
                           return _showEmptyCard(
                               'error: ${snapshot.error}', colorScheme);
+                        } else if (snapshot.data!.isEmpty) {
+                          return _showEmptyCard('No data to show', colorScheme);
                         } else if (snapshot.hasData) {
                           List<UserM>? usersNotApproved = snapshot.data;
 
@@ -207,6 +209,8 @@ class _DashboardState extends State<Dashboard> {
                           } else if (snapshot.hasError) {
                             return Center(
                                 child: Text('error: ${snapshot.error}'));
+                          } else if (snapshot.data!.isEmpty) {
+                            return _showEmptyCard('No data to show', colorScheme);
                           } else if (snapshot.hasData) {
                             int yAxisMax = 4;
                             Map<String, List<String>>? postedTimes =

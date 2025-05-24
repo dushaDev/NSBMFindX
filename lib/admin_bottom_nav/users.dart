@@ -40,7 +40,7 @@ class _UsersState extends State<Users> {
     }
     navProvider.pageData = null;
 
-    ColorScheme _colorScheme = Theme.of(context).colorScheme;
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -117,7 +117,7 @@ class _UsersState extends State<Users> {
                                 'No $_currentFilter users to show ',
                                 style: TextStyle(
                                     fontSize: FontProfile.small,
-                                    color: _colorScheme.onSurface),
+                                    color: colorScheme.onSurface),
                               ),
                             )
                           : ListView.builder(
@@ -161,7 +161,7 @@ class _UsersState extends State<Users> {
               ),
             );
           },
-          child: Icon(Icons.add),
+          child: Icon(Icons.add,color: colorScheme.onSurface,),
         ),
       ),
     );

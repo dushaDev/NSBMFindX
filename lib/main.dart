@@ -1,27 +1,38 @@
+import 'dart:io';
+
 import 'package:find_x/res/color_profile.dart';
+import 'package:find_x/firebase/use_fire_base_emulator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'firebase/fire_base_msg_service.dart';
 import 'navigation_provider.dart';
 import 'index_page.dart';
 import 'login.dart';
 
 void main() async {
-  await dotenv.load();
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-      options: FirebaseOptions(
-    apiKey: dotenv.env['FIREBASE_API_KEY']!,
-    appId: dotenv.env['FIREBASE_APP_ID']!,
-    messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID']!,
-    projectId: dotenv.env['FIREBASE_PROJECT_ID']!,
-  ));
+
+  await dotenv.load(fileName: ".env");
+  await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  await FirebaseMsgService().initNotifications();
+  // FirebaseOptions firebaseOptions;
+  // firebaseOptions = FirebaseOptions(
+  //   apiKey: dotenv.env['FIREBASE_API_KEY']!,
+  //   appId: dotenv.env['FIREBASE_APP_ID']!,
+  //   messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID']!,
+  //   projectId: dotenv.env['FIREBASE_PROJECT_ID']!,
+  // );
+  // await Firebase.initializeApp(options: firebaseOptions);
+
   runApp(
-    // ChangeNotifierProvider is a provider that allows you to listen to changes in the NavigationProvider class
     ChangeNotifierProvider(
       create: (context) => NavigationProvider(),
       child: MyApp(),
@@ -36,8 +47,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
-        systemNavigationBarColor:
-            Colors.transparent, // Transparent navigation bar
+        systemNavigationBarColor: Colors.transparent,
       ),
     );
     return MaterialApp(
@@ -80,4 +90,11 @@ class MyApp extends StatelessWidget {
       },
     );
   }
+}
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(); // Required for background processing
+  print("Handling a background message: ${message.messageId}");
+  // You can process the message here, e.g., save to local storage
 }

@@ -4,7 +4,6 @@ import 'package:find_x/res/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import '../res/email_service.dart';
 import '../firebase/auth_service.dart';
@@ -235,15 +234,12 @@ class _AddUserState extends State<AddUser> {
                                       _selectedPosition!,
                                     )
                                         .whenComplete(() async {
-                                      User? user =
-                                          await authService.getSignedUser();
                                       setState(() {
                                         _isSpinKitLoaded = false;
                                       });
                                       _showSnackBar(
                                           'User added successfully. Username and Password mailed to user',
                                           false);
-                                      navigate(user);
                                     });
                                   }
                                 });
