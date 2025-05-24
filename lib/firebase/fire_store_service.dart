@@ -146,23 +146,27 @@ class FireStoreService {
         .set(program.toFirestore());
   }
 
-  Future<void> addLostItem(
-      LostItem lostItem,Embeddings vectors) async {
+  Future<void> addLostItem(LostItem lostItem, Embeddings vectors) async {
     DocumentReference docRef =
         await _fireStore.collection('lostItems').add(lostItem.toFirestore());
     lostItem.reference = 'embeddings/${docRef.id}';
-    await _fireStore.collection('lostItems').doc(docRef.id).set(lostItem.toFirestore());
+    await _fireStore
+        .collection('lostItems')
+        .doc(docRef.id)
+        .set(lostItem.toFirestore());
     // update the lostItem reference with embeddings
     await addVector(vectors, docRef.id);
     lostItem.id = docRef.id;
   }
 
-  Future<void> addFoundItem(
-      FoundItem foundItem, Embeddings vectors) async {
+  Future<void> addFoundItem(FoundItem foundItem, Embeddings vectors) async {
     DocumentReference docRef =
         await _fireStore.collection('foundItems').add(foundItem.toFirestore());
     foundItem.reference = 'embeddings/${docRef.id}';
-    await _fireStore.collection('foundItems').doc(docRef.id).set(foundItem.toFirestore());
+    await _fireStore
+        .collection('foundItems')
+        .doc(docRef.id)
+        .set(foundItem.toFirestore());
     // update the foundItem reference with embeddings
     await addVector(vectors, docRef.id);
     foundItem.id = docRef.id;
@@ -864,7 +868,7 @@ class FireStoreService {
           .collection('users')
           .doc(userId)
           .collection('notifications')
-          .add(notification.toMap());
+          .add(notification.toFirestore());
 
       // Update the notification object with the generated ID
       notification.id = docRef.id;
@@ -886,7 +890,8 @@ class FireStoreService {
           .get();
 
       return querySnapshot.docs.map((doc) {
-        return NotificationM.fromMap(doc.data() as Map<String, dynamic>);
+        return NotificationM.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id);
       }).toList();
     } catch (e) {
       print("Error fetching notifications: $e");
@@ -969,13 +974,15 @@ class FireStoreService {
       print("Error updating user restriction status: $e");
     }
   }
-  //____________________________________________________________________________________________
-
+  //____________________________________________________________________________
 
 // Methods to add a vectors to Firestore
 // this map contain {'0': textVector, '1': imageVector1, '2': imageVector2}
   Future<void> addVector(Embeddings embeddings, String id) async {
-    await _fireStore.collection('embeddings').doc(id).set(embeddings.toFirestore());
+    await _fireStore
+        .collection('embeddings')
+        .doc(id)
+        .set(embeddings.toFirestore());
   }
 
   // Helper method to parse the custom date format

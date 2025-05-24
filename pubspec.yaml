@@ -58,6 +58,7 @@ dependencies:
   tflite_flutter: ^0.11.0
   cloud_functions: ^5.5.0
   firebase_vertexai: ^1.6.0
+  firebase_messaging: ^15.2.6
 
 dev_dependencies:
   flutter_test:

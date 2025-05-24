@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../firebase/fire_store_service.dart';
 import '../firebase/models/lost_found_unified.dart';
+import '../res/font_profile.dart';
 import '../res/items/build_shimmer_loading.dart';
 import '../res/items/item_post.dart';
 import '../navigation_provider.dart';
@@ -63,9 +64,10 @@ class _PostsState extends State<Posts> {
                     },
                     backgroundColor: colorScheme.surface,
                     selectedColor: colorScheme.primaryContainer,
+                    checkmarkColor: colorScheme.onSurface,
                     labelStyle: TextStyle(
                       color: _currentFilter == filter
-                          ? colorScheme.onPrimaryContainer
+                          ? colorScheme.onSurface
                           : colorScheme.onSurface,
                     ),
                   ),
@@ -123,7 +125,9 @@ class _PostsState extends State<Posts> {
                   return Center(
                     child: Text(
                       'No posts available',
-                      style: TextStyle(color: colorScheme.onSurfaceVariant),
+                      style: TextStyle(
+                          color: colorScheme.onSurfaceVariant,
+                          fontSize: FontProfile.small),
                     ),
                   );
                 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:find_x/firebase/auth_service.dart';
 import 'package:find_x/firebase/fire_store_service.dart';
 import 'package:find_x/found_post.dart';
@@ -26,189 +28,228 @@ class _HomeState extends State<Home> {
   AuthService _authService = AuthService();
   ReadDate _readDate = ReadDate();
   String _title = 'Hello!';
+  StreamController<String> _tittleController = StreamController<String>.broadcast();
+  StreamController<String> _getIdController = StreamController<String>.broadcast();
   @override
   Widget build(BuildContext context) {
     ColorScheme colorScheme = Theme.of(context).colorScheme;
-    return FutureBuilder(
-        future: _getIdName(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return BuildShimmerLoading();
-          } else if (snapshot.hasError) {
-            return Center(child: Text('error: ${snapshot.error}'));
-          } else if (snapshot.hasData) {
-            Map<String, String?> _getId = snapshot.data as Map<String, String?>;
-            _title = '${_readDate.getWishStatement()}, ${_getId['name']}!';
             return Scaffold(
               extendBody: true,
               appBar: AppBar(
-                title: Text(
-                  '$_title',
-                  style: TextStyle(color: colorScheme.primary),
+                title: StreamBuilder<String>(
+                  stream: _tittleController.stream,
+                  builder: (context, snapshot) {
+                    if(snapshot.hasData){
+                      return Text(
+                        '${snapshot.data}',
+                        style: TextStyle(color: colorScheme.primary),
+                      );
+                    }
+                    return Text(
+                      _title,
+                      style: TextStyle(color: colorScheme.primary),
+                    );
+
+                  }
                 ),
                 foregroundColor: colorScheme.onSurface,
                 actions: [
-                  IconButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => UserProfileSettings(
-                            userId: _getId['id']!,
-                            itemType: false,
+                  StreamBuilder<String>(
+                    stream: _getIdController.stream,
+                    builder: (context, snapshot) {
+                      if(snapshot.hasData){
+                        return IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => UserProfileSettings(
+                                  userId: snapshot.data!,
+                                  itemType: false,
+                                ),
+                              ),
+                            );
+                          },
+                          icon: Icon(
+                            Icons.manage_accounts_outlined,
+                            color: colorScheme.onSecondaryContainer,
                           ),
+                          iconSize: 32.0,
+                        );
+                      }
+                      return IconButton(
+                        onPressed: null,
+                        icon: Icon(
+                          Icons.manage_accounts_outlined,
+                          color: colorScheme.onSecondaryContainer,
                         ),
+                        iconSize: 32.0,
                       );
-                    },
-                    icon: Icon(
-                      Icons.manage_accounts_outlined,
-                      color: colorScheme.onSecondaryContainer,
-                    ),
-                    iconSize: 32.0,
+                    }
                   ),
                 ],
               ),
-              body: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                              child: _buildReportCard(
-                                  'Lost Report',
-                                  colorScheme,
-                                  'assets/images/communication.png',
-                                  () => LostPost())),
-                          SizedBox(width: 5),
-                          Expanded(
-                              child: _buildReportCard(
-                                  'Found Report',
-                                  colorScheme,
-                                  'assets/images/searching.png',
-                                  () =>
-                                      FoundPost())), //There should be a FoundPost page
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      Column(children: [
-                        FutureBuilder(
-                            future: _fireStoreService
-                                .getLostAndFoundItemsWithLimit(4),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Center(
-                                    child: CircularProgressIndicator());
-                              } else if (snapshot.hasError) {
-                                return Center(
-                                    child: Text('error: ${snapshot.error}'));
-                              } else if (snapshot.data!.isEmpty) {
-                                return _showEmptyCard(
-                                    'No data to show', colorScheme);
-                              } else if (snapshot.hasData) {
-                                List? allItemsList = snapshot.data;
-                                final List<Map<String, dynamic>> finalList = [];
-                                for (var item in allItemsList!) {
-                                  if (item is LostItem) {
-                                    finalList.add(item.toFirestore());
-                                  } else if (item is FoundItem) {
-                                    finalList.add(item.toFirestore());
-                                  }
-                                }
+              body: FutureBuilder(
+                  future: _getIdName(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return BuildShimmerLoading();
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('error: ${snapshot.error}'));
+                    } else if (snapshot.hasData) {
+                      Map<String, String?> _getId =
+                          snapshot.data as Map<String, String?>;
+                      _title =
+                          '${_readDate.getWishStatement()}, ${_getId['name']}!';
+                      _tittleController.sink.add(_title);
+                      _getIdController.sink.add(_getId['id']!);
+                      return SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                      child: _buildReportCard(
+                                          'Lost Report',
+                                          colorScheme,
+                                          'assets/images/communication.png',
+                                          () => LostPost())),
+                                  SizedBox(width: 5),
+                                  Expanded(
+                                      child: _buildReportCard(
+                                          'Found Report',
+                                          colorScheme,
+                                          'assets/images/searching.png',
+                                          () =>
+                                              FoundPost())), //There should be a FoundPost page
+                                ],
+                              ),
+                              SizedBox(height: 10),
+                              Column(children: [
+                                FutureBuilder(
+                                    future: _fireStoreService
+                                        .getLostAndFoundItemsWithLimit(4),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return Center(
+                                            child: CircularProgressIndicator());
+                                      } else if (snapshot.hasError) {
+                                        return Center(
+                                            child: Text(
+                                                'error: ${snapshot.error}'));
+                                      } else if (snapshot.data!.isEmpty) {
+                                        return _showEmptyCard(
+                                            'No data to show', colorScheme);
+                                      } else if (snapshot.hasData) {
+                                        List? allItemsList = snapshot.data;
+                                        final List<Map<String, dynamic>>
+                                            finalList = [];
+                                        for (var item in allItemsList!) {
+                                          if (item is LostItem) {
+                                            finalList.add(item.toFirestore());
+                                          } else if (item is FoundItem) {
+                                            finalList.add(item.toFirestore());
+                                          }
+                                        }
 
-                                return BuildUpdatesSection(
-                                  title: 'Updates',
-                                  colorScheme: colorScheme,
-                                  readDate: _readDate,
-                                  items: finalList,
-                                  onPressed: () {
-                                    // Navigate to the Posts page on bottom navigation bar
-                                    Provider.of<NavigationProvider>(context,
-                                            listen: false)
-                                        .navigateTo(
-                                      1,
-                                    ); // 1 is Posts page without any data for now // 1 in the user bottom nav bar
+                                        return BuildUpdatesSection(
+                                          title: 'Updates',
+                                          colorScheme: colorScheme,
+                                          readDate: _readDate,
+                                          items: finalList,
+                                          onPressed: () {
+                                            // Navigate to the Posts page on bottom navigation bar
+                                            Provider.of<NavigationProvider>(
+                                                    context,
+                                                    listen: false)
+                                                .navigateTo(
+                                              1,
+                                            ); // 1 is Posts page without any data for now // 1 in the user bottom nav bar
 
-                                    // Navigator.push(
-                                    //   context,
-                                    //   MaterialPageRoute(
-                                    //     builder: (context) => ViewPosts(
-                                    //       userId: '',
-                                    //       title: 'Updates',
-                                    //     ),
-                                    //   ),
-                                    // );
-                                  },
-                                );
-                              } else {
-                                return _showEmptyCard(
-                                    'Data not found', colorScheme);
-                              }
-                            }),
-                        SizedBox(height: 10),
-                        FutureBuilder(
-                            future: _fireStoreService
-                                .getLostAndFoundItemsByIdWithLimit(
-                                    _getId['id']!, 7),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return Center(
-                                    child: CircularProgressIndicator());
-                              } else if (snapshot.hasError) {
-                                return Center(
-                                    child: Text('error: ${snapshot.error}'));
-                              } else if (snapshot.data!.isEmpty) {
-                                return _showEmptyCard(
-                                    'No data to show', colorScheme);
-                              } else if (snapshot.hasData) {
-                                List? allItemsList = snapshot.data;
-                                final List<Map<String, dynamic>> finalList = [];
-                                for (var item in allItemsList!) {
-                                  if (item is LostItem) {
-                                    finalList.add(item.toFirestore());
-                                  } else if (item is FoundItem) {
-                                    finalList.add(item.toFirestore());
-                                  }
-                                }
+                                            // Navigator.push(
+                                            //   context,
+                                            //   MaterialPageRoute(
+                                            //     builder: (context) => ViewPosts(
+                                            //       userId: '',
+                                            //       title: 'Updates',
+                                            //     ),
+                                            //   ),
+                                            // );
+                                          },
+                                        );
+                                      } else {
+                                        return _showEmptyCard(
+                                            'Data not found', colorScheme);
+                                      }
+                                    }),
+                                SizedBox(height: 10),
+                                FutureBuilder(
+                                    future: _fireStoreService
+                                        .getLostAndFoundItemsByIdWithLimit(
+                                            _getId['id']!, 7),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return Center(
+                                            child: CircularProgressIndicator());
+                                      } else if (snapshot.hasError) {
+                                        return Center(
+                                            child: Text(
+                                                'error: ${snapshot.error}'));
+                                      } else if (snapshot.data!.isEmpty) {
+                                        return _showEmptyCard(
+                                            'No data to show', colorScheme);
+                                      } else if (snapshot.hasData) {
+                                        List? allItemsList = snapshot.data;
+                                        final List<Map<String, dynamic>>
+                                            finalList = [];
+                                        for (var item in allItemsList!) {
+                                          if (item is LostItem) {
+                                            finalList.add(item.toFirestore());
+                                          } else if (item is FoundItem) {
+                                            finalList.add(item.toFirestore());
+                                          }
+                                        }
 
-                                return BuildUpdatesSection(
-                                  title: 'Your history',
-                                  colorScheme: colorScheme,
-                                  readDate: _readDate,
-                                  items: finalList,
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ViewPosts(
-                                          userId: _getId['id']!,
-                                          title: 'History',
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              } else {
-                                return _showEmptyCard(
-                                    'Data not found', colorScheme);
-                              }
-                            }),
-                      ]),
-                      SizedBox(height: 80),
-                    ],
-                  ),
-                ),
-              ),
+                                        return BuildUpdatesSection(
+                                          title: 'Your history',
+                                          colorScheme: colorScheme,
+                                          readDate: _readDate,
+                                          items: finalList,
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => ViewPosts(
+                                                  userId: _getId['id']!,
+                                                  title: 'History',
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      } else {
+                                        return _showEmptyCard(
+                                            'Data not found', colorScheme);
+                                      }
+                                    }),
+                              ]),
+                              SizedBox(height: 80),
+                            ],
+                          ),
+                        ),
+                      );
+                    } else {
+                      return _showEmptyCard('Data not found', colorScheme);
+                    }
+                  }),
             );
-          } else {
-            return _showEmptyCard('Data not found', colorScheme);
-          }
-        });
   }
 
   Widget _buildReportCard(String title, ColorScheme colorScheme, String image,

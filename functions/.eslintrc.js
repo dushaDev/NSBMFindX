@@ -23,7 +23,7 @@ module.exports = {
       'SwitchCase': 1,
       'flatTernaryExpressions': true,
     }],
-    'max-len': ['warn', { 'code': 120, 'ignoreComments': true, 'ignoreUrls': true }],
+    'max-len': ['warn', { 'code': 350, 'ignoreComments': true, 'ignoreUrls': true }],
     'comma-dangle': ['error', 'always-multiline'],
     'arrow-parens': ['error', 'as-needed'],
     'eol-last': ['error', 'always'],

@@ -29,7 +29,6 @@ class _FoundPostState extends State<FoundPost> {
   bool _agreeTerms = false;
   bool _isImageUploaded = true;
   bool _selectDate = true; // to select date or now in Radio button (true = now)
-  bool _isSpinKitLoaded = false;
   double _wholePadding = 10.0; // to set padding for all widgets
   String _title = 'Found Post';
   String _displayDate = "-"; //to store the selected date
@@ -42,7 +41,7 @@ class _FoundPostState extends State<FoundPost> {
   String? _selectedFaculty;
   String? _selectedDegree;
   List<File> _images = [];
-  List<String> _imageUrls = [];
+  List<String> _imgUrls = ['', ''];
   List<List<double>> _imageEmbeddings = [[], []];
   int _hour24 = 0; //to store the selected hour in 24 hours format
   int _minute = 0;
@@ -77,6 +76,8 @@ class _FoundPostState extends State<FoundPost> {
   final TextEditingController _idTextController = TextEditingController();
   StreamController<String> _controller1 = StreamController<String>.broadcast();
   StreamController<String> _controller2 = StreamController<String>.broadcast();
+  StreamController<bool> _spinKitController =
+      StreamController<bool>.broadcast();
   final _formKey = GlobalKey<FormState>();
   final ImagePicker _picker = ImagePicker();
   final CompressFile _compressFile = CompressFile();
@@ -116,7 +117,7 @@ class _FoundPostState extends State<FoundPost> {
                             String imgUrl =
                                 await _pickAndUploadImage(_controller1, 1);
                             if (imgUrl != '') {
-                              _imageUrls.add(imgUrl);
+                              _imgUrls[0] = imgUrl;
                               _controller1.sink.add(imgUrl);
                               _imageEmbeddings[0] =
                                   await getImageEmbedding(imgUrl);
@@ -129,7 +130,7 @@ class _FoundPostState extends State<FoundPost> {
                           child: StreamBuilder(
                               stream: _controller1.stream,
                               builder: (context, snapshot) {
-                                if (snapshot.hasData) {
+                                if (_images.length > 0) {
                                   return Container(
                                     height: 70,
                                     width: 100,
@@ -172,10 +173,10 @@ class _FoundPostState extends State<FoundPost> {
                             String imgUrl =
                                 await _pickAndUploadImage(_controller2, 2);
                             if (imgUrl != '') {
-                              _imageUrls.add(imgUrl);
+                              _imgUrls[1] = imgUrl;
                               _controller2.sink.add(imgUrl);
-                              _imageEmbeddings
-                                  .add(await getImageEmbedding(imgUrl));
+                              _imageEmbeddings[1] =
+                                  await getImageEmbedding(imgUrl);
                             } else {
                               _isImageUploaded = true;
                               _showSnackBar(
@@ -185,7 +186,7 @@ class _FoundPostState extends State<FoundPost> {
                           child: StreamBuilder(
                               stream: _controller2.stream,
                               builder: (context, snapshot) {
-                                if (snapshot.hasData) {
+                                if (_images.length > 1) {
                                   return Container(
                                     height: 70,
                                     width: 100,
@@ -824,8 +825,8 @@ class _FoundPostState extends State<FoundPost> {
                                         colorScheme,
                                         true);
                                   } else {
-                                    _isSpinKitLoaded =
-                                        true; // show loading spinner
+                                    _spinKitController.sink.add(true);
+                                    true; // show loading spinner
                                     var textEmbedding = await getTextEmbedding(
                                         _foundTextController.text,
                                         _descriptionTextController.text);
@@ -852,7 +853,7 @@ class _FoundPostState extends State<FoundPost> {
                                             _descriptionTextController.text,
                                         currentLocation:
                                             _locationTextController.text,
-                                        images: _imageUrls,
+                                        images: _imgUrls,
                                         agreedToTerms: _agreeTerms,
                                         userId: userId,
                                         privacy: _selectedPrivacy!,
@@ -871,6 +872,7 @@ class _FoundPostState extends State<FoundPost> {
                                         isCompleted: false,
                                       ),
                                       Embeddings(
+                                          type: true,
                                           textEmbedding: textEmbedding,
                                           imageEmbedding1: _imageEmbeddings[0],
                                           imageEmbedding2: _imageEmbeddings[1]),
@@ -880,7 +882,7 @@ class _FoundPostState extends State<FoundPost> {
                                           'Found item posted successfully',
                                           colorScheme,
                                           false);
-                                      _isSpinKitLoaded = false;
+                                      _spinKitController.sink.add(false);
                                       Navigator.pop(context);
                                     });
                                   }
@@ -888,7 +890,7 @@ class _FoundPostState extends State<FoundPost> {
                                   _showSnackBar('Please fill all fields',
                                       colorScheme, true);
                                 }
-                                _isSpinKitLoaded=false;
+                                _spinKitController.sink.add(false);
                               }
                             : null,
                         style: FilledButton.styleFrom(
@@ -914,18 +916,31 @@ class _FoundPostState extends State<FoundPost> {
             ],
           ),
         ),
-        _isSpinKitLoaded
-            ? Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                  margin: const EdgeInsets.only(top: 100.0),
-                  child: SpinKitThreeBounce(
-                    color: Theme.of(context).colorScheme.primary,
-                    size: 25.0,
-                  ),
-                ),
-              )
-            : Container(),
+        StreamBuilder<bool>(
+            stream: _spinKitController.stream,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    snapshot.data!
+                        ? Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Container(
+                              margin: const EdgeInsets.all(10.0),
+                              child: SpinKitThreeBounce(
+                                color: Theme.of(context).colorScheme.primary,
+                                size: 25.0,
+                              ),
+                            ),
+                          )
+                        : Container(),
+                  ],
+                );
+              } else {
+                return Container();
+              }
+            })
       ]),
     );
   }
