@@ -28,7 +28,6 @@ class _LostPostState extends State<LostPost> {
   bool _agreeTerms = false;
   bool _isImageUploaded = true;
   bool _selectDate = true;
-  bool _isSpinKitLoaded = false;
   double _wholePadding = 10.0;
   String _title = 'Lost Post';
   String _displayDate = "-";
@@ -59,6 +58,8 @@ class _LostPostState extends State<LostPost> {
   final TextEditingController _contactTextController = TextEditingController();
   StreamController<String> _controller1 = StreamController<String>.broadcast();
   StreamController<String> _controller2 = StreamController<String>.broadcast();
+  StreamController<bool> _spinKitController =
+      StreamController<bool>.broadcast();
   final _formKey = GlobalKey<FormState>();
   final ImagePicker _picker = ImagePicker();
   final CompressFile _compressFile = CompressFile();
@@ -499,8 +500,7 @@ class _LostPostState extends State<LostPost> {
                                           colorScheme,
                                           true);
                                     } else {
-                                      _isSpinKitLoaded =
-                                          true; // show loading spinner
+                                      _spinKitController.sink.add(true);
                                       var textEmbedding =
                                           await getTextEmbedding(
                                               _lostTextController.text,
@@ -534,6 +534,7 @@ class _LostPostState extends State<LostPost> {
                                           isCompleted: false,
                                         ),
                                         Embeddings(
+                                            type: false,
                                             textEmbedding: textEmbedding,
                                             imageEmbedding1:
                                                 _imageEmbeddings[0],
@@ -545,7 +546,7 @@ class _LostPostState extends State<LostPost> {
                                             'Lost item posted successfully',
                                             colorScheme,
                                             false);
-                                        _isSpinKitLoaded = false;
+                                        _spinKitController.sink.add(false);
                                         Navigator.pop(context);
                                       });
                                     }
@@ -553,7 +554,7 @@ class _LostPostState extends State<LostPost> {
                                     _showSnackBar('Please fill all fields',
                                         colorScheme, true);
                                   }
-                                  _isSpinKitLoaded=false;
+                                  _spinKitController.sink.add(false);
                                 }
                               : null,
                           style: FilledButton.styleFrom(
@@ -582,18 +583,31 @@ class _LostPostState extends State<LostPost> {
               ],
             ),
           ),
-          _isSpinKitLoaded
-              ? Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    margin: const EdgeInsets.only(top: 100.0),
-                    child: SpinKitThreeBounce(
-                      color: Theme.of(context).colorScheme.primary,
-                      size: 25.0,
-                    ),
-                  ),
-                )
-              : Container(),
+          StreamBuilder<bool>(
+              stream: _spinKitController.stream,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      snapshot.data!
+                          ? Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Container(
+                                margin: const EdgeInsets.all(10.0),
+                                child: SpinKitThreeBounce(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  size: 25.0,
+                                ),
+                              ),
+                            )
+                          : Container(),
+                    ],
+                  );
+                } else {
+                  return Container();
+                }
+              })
         ],
       ),
     );

@@ -24,7 +24,7 @@ class AIService {
   Future<List<double>> runGenAIEmbeddingTest(String textToEmbed) async {
     try {
       final HttpsCallable callable =
-          FirebaseFunctions.instance.httpsCallable('simpleGenAIEmbeddingTest');
+          FirebaseFunctions.instance.httpsCallable('textEmbedding');
 
       final result = await callable.call<Map<String, dynamic>>({
         'content': textToEmbed,

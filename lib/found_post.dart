@@ -29,7 +29,6 @@ class _FoundPostState extends State<FoundPost> {
   bool _agreeTerms = false;
   bool _isImageUploaded = true;
   bool _selectDate = true; // to select date or now in Radio button (true = now)
-  bool _isSpinKitLoaded = false;
   double _wholePadding = 10.0; // to set padding for all widgets
   String _title = 'Found Post';
   String _displayDate = "-"; //to store the selected date
@@ -77,6 +76,8 @@ class _FoundPostState extends State<FoundPost> {
   final TextEditingController _idTextController = TextEditingController();
   StreamController<String> _controller1 = StreamController<String>.broadcast();
   StreamController<String> _controller2 = StreamController<String>.broadcast();
+  StreamController<bool> _spinKitController =
+      StreamController<bool>.broadcast();
   final _formKey = GlobalKey<FormState>();
   final ImagePicker _picker = ImagePicker();
   final CompressFile _compressFile = CompressFile();
@@ -824,8 +825,8 @@ class _FoundPostState extends State<FoundPost> {
                                         colorScheme,
                                         true);
                                   } else {
-                                    _isSpinKitLoaded =
-                                        true; // show loading spinner
+                                    _spinKitController.sink.add(true);
+                                    true; // show loading spinner
                                     var textEmbedding = await getTextEmbedding(
                                         _foundTextController.text,
                                         _descriptionTextController.text);
@@ -881,7 +882,7 @@ class _FoundPostState extends State<FoundPost> {
                                           'Found item posted successfully',
                                           colorScheme,
                                           false);
-                                      _isSpinKitLoaded = false;
+                                      _spinKitController.sink.add(false);
                                       Navigator.pop(context);
                                     });
                                   }
@@ -889,7 +890,7 @@ class _FoundPostState extends State<FoundPost> {
                                   _showSnackBar('Please fill all fields',
                                       colorScheme, true);
                                 }
-                                _isSpinKitLoaded = false;
+                                _spinKitController.sink.add(false);
                               }
                             : null,
                         style: FilledButton.styleFrom(
@@ -915,18 +916,31 @@ class _FoundPostState extends State<FoundPost> {
             ],
           ),
         ),
-        _isSpinKitLoaded
-            ? Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                  margin: const EdgeInsets.only(top: 100.0),
-                  child: SpinKitThreeBounce(
-                    color: Theme.of(context).colorScheme.primary,
-                    size: 25.0,
-                  ),
-                ),
-              )
-            : Container(),
+        StreamBuilder<bool>(
+            stream: _spinKitController.stream,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    snapshot.data!
+                        ? Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Container(
+                              margin: const EdgeInsets.all(10.0),
+                              child: SpinKitThreeBounce(
+                                color: Theme.of(context).colorScheme.primary,
+                                size: 25.0,
+                              ),
+                            ),
+                          )
+                        : Container(),
+                  ],
+                );
+              } else {
+                return Container();
+              }
+            })
       ]),
     );
   }

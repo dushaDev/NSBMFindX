@@ -128,17 +128,18 @@ class _NotificationsState extends State<Notifications> {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: _getNotificationColor(notification.type, colorScheme),
+            color: _getNotificationColor(
+                notification.notificationType, colorScheme),
             shape: BoxShape.circle,
           ),
           child: Icon(
-            _getNotificationIcon(notification.type),
+            _getNotificationIcon(notification.notificationType),
             color: Colors.white,
             size: 20,
           ),
         ),
         title: Text(
-          notification.title,
+          notification.message,
           style: textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -152,14 +153,14 @@ class _NotificationsState extends State<Notifications> {
             ),
             const SizedBox(height: 4),
             Text(
-              _readDate.getDateStringToDisplay(notification.postedTime),
+              _readDate.getDateStringToDisplay(notification.timestamp),
               style: textTheme.bodySmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
           ],
         ),
-        trailing: !notification.isRead
+        trailing: !notification.read
             ? Container(
                 width: 8,
                 height: 8,
@@ -182,7 +183,7 @@ class _NotificationsState extends State<Notifications> {
 
   void _handleNotificationTap(NotificationM notification) {
     // Handle notification tap based on type
-    switch (notification.type) {
+    switch (notification.notificationType) {
       case 'new_user':
         // Navigate to user profile
         break;
