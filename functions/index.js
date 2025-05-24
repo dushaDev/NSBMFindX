@@ -344,9 +344,7 @@ exports.sendMatchNotification = functions.firestore.onDocumentCreated(
     // Create notification for the owner of Item 1
     if (!processedOwners.has(owner1Id)) {
       const notification1Ref = firestore.collection('users').doc(owner1Id).collection('notifications').doc();
-      const message1 = `A new match found for your ${item1Type === false ? 'lost' : 'found'} item
-       '${item1Doc.itemName || item1Id}' 
-      with a ${item2Type === false ? 'lost' : 'found'} item '${item2Doc.itemName || item2Id}'!`;
+      const message1 = `New match for your ${item1Type === false ? 'Lost' : 'Found'} item '${item1Doc.itemName || item1Id}' with ${item2Type === false ? 'Lost' : 'Found'} item '${item2Doc.itemName || item2Id}'!`;
 
       notificationsBatch.set(notification1Ref, {
         userId: owner1Id,

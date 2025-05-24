@@ -890,7 +890,8 @@ class FireStoreService {
           .get();
 
       return querySnapshot.docs.map((doc) {
-        return NotificationM.fromFirestore(doc.data() as Map<String, dynamic>,doc.id);
+        return NotificationM.fromFirestore(
+            doc.data() as Map<String, dynamic>, doc.id);
       }).toList();
     } catch (e) {
       print("Error fetching notifications: $e");
@@ -973,8 +974,7 @@ class FireStoreService {
       print("Error updating user restriction status: $e");
     }
   }
-  //____________________________________________________________________________________________
-
+  //____________________________________________________________________________
 
 // Methods to add a vectors to Firestore
 // this map contain {'0': textVector, '1': imageVector1, '2': imageVector2}

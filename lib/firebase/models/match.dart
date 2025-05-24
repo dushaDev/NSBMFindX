@@ -28,10 +28,11 @@ class Match {
     return Match(
       id: id, // The document ID passed separately
       item1Id: json['item1Id'],
-      item1Type: json['item1Type'] ,
+      item1Type: json['item1Type'],
       item2Id: json['item2Id'],
       item2Type: json['item2Type'],
-      similarityScore: (json['similarityScore'] as num).toDouble(), // Handle num to double conversion
+      similarityScore: (json['similarityScore'] as num)
+          .toDouble(), // Handle num to double conversion
       matchType: json['matchType'] as String,
       timestamp: json['timestamp'] as Timestamp, // Cast to Timestamp
       status: json['status'] as String,

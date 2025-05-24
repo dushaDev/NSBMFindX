@@ -1,8 +1,9 @@
+import 'package:find_x/firebase/auth_service.dart';
 import 'package:find_x/firebase/models/notification_m.dart';
 import 'package:find_x/res/font_profile.dart';
-import 'package:find_x/res/read_date.dart';
+import 'package:find_x/res/items/item_notification.dart';
 import 'package:flutter/material.dart';
-import 'package:find_x/firebase/fire_store_service.dart'; // Assume this exists
+import 'package:find_x/firebase/fire_store_service.dart';
 
 class Notifications extends StatefulWidget {
   const Notifications({super.key});
@@ -13,13 +14,39 @@ class Notifications extends StatefulWidget {
 
 class _NotificationsState extends State<Notifications> {
   final FireStoreService _firestoreService = FireStoreService();
-  final ReadDate _readDate = ReadDate();
+  final AuthService _authService = AuthService();
+
   late Future<List<NotificationM>> _notificationsFuture;
+  String? _currentUserId;
 
   @override
   void initState() {
     super.initState();
-    _notificationsFuture = _firestoreService.getNotificationsById('28232');
+
+    _notificationsFuture = _loadNotificationsForUser();
+  }
+
+  Future<List<NotificationM>> _loadNotificationsForUser() async {
+    try {
+      _currentUserId = await _authService.getUserId();
+      if (_currentUserId != null && _currentUserId!.isNotEmpty) {
+        print("Fetching notifications for user ID: $_currentUserId");
+        return await _firestoreService.getNotificationsById(_currentUserId!);
+      } else {
+        print("Warning: User ID is null or empty. Cannot fetch notifications.");
+        return [];
+      }
+    } catch (e) {
+      print("Error loading notifications: $e");
+
+      throw Exception("Failed to load notifications: $e");
+    }
+  }
+
+  Future<void> _refreshNotifications() async {
+    setState(() {
+      _notificationsFuture = _loadNotificationsForUser();
+    });
   }
 
   @override
@@ -40,12 +67,10 @@ class _NotificationsState extends State<Notifications> {
       body: FutureBuilder<List<NotificationM>>(
         future: _notificationsFuture,
         builder: (context, snapshot) {
-          // Handle loading state
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          // Handle error state
           if (snapshot.hasError) {
             return Center(
               child: Column(
@@ -53,7 +78,13 @@ class _NotificationsState extends State<Notifications> {
                 children: [
                   const Icon(Icons.error_outline, size: 48, color: Colors.red),
                   const SizedBox(height: 16),
-                  Text('Failed to load notifications'),
+                  Text('Failed to load notifications.',
+                      style: textTheme.bodyLarge
+                          ?.copyWith(color: colorScheme.error)),
+                  Text('${snapshot.error}',
+                      style: textTheme.bodySmall
+                          ?.copyWith(color: colorScheme.error.withAlpha(200))),
+                  const SizedBox(height: 16),
                   TextButton(
                     onPressed: _refreshNotifications,
                     child: const Text('Retry'),
@@ -63,7 +94,6 @@ class _NotificationsState extends State<Notifications> {
             );
           }
 
-          // Handle empty state
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(
               child: Column(
@@ -85,7 +115,6 @@ class _NotificationsState extends State<Notifications> {
             );
           }
 
-          // Build notifications list
           final notifications = snapshot.data!;
           return RefreshIndicator(
             onRefresh: _refreshNotifications,
@@ -94,10 +123,9 @@ class _NotificationsState extends State<Notifications> {
               itemCount: notifications.length,
               itemBuilder: (context, index) {
                 final notification = notifications[index];
-                return _buildNotificationCard(
-                  notification,
-                  colorScheme,
-                  textTheme,
+                return ItemNotification(
+                  notification: notification,
+                  colorScheme: colorScheme,
                 );
               },
             ),
@@ -105,119 +133,5 @@ class _NotificationsState extends State<Notifications> {
         },
       ),
     );
-  }
-
-  Widget _buildNotificationCard(
-    NotificationM notification,
-    ColorScheme colorScheme,
-    TextTheme textTheme,
-  ) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: colorScheme.outline.withAlpha(100),
-          width: 1,
-        ),
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(12),
-        leading: Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: _getNotificationColor(
-                notification.notificationType, colorScheme),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            _getNotificationIcon(notification.notificationType),
-            color: Colors.white,
-            size: 20,
-          ),
-        ),
-        title: Text(
-          notification.message,
-          style: textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              notification.message,
-              style: textTheme.bodyMedium,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              _readDate.getDateStringToDisplay(notification.timestamp),
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-        trailing: !notification.read
-            ? Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: colorScheme.primary,
-                  shape: BoxShape.circle,
-                ),
-              )
-            : null,
-        onTap: () => _handleNotificationTap(notification),
-      ),
-    );
-  }
-
-  Future<void> _refreshNotifications() async {
-    setState(() {
-      _notificationsFuture = _firestoreService.getNotificationsById('28232');
-    });
-  }
-
-  void _handleNotificationTap(NotificationM notification) {
-    // Handle notification tap based on type
-    switch (notification.notificationType) {
-      case 'new_user':
-        // Navigate to user profile
-        break;
-      case 'report':
-        // Navigate to reported item
-        break;
-      case 'system':
-        // Show system alert
-        break;
-    }
-  }
-
-  Color _getNotificationColor(String type, ColorScheme colorScheme) {
-    switch (type) {
-      case 'alert':
-        return colorScheme.error;
-      case 'warning':
-        return colorScheme.tertiary;
-      case 'info':
-      default:
-        return colorScheme.primary;
-    }
-  }
-
-  IconData _getNotificationIcon(String type) {
-    switch (type) {
-      case 'new_user':
-        return Icons.person_add;
-      case 'report':
-        return Icons.flag;
-      case 'system':
-        return Icons.settings;
-      default:
-        return Icons.notifications;
-    }
   }
 }
