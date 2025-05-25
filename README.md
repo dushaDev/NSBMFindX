@@ -14,7 +14,7 @@ Our goal is to create a more connected and supportive campus community by levera
 
 * **Report Lost Items:** Quickly and easily report lost items with essential details like category, detailed description, last known location, and date.
 * **Browse Found Items:** View a comprehensive list of items found and reported by other members of the NSBM community.
-* **Smart Matching (ML Integration):** Utilizes a Machine Learning model to intelligently match reported lost items with found items, significantly increasing the chances of recovery.
+* **Smart Matching (ML Integration):** Utilizes two Machine Learning models(Vision,Gemini) to intelligently match reported lost items with found items. The app employs Google's Vision AI and Gemini models to intelligently match items. They convert images and descriptions into vectors (numerical representations). By comparing these vectors, the system accurately finds highly similar lost and found items, significantly boosting recovery.
 * **Real-time Notifications:** Get instant alerts when a potential match for your lost or found item is detected.
 * **User Profiles:** Manage your reported items and notification preferences.
 
@@ -26,7 +26,6 @@ Here's a glimpse of NSBM FindX in action:
 Dark and light mode supported for a better user experience.
 
 **1. Home (Student)**
-*(Include a clear screenshot of your main item Browse screen)*
 <table>
   <tr>
     <td>
@@ -45,7 +44,6 @@ _Easily view recent updates about found and lost items._
 
 
 **1. Dashboard (Admin/Staff)**
-*(Include a clear screenshot of your main item Browse screen)*
 <table>
   <tr>
     <td>
@@ -63,7 +61,6 @@ _Easily view recent updates about found and lost items._
 _Easily view recent updates about found and lost items._
 
 **4. Item Details / Match View**
-*(Include a screenshot of an item's detail page, especially if it shows match info)*
 <table>
   <tr>
     <td>
@@ -87,13 +84,11 @@ _View details of items and potential matches._
 This project is a Flutter application. To get a copy up and running on your local machine for development and testing purposes, follow these steps.
 
 ### Prerequisites
-
 * Flutter SDK installed (version 3.x.x recommended)
 * Firebase CLI installed and configured
 * Node.js and npm (for Cloud Functions)
 
 ### Installation
-
 1.  **Clone the repository:**
     ```bash
     git clone [https://github.com/dushaDev/NSBMFindX.git](https://github.com/dushaDev/NSBMFindX.git)
@@ -104,20 +99,7 @@ This project is a Flutter application. To get a copy up and running on your loca
     ```bash
     flutter pub get
     ```
-
-### Model Setup
-
-The application relies on an integrated Machine Learning model for intelligent matching.
-
-1.  **Acquire the Model:**
-    * Download the `mobilenetv2.tflite` model file from [your provided drive link here, if applicable].
-    * *(Alternatively, if you've provided it directly)* Use the `mobilenetv2.tflite` file given to you.
-
-2.  **Place the Model:**
-    * Place the `mobilenetv2.tflite` file into the `assets/models/` directory of your project.
-
 ### Running the App
-
 1.  **Configure Firebase:**
     * Follow the official Firebase Flutter setup guide to connect your project to a Firebase project (iOS, Android, Web). This typically involves creating a `firebase_options.dart` file.
     * Deploy your Firebase Cloud Functions (if not already deployed).
@@ -125,17 +107,14 @@ The application relies on an integrated Machine Learning model for intelligent m
     ```bash
     flutter run
     ```
-
 ---
-
 ## 🤝 Contributing
-
 We welcome contributions! If you have suggestions for improvements or bug fixes, please feel free to:
 
 1.  Fork the repository.
-2.  Create your feature branch (`git checkout -b feature/AmazingFeature`).
-3.  Commit your changes (`git commit -m 'Add some AmazingFeature'`).
-4.  Push to the branch (`git push origin feature/AmazingFeature`).
+2.  Create your feature branch (`git checkout -b feature/your-branch`).
+3.  Commit your changes (`git commit -m 'Add some Features'`).
+4.  Push to the branch (`git push origin feature/your-branch`).
 5.  Open a Pull Request.
 
 ---
