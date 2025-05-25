@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'firebase/fire_base_msg_service.dart';
@@ -40,9 +41,14 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
@@ -76,7 +82,7 @@ class MyApp extends StatelessWidget {
             // User is signed in, load the home page after index page manage user's type (admin/student)
             return IndexPage();
           } else {
-            // User is not signed in, load the login page
+            // User is not signed in, load the login page true Splash screen
             return Login();
           }
         } else {
@@ -89,6 +95,19 @@ class MyApp extends StatelessWidget {
         }
       },
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initialization();
+  }
+
+  void initialization() async {
+    print('initializing..');
+    await Future.delayed(const Duration(seconds: 2));
+    FlutterNativeSplash.remove();
+    print('initialization complete');
   }
 }
 
