@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import 'bottom_nav/notifications.dart';
 import 'bottom_nav/posts.dart';
 import 'bottom_nav/search.dart';
-import 'login.dart';
 import 'navigation_provider.dart';
 import 'admin_bottom_nav/dashboard.dart';
 import 'user_bottom_navigation.dart';

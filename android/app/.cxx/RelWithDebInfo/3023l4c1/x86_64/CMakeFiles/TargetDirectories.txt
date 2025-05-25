@@ -1,2 +1,0 @@
-C:/Users/dusha/Documents/flutter/find_x/android/app/.cxx/RelWithDebInfo/3023l4c1/x86_64/CMakeFiles/edit_cache.dir
-C:/Users/dusha/Documents/flutter/find_x/android/app/.cxx/RelWithDebInfo/3023l4c1/x86_64/CMakeFiles/rebuild_cache.dir
