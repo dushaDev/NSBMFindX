@@ -5,7 +5,6 @@ import 'package:find_x/user_profile_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:find_x/firebase/fire_store_service.dart';
-
 import 'firebase/auth_service.dart';
 import 'firebase/models/user_m.dart';
 
@@ -357,8 +356,6 @@ class _PostDetailsState extends State<PostDetails> {
         ),
       ),
     );
-
-    return Container();
   }
 
   Future<bool?> _showDialog(BuildContext context) async {

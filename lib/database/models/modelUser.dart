@@ -5,7 +5,12 @@ class ModelUser {
   String user_email;
   String user_contact;
 
-  ModelUser({required this.user_id, required this.user_name, required this.user_display_name, required this.user_email, required this.user_contact});
+  ModelUser(
+      {required this.user_id,
+      required this.user_name,
+      required this.user_display_name,
+      required this.user_email,
+      required this.user_contact});
 
   // Convert a User object into a Map object
   Map<String, dynamic> toMap() {

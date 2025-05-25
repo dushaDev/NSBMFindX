@@ -18,9 +18,14 @@ class AdminBottomNavigation extends StatelessWidget {
         currentIndex: selectedIndex,
         onTap: onItemSelected,
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Theme.of(context).colorScheme.primary, // Selected item color
-        unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,// Unselected item color
-        backgroundColor:  Theme.of(context).colorScheme.surfaceContainerHigh, // Background color
+        selectedItemColor:
+            Theme.of(context).colorScheme.primary, // Selected item color
+        unselectedItemColor: Theme.of(context)
+            .colorScheme
+            .onSurfaceVariant, // Unselected item color
+        backgroundColor: Theme.of(context)
+            .colorScheme
+            .surfaceContainerHigh, // Background color
         iconSize: 32.0,
         selectedFontSize: 14.0,
         unselectedFontSize: 12.0,
@@ -31,7 +36,6 @@ class AdminBottomNavigation extends StatelessWidget {
             icon: Icon(Icons.dashboard_rounded),
             activeIcon: Icon(Icons.dashboard_rounded),
             label: 'Dashboard',
-
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.people_rounded),
@@ -49,11 +53,12 @@ class AdminBottomNavigation extends StatelessWidget {
             label: 'Search',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.notifications_rounded,),
+            icon: Icon(
+              Icons.notifications_rounded,
+            ),
             activeIcon: Icon(Icons.notifications_rounded),
             label: 'Notifications',
           ),
-
         ],
       ),
     );

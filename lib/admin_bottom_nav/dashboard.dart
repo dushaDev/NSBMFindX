@@ -210,7 +210,8 @@ class _DashboardState extends State<Dashboard> {
                             return Center(
                                 child: Text('error: ${snapshot.error}'));
                           } else if (snapshot.data!.isEmpty) {
-                            return _showEmptyCard('No data to show', colorScheme);
+                            return _showEmptyCard(
+                                'No data to show', colorScheme);
                           } else if (snapshot.hasData) {
                             int yAxisMax = 4;
                             Map<String, List<String>>? postedTimes =

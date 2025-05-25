@@ -33,21 +33,21 @@ class _ItemUserState extends State<ItemUser> {
             radius: 28,
             backgroundImage: AssetImage('assets/images/user.png'),
             backgroundColor: Colors.transparent,
-          )
-          ,
-    title: GestureDetector(
-      onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => UserProfileSettings(userId: widget.id, itemType: false),
-            ),
-          );
-        
-      },
-      child: Text(widget.name,
-                style: TextStyle(fontSize: FontProfile.medium,fontWeight: FontWeight.w600)),
-    ),
+          ),
+          title: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      UserProfileSettings(userId: widget.id, itemType: false),
+                ),
+              );
+            },
+            child: Text(widget.name,
+                style: TextStyle(
+                    fontSize: FontProfile.medium, fontWeight: FontWeight.w600)),
+          ),
           subtitle: Row(
             children: [
               Text(widget.role),
@@ -56,22 +56,21 @@ class _ItemUserState extends State<ItemUser> {
                 alignment: Alignment.center,
                 width: 60,
                 height: 18,
-                padding:
-                EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+                padding: EdgeInsets.symmetric(horizontal: 1, vertical: 1),
                 decoration: BoxDecoration(
                   color: widget.isRestricted
                       ? _getStatusColor('restricted')
                       : widget.isApproved
-                      ? _getStatusColor('approved')
-                      : _getStatusColor('pending'),
+                          ? _getStatusColor('approved')
+                          : _getStatusColor('pending'),
                   borderRadius: BorderRadius.circular(2),
                 ),
                 child: Text(
                   widget.isRestricted
                       ? 'restricted'
                       : widget.isApproved
-                      ? 'approved'
-                      : 'pending',
+                          ? 'approved'
+                          : 'pending',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12,

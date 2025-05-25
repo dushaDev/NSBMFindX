@@ -2,12 +2,12 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-
 class EmailService {
   static final String _emailjsServiceId = dotenv.env['EMAILJS_SERVICE_ID']!;
   static final String _emailjsTemplateId = dotenv.env['EMAILJS_TEMPLATE_ID']!;
   static final String _emailjsUserId = dotenv.env['EMAILJS_PUBLIC_KEY']!;
-  static const String _emailjsUrl = 'https://api.emailjs.com/api/v1.0/email/send';
+  static const String _emailjsUrl =
+      'https://api.emailjs.com/api/v1.0/email/send';
 
   static Future<void> sendRegistrationEmail({
     required String userEmail,
