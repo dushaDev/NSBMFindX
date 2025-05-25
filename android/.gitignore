@@ -12,3 +12,8 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
+
+# Android build artifacts and caches
+.cxx/
+app/.cxx/
+

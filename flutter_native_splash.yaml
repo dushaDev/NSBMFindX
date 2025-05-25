@@ -3,18 +3,18 @@ flutter_native_splash:
   ios: true
 
   color: "#ffffff"
-  image: assets/images/logo.png
+  image: assets/images/logo_splash.png
   branding: assets/images/logo_nsbm.png
 
   color_dark: "#282828"
-  image_dark: assets/images/logo.png
+  image_dark: assets/images/logo_splash.png
   branding_dark: assets/images/logo_nsbm.png
 
   android_12:
     color: "#ffffff"
-    image: assets/images/logo.png
+    image: assets/images/logo_splash.png
     branding: assets/images/logo_nsbm.png
 
     color_dark: "#282828"
-    image_dark: assets/images/logo.png
+    image_dark: assets/images/logo_splash.png
     branding_dark: assets/images/logo_nsbm.png
