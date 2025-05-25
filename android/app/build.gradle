@@ -30,6 +30,8 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders += [EMAILJS_PUBLIC_KEY: "${System.env.EMAILJS_PUBLIC_KEY}"]
+
     }
 
     buildTypes {

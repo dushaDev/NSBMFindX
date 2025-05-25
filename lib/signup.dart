@@ -1,5 +1,6 @@
+import 'dart:async';
 import 'package:find_x/login.dart';
-import 'package:find_x/read_date.dart';
+import 'package:find_x/res/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -24,22 +25,46 @@ class _SignupState extends State<Signup> {
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _contactNumberController =
       TextEditingController();
+  StreamController<List<String>> _degreeController =
+      StreamController<List<String>>.broadcast();
 
   final List<String> _faculties = [
-    'Faculty of Computing',
     'Faculty of Business',
+    'Faculty of Computing',
     'Faculty of Engineering'
   ];
   String? _selectedFaculty;
-  final List<String> _degrees = [
-    'BSc(Hons) in Computer Science',
-    'BSc(Hons) in Software Engineering',
-    'BSc(Hons) in Computer Networks',
-    'BSc(Hons) in Management Information Systems',
-    'BSc(Hons) in Data Science',
-    'BBA(Hons) in Business Administration',
-    'BEng(Hons) in Civil Engineering'
+
+  final List<String> _public_degrees = [
+    'Data Science',
+    'Computer Networks',
+    'Software Engineering',
+    'Management Information Systems'
+        'Business Analytics',
+    'Applied Economics',
+    'Accounting and Finance',
+    'Computer Engineering',
+    'Electrical and Electronic Engineering',
+    'Interior Design'
   ];
+
+  final List<String> _computing_degrees = [
+    'Data Science',
+    'Computer Networks',
+    'Software Engineering',
+    'Management Information Systems'
+  ];
+  final List<String> _management_degrees = [
+    'Business Analytics',
+    'Applied Economics',
+    'Accounting and Finance'
+  ];
+  final List<String> _engineering_degrees = [
+    'Computer Engineering',
+    'Electrical and Electronic Engineering',
+    'Interior Design'
+  ];
+
   String? _selectedDegree;
   bool _isSpinKitLoaded = false;
   final _formKey = GlobalKey<FormState>();
@@ -56,10 +81,6 @@ class _SignupState extends State<Signup> {
         backgroundColor: colorScheme.surface,
         title: Text(
           "Sign Up",
-          style: TextStyle(
-              color: colorScheme.onSurface,
-              fontSize: FontProfile.extraLarge,
-              fontWeight: FontWeight.normal),
         ),
         centerTitle: true,
       ),
@@ -129,6 +150,16 @@ class _SignupState extends State<Signup> {
                               setState(() {
                                 _selectedFaculty = value;
                               });
+                              if (_selectedFaculty == 'Faculty of Computing') {
+                                _degreeController.sink.add(_computing_degrees);
+                              } else if (_selectedFaculty ==
+                                  'Faculty of Business') {
+                                _degreeController.sink.add(_management_degrees);
+                              } else {
+                                _degreeController.sink
+                                    .add(_engineering_degrees);
+                              }
+                              _selectedDegree = null;
                             }),
                       ],
                     ),
@@ -136,21 +167,25 @@ class _SignupState extends State<Signup> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildText('Degree Program', colorScheme),
-                        _buildDropdown(
-                            _degrees,
-                            "Select Degree",
-                            _selectedDegree,
-                            (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Degree is required.';
-                              }
-                              return null;
-                            },
-                            colorScheme,
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedDegree = value;
-                              });
+                        StreamBuilder<List<String>>(
+                            stream: _degreeController.stream,
+                            builder: (context, snapshot) {
+                              return _buildDropdown(
+                                  snapshot.data ?? _public_degrees,
+                                  "Select Degree",
+                                  _selectedDegree,
+                                  (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Degree is required.';
+                                    }
+                                    return null;
+                                  },
+                                  colorScheme,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _selectedDegree = value;
+                                    });
+                                  });
                             }),
                       ],
                     ),
@@ -288,7 +323,8 @@ class _SignupState extends State<Signup> {
                                       _isSpinKitLoaded = false;
                                     });
                                     _showSnackBar(
-                                        'Email already in use.Try another one',true);
+                                        'Email already in use.Try another one',
+                                        true);
                                   } else {
                                     await firestoreService
                                         .registerStudent(
@@ -309,14 +345,15 @@ class _SignupState extends State<Signup> {
                                       });
                                       authService.signOut().whenComplete(() {
                                         _showSnackBar(
-                                            'Registration successfully. use Login',false);
+                                            'Registration successfully. use Login',
+                                            false);
                                         navigate(user);
                                       });
                                     });
                                   }
                                 });
                               } else {
-                                _showSnackBar('Verification failed',true);
+                                _showSnackBar('Verification failed', true);
                               }
                             },
                             style: FilledButton.styleFrom(
@@ -392,7 +429,7 @@ class _SignupState extends State<Signup> {
     if (user != null) {
       Navigator.of(context).pop();
     } else {
-      _showSnackBar('Something went wrong. Signup failed.',true);
+      _showSnackBar('Something went wrong. Signup failed.', true);
     }
   }
 

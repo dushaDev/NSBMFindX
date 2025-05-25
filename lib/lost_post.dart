@@ -1,14 +1,20 @@
+import 'dart:async';
+import 'dart:io';
 import 'package:find_x/firebase/fire_store_service.dart';
+import 'package:find_x/firebase/models/embeddings.dart';
 import 'package:find_x/firebase/models/lost_item.dart';
-import 'package:find_x/read_date.dart';
+import 'package:find_x/res/read_date.dart';
 import 'package:find_x/res/font_profile.dart';
 import 'package:find_x/res/utils.dart';
+import 'package:find_x/services/ai_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-
+import 'package:image_picker/image_picker.dart';
+import 'res/compress_file.dart';
 import 'firebase/auth_service.dart';
+import 'firebase/fire_base_storage.dart';
 
 class LostPost extends StatefulWidget {
   const LostPost({super.key});
@@ -20,8 +26,8 @@ class LostPost extends StatefulWidget {
 class _LostPostState extends State<LostPost> {
   bool _useOwnNumber = true;
   bool _agreeTerms = false;
+  bool _isImageUploaded = true;
   bool _selectDate = true;
-  bool _isSpinKitLoaded = false;
   double _wholePadding = 10.0;
   String _title = 'Lost Post';
   String _displayDate = "-";
@@ -30,18 +36,33 @@ class _LostPostState extends State<LostPost> {
   String _lostTime = "-";
   String _amPm = '';
   String _contactNumber = '';
+  List<File> _images = [];
+  List<String> _imgUrls = ['', ''];
+
+  List<List<double>> _imageEmbeddings = [[], []];
   int _hour24 = 0;
   int _minute = 0;
+  double _uploadProgress1 = 0.0;
+  double _uploadProgress2 = 0.0;
   late Future<DateTime?> _selectedDate;
   late Future<TimeOfDay?> _selectedTime;
-  FireStoreService _fireStoreService = FireStoreService();
-  AuthService _authService = AuthService();
+  final FireStoreService _fireStoreService = FireStoreService();
+  final FireBaseStorage _storageService = FireBaseStorage();
+  final AuthService _authService = AuthService();
+  final AIService _aiService = AIService();
+
   final TextEditingController _lostTextController = TextEditingController();
   final TextEditingController _descriptionTextController =
       TextEditingController();
   final TextEditingController _locationTextController = TextEditingController();
   final TextEditingController _contactTextController = TextEditingController();
+  StreamController<String> _controller1 = StreamController<String>.broadcast();
+  StreamController<String> _controller2 = StreamController<String>.broadcast();
+  StreamController<bool> _spinKitController =
+      StreamController<bool>.broadcast();
   final _formKey = GlobalKey<FormState>();
+  final ImagePicker _picker = ImagePicker();
+  final CompressFile _compressFile = CompressFile();
 
   @override
   Widget build(BuildContext context) {
@@ -313,39 +334,124 @@ class _LostPostState extends State<LostPost> {
                       Padding(
                         padding: const EdgeInsets.only(left: 20.0),
                         child: Text(
-                          "Upload maximum 20MB images",
+                          "Upload maximum 10MB images",
                           style: TextStyle(color: colorScheme.onSurfaceVariant),
                         ),
                       ),
                       SizedBox(height: 10),
                       Row(
                         children: [
-                          Container(
-                            height: 70,
-                            width: 100,
-                            decoration: BoxDecoration(
-                              color: colorScheme.surfaceContainer,
-                            ),
-                            child: Icon(Icons.add,
-                                size: 32,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurface
-                                    .withAlpha(60)),
+                          GestureDetector(
+                            onTap: () async {
+                              String imgUrl =
+                                  await _pickAndUploadImage(_controller1, 1);
+                              if (imgUrl != '') {
+                                _imgUrls[0] = imgUrl;
+                                _controller1.sink.add(imgUrl);
+                                _imageEmbeddings[0] =
+                                    await getImageEmbedding(imgUrl);
+                              } else {
+                                _isImageUploaded = true;
+                                _showSnackBar(
+                                    'Image not selected', colorScheme, true);
+                              }
+                            },
+                            child: StreamBuilder(
+                                stream: _controller1.stream,
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    return Container(
+                                      height: 70,
+                                      width: 100,
+                                      decoration: BoxDecoration(
+                                        color: colorScheme.surfaceContainer,
+                                      ),
+                                      child: Stack(children: [
+                                        Image.file(_images[0]),
+                                        Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            LinearProgressIndicator(
+                                              value: _uploadProgress1,
+                                            ),
+                                          ],
+                                        )
+                                      ]),
+                                    );
+                                  } else {
+                                    return Container(
+                                      height: 70,
+                                      width: 100,
+                                      decoration: BoxDecoration(
+                                        color: colorScheme.surfaceContainer,
+                                      ),
+                                      child: Icon(Icons.add,
+                                          size: 32,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withAlpha(60)),
+                                    );
+                                  }
+                                }),
                           ),
                           SizedBox(width: 10),
-                          Container(
-                            height: 70,
-                            width: 100,
-                            decoration: BoxDecoration(
-                              color: colorScheme.surfaceContainer,
-                            ),
-                            child: Icon(Icons.add,
-                                size: 32,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurface
-                                    .withAlpha(60)),
+                          GestureDetector(
+                            onTap: () async {
+                              String imgUrl =
+                                  await _pickAndUploadImage(_controller2, 2);
+                              if (imgUrl != '') {
+                                _imgUrls[1] = imgUrl;
+                                _controller2.sink.add(imgUrl);
+                                await _aiService.analyzeImageWithVision(imgUrl);
+                                _imageEmbeddings
+                                    .add(await getImageEmbedding(imgUrl));
+                              } else {
+                                _isImageUploaded = true;
+                                _showSnackBar(
+                                    'Image not selected', colorScheme, true);
+                              }
+                            },
+                            child: StreamBuilder(
+                                stream: _controller2.stream,
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    return Container(
+                                      height: 70,
+                                      width: 100,
+                                      decoration: BoxDecoration(
+                                        color: colorScheme.surfaceContainer,
+                                      ),
+                                      child: Stack(children: [
+                                        Image.file(_images[1]),
+                                        Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            LinearProgressIndicator(
+                                              value: _uploadProgress2,
+                                            ),
+                                          ],
+                                        )
+                                      ]),
+                                    );
+                                  } else {
+                                    return Container(
+                                      height: 70,
+                                      width: 100,
+                                      decoration: BoxDecoration(
+                                        color: colorScheme.surfaceContainer,
+                                      ),
+                                      child: Icon(Icons.add,
+                                          size: 32,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withAlpha(60)),
+                                    );
+                                  }
+                                }),
                           ),
                         ],
                       ),
@@ -376,11 +482,14 @@ class _LostPostState extends State<LostPost> {
                         onTap: _agreeTerms
                             ? null
                             : () {
-                                _showSnackBar(
-                                    'Agree to T&C', colorScheme, true);
+                                _isImageUploaded
+                                    ? _showSnackBar(
+                                        'Agree to T&C', colorScheme, true)
+                                    : _showSnackBar('Images Uploading..',
+                                        colorScheme, true);
                               },
                         child: FilledButton(
-                          onPressed: _agreeTerms
+                          onPressed: _agreeTerms && _isImageUploaded
                               ? () async {
                                   if (_formKey.currentState!.validate()) {
                                     if (_displayDate == '-' && !_selectDate ||
@@ -391,8 +500,11 @@ class _LostPostState extends State<LostPost> {
                                           colorScheme,
                                           true);
                                     } else {
-                                      _isSpinKitLoaded =
-                                          true; // show loading spinner
+                                      _spinKitController.sink.add(true);
+                                      var textEmbedding =
+                                          await getTextEmbedding(
+                                              _lostTextController.text,
+                                              _descriptionTextController.text);
                                       String? userId =
                                           await _authService.getUserId();
                                       _selectDate
@@ -400,33 +512,41 @@ class _LostPostState extends State<LostPost> {
                                           : _lostTime = '$_date$_displayTime';
 
                                       await _fireStoreService
-                                          .addLostItem(LostItem(
-                                              id: userId!,
-                                              itemName:
-                                                  _lostTextController.text,
-                                              type: false,
-                                              lostTime: _lostTime,
-                                              postedTime:
-                                                  ReadDate().getDateNow(),
-                                              lastKnownLocation:
-                                                  _locationTextController.text,
-                                              contactNumber: _useOwnNumber
-                                                  ? _contactNumber
-                                                  : _contactTextController.text,
-                                              description:
-                                                  _descriptionTextController
-                                                      .text,
-                                              images: [
-                                                'path/to/image1.jpg',
-                                                'path/to/image2.jpg'
-                                              ],
-                                              agreedToTerms: _agreeTerms,
-                                              userId: userId,
-                                              isCompleted: false))
+                                          .addLostItem(
+                                        LostItem(
+                                          id: userId!,
+                                          itemName: _lostTextController.text,
+                                          itemName_lc: _lostTextController.text
+                                              .toLowerCase(),
+                                          type: false,
+                                          lostTime: _lostTime,
+                                          postedTime: ReadDate().getDateNow(),
+                                          lastKnownLocation:
+                                              _locationTextController.text,
+                                          contactNumber: _useOwnNumber
+                                              ? _contactNumber
+                                              : _contactTextController.text,
+                                          description:
+                                              _descriptionTextController.text,
+                                          images: _imgUrls,
+                                          agreedToTerms: _agreeTerms,
+                                          userId: userId,
+                                          isCompleted: false,
+                                        ),
+                                        Embeddings(
+                                            type: false,
+                                            textEmbedding: textEmbedding,
+                                            imageEmbedding1:
+                                                _imageEmbeddings[0],
+                                            imageEmbedding2:
+                                                _imageEmbeddings[1]),
+                                      )
                                           .whenComplete(() {
-                                        _showSnackBar('Lost item posted successfully',
-                                            colorScheme, false);
-                                        _isSpinKitLoaded = false;
+                                        _showSnackBar(
+                                            'Lost item posted successfully',
+                                            colorScheme,
+                                            false);
+                                        _spinKitController.sink.add(false);
                                         Navigator.pop(context);
                                       });
                                     }
@@ -434,6 +554,7 @@ class _LostPostState extends State<LostPost> {
                                     _showSnackBar('Please fill all fields',
                                         colorScheme, true);
                                   }
+                                  _spinKitController.sink.add(false);
                                 }
                               : null,
                           style: FilledButton.styleFrom(
@@ -462,18 +583,31 @@ class _LostPostState extends State<LostPost> {
               ],
             ),
           ),
-          _isSpinKitLoaded
-              ? Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    margin: const EdgeInsets.only(top: 100.0),
-                    child: SpinKitThreeBounce(
-                      color: Theme.of(context).colorScheme.primary,
-                      size: 25.0,
-                    ),
-                  ),
-                )
-              : Container(),
+          StreamBuilder<bool>(
+              stream: _spinKitController.stream,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      snapshot.data!
+                          ? Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Container(
+                                margin: const EdgeInsets.all(10.0),
+                                child: SpinKitThreeBounce(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  size: 25.0,
+                                ),
+                              ),
+                            )
+                          : Container(),
+                    ],
+                  );
+                } else {
+                  return Container();
+                }
+              })
         ],
       ),
     );
@@ -695,5 +829,82 @@ class _LostPostState extends State<LostPost> {
       backgroundColor: isError ? _colorScheme.secondary : _colorScheme.primary,
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  Future<String> _pickAndUploadImage(
+      StreamController<String> controller, int progressVersion) async {
+    _isImageUploaded = false;
+    try {
+      // 1. Pick an image
+      final XFile? pickedFile =
+          await _picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile == null) {
+        return '';
+      }
+
+      // 2. Compress the image
+      File imageFile = File(pickedFile.path);
+      File compressedFile = await _compressFile.compressImage(imageFile, 700);
+      _images.add(compressedFile);
+
+      // 3. Update UI immediately with empty string (shows loading state)
+      controller.sink.add('');
+
+      // 4. Get user ID and upload
+      String? userId = await _authService.getUserId();
+      if (userId == null) throw Exception('User not authenticated');
+
+      // 5. Upload with progress (using your FirebaseStorage class)
+      Map<String, String> imageData = await _storageService.uploadImage(
+        compressedFile,
+        userId,
+        (double progress) {
+          // Optional: Send progress updates to stream
+          if (progressVersion == 1) {
+            _uploadProgress1 = progress;
+          } else {
+            _uploadProgress2 = progress;
+          }
+          controller.sink.add('');
+        },
+      );
+      // 6. Send final URL to stream
+      _isImageUploaded = true;
+      controller.sink.add(imageData['url']!);
+      _imgUrls[progressVersion - 1] = imageData['url']!;
+      return imageData['url']!;
+    } catch (e) {
+      // 7. Handle errors
+      controller.sink.addError('Error: ${e.toString()}');
+      rethrow;
+    }
+  }
+
+  String _getImageDataToSingleParameter(Map<String, dynamic> imageTexts) {
+    return "labels:${imageTexts['labels'].toString()}, objects:${imageTexts['objects'].toString()},fullText:${imageTexts['fullText']}";
+  }
+
+  String _getTextDataToSingleParameter(String heading, String description) {
+    return "heading:$heading,description:$description";
+  }
+
+  Future<List<double>> getImageEmbedding(String url) async {
+    if (url.isEmpty || url == '') {
+      return [];
+    }
+    var textToEmbed = await _aiService.analyzeImageWithVision(url);
+
+    List<double> embedded = await _aiService
+        .runGenAIEmbeddingTest(_getImageDataToSingleParameter(textToEmbed));
+
+    return embedded;
+  }
+
+  Future<List<double>> getTextEmbedding(
+      String heading, String description) async {
+    var embedded = await _aiService.runGenAIEmbeddingTest(
+        _getTextDataToSingleParameter(heading, description));
+
+    return embedded;
   }
 }

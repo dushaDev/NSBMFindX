@@ -127,7 +127,7 @@ class LostFoundWeek extends StatelessWidget {
                     spots: lostItemsData,
                     isCurved: true,
                     color: lostItemsColor,
-                    barWidth: 3,
+                    barWidth: 2,
                     isStrokeCapRound: true,
                     dotData: FlDotData(show: false),
                     belowBarData: BarAreaData(show: false),

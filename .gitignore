@@ -1,7 +1,12 @@
 #my added
 .env
+functions/.env
+
 android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
+
+# Exclude TFLite models
+assets/models/*.tflite
 
 # Miscellaneous
 *.class
@@ -48,3 +53,28 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Flutter-specific ignores (usually already present)
+.fvm/
+build/
+ios/Podfile.lock
+android/.gradle
+android/build
+android/app/build
+linux/build/
+macos/build/
+web/build/
+
+# Firebase-specific ignores
+**/functions/node_modules
+**/functions/.dart_tool
+**/functions/.gradle
+**/functions/build
+.firebaserc # Stores local project associations (usually safe to commit, but personal preference)
+
+# Consider ignoring firebase.json ONLY if you have very specific reasons
+# firebase.json
+
+# Keep your rules files tracked!
+# firestore.rules
+# storage.rules

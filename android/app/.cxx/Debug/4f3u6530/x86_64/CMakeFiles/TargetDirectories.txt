@@ -1,0 +1,2 @@
+/Users/halvitikankanamgegihan/Desktop/NSBMFindX/android/app/.cxx/Debug/4f3u6530/x86_64/CMakeFiles/edit_cache.dir
+/Users/halvitikankanamgegihan/Desktop/NSBMFindX/android/app/.cxx/Debug/4f3u6530/x86_64/CMakeFiles/rebuild_cache.dir

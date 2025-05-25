@@ -1,15 +1,16 @@
-import 'package:find_x/admin_bottom_nav/admin_notifications.dart';
-import 'package:find_x/admin_bottom_nav/admin_search.dart';
-import 'package:find_x/admin_bottom_nav/posts.dart';
 import 'package:find_x/admin_bottom_nav/users.dart';
 import 'package:find_x/admin_bottom_navigation.dart';
-import 'package:find_x/bottom_nav/notifications.dart';
 import 'package:find_x/firebase/auth_service.dart';
+import 'package:find_x/user_bottom_nav/home.dart';
 import 'package:flutter/material.dart';
-import 'admin_bottom_nav/dashboard.dart';
+import 'package:provider/provider.dart';
+import 'bottom_nav/notifications.dart';
+import 'bottom_nav/posts.dart';
 import 'bottom_nav/search.dart';
-import 'bottom_nav/home.dart';
-import 'bottom_navigation.dart';
+import 'login.dart';
+import 'navigation_provider.dart';
+import 'admin_bottom_nav/dashboard.dart';
+import 'user_bottom_navigation.dart';
 
 class IndexPage extends StatefulWidget {
   const IndexPage({super.key});
@@ -19,20 +20,31 @@ class IndexPage extends StatefulWidget {
 }
 
 class _IndexPageState extends State<IndexPage> {
-  int _selectedIndex = 0;
-  final _tabs = [const Home(), const Search(), const Notifications()];
+  // int _selectedIndex = 0;
+  final _tabs = [
+    const Home(),
+    const Posts(),
+    const Search(),
+    const Notifications()
+  ];
   Future<String?> _userRole = Future.value('student');
   final _admin_tabs = [
     Dashboard(),
     Users(),
     Posts(),
-    AdminSearch(),
-    AdminNotifications()
+    Search(),
+    Notifications()
   ];
   AuthService _authService = AuthService();
   @override
   Widget build(BuildContext context) {
     _authService.getSignedUser();
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    // provider for manage navigation
+    // this provider use for manage pages customly when click button on any page.
+    // only uses for admin yet.
+    final navProvider = Provider.of<NavigationProvider>(context);
 
     return Scaffold(
         resizeToAvoidBottomInset: false,
@@ -44,45 +56,85 @@ class _IndexPageState extends State<IndexPage> {
                 child: CircularProgressIndicator(),
               );
             } else if (snapshot.hasError) {
-              return const Center(
-                child: Text('An error occurred'),
+              return Center(
+                child: Text('An error occurred',
+                    style: TextStyle(color: colorScheme.onSurface)),
               );
             } else if (snapshot.data == null) {
-              return const Center(
-                child: Text('User not signed in'),
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('User not signed in or User not found',
+                        style: TextStyle(color: colorScheme.onSurface)),
+                    const SizedBox(height: 20),
+                    OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                            foregroundColor: colorScheme.onPrimary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 24)),
+                        onPressed: () async {
+                          _authService.signOut().whenComplete(() {
+                            setState(() {});
+                          });
+                        },
+                        child: Text(' Try Cleaning Cache and Login Again')),
+                  ],
+                ),
               );
             } else if (snapshot.data == 'admin' || snapshot.data == 'staff') {
               return Stack(children: [
-                _admin_tabs[_selectedIndex],
+                //navProvider used for manage pages customly when click button on any page.
+                _admin_tabs[navProvider.currentIndex],
                 Align(
                     alignment: Alignment.bottomCenter,
                     child: AdminBottomNavigation(
-                      selectedIndex: _selectedIndex,
-                      onItemSelected: (int index) {
-                        setState(() {
-                          _selectedIndex = index;
-                        });
-                      },
+                      selectedIndex: navProvider.currentIndex,
+                      onItemSelected: (index) => navProvider.navigateTo(index,
+                          data:
+                              'All'), //true use for indicate if the navigation is from another page.
+                      //that 'All' used for display data on Users page.
                     )),
               ]);
             } else if (snapshot.data == 'student') {
               return Stack(children: [
-                _tabs[_selectedIndex],
+                _tabs[navProvider.currentIndex],
                 Align(
                   alignment: Alignment.bottomCenter,
-                  child: BottomNavigation(
-                    selectedIndex: _selectedIndex,
-                    onItemSelected: (int index) {
-                      setState(() {
-                        _selectedIndex = index;
-                      });
-                    },
+                  child: UserBottomNavigation(
+                    selectedIndex: navProvider.currentIndex,
+                    onItemSelected: (index) =>
+                        navProvider.navigateTo(index, data: 'All'),
                   ),
                 ),
               ]);
             } else {
-              return const Center(
-                child: Text('User role not recognized'),
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('User role not recognized',
+                        style: TextStyle(color: colorScheme.onSurface)),
+                    const SizedBox(height: 20),
+                    OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                            foregroundColor: colorScheme.onPrimary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 24)),
+                        onPressed: () async {
+                          _authService.signOut().whenComplete(() {
+                            setState(() {});
+                          });
+                        },
+                        child: Text(' Try Cleaning Cache and Login Again')),
+                  ],
+                ),
               );
             }
           },
