@@ -1,4 +1,3 @@
-import 'package:find_x/firebase/fire_store_service.dart';
 import 'package:flutter/material.dart';
 import 'package:find_x/res/font_profile.dart';
 import 'package:find_x/firebase/models/notification_m.dart';
@@ -33,7 +32,9 @@ class ItemNotification extends StatelessWidget {
     ReadDate _readDate = ReadDate();
 
     return Container(
-      color: notification.read? colorScheme.surface: colorScheme.onSurfaceVariant.withAlpha(8),
+      color: notification.read
+          ? colorScheme.surface
+          : colorScheme.onSurfaceVariant.withAlpha(8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -77,8 +78,9 @@ class ItemNotification extends StatelessWidget {
                   Text(
                     '${notification.message}',
                     style: TextStyle(
-                        fontSize: FontProfile.small,
-                        color: colorScheme.onSurfaceVariant,),
+                      fontSize: FontProfile.small,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                     maxLines: 3,
                   ),
                   const SizedBox(height: 8),
@@ -98,9 +100,7 @@ class ItemNotification extends StatelessWidget {
                           borderRadius: BorderRadius.circular(2),
                         ),
                         child: Text(
-                          notification.targetItemType
-                              ? 'found'
-                              : 'lost',
+                          notification.targetItemType ? 'found' : 'lost',
                           style: TextStyle(
                             color: colorScheme.onPrimary,
                             fontSize: FontProfile.extraSmall,

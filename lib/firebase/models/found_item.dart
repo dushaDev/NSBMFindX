@@ -36,7 +36,7 @@ class FoundItem {
     this.restrictedDegreeProgramId,
     this.privateUserId,
     required this.isCompleted,
-    this.reference='',
+    this.reference = '',
   });
 
   // Factory method to create a FoundItem instance from a Firestore document

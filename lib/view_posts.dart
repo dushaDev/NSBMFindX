@@ -1,13 +1,10 @@
 import 'package:find_x/firebase/models/found_item.dart';
 import 'package:find_x/firebase/models/lost_item.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
 import '../firebase/fire_store_service.dart';
 import '../firebase/models/lost_found_unified.dart';
 import '../res/items/build_shimmer_loading.dart';
 import '../res/items/item_post.dart';
-import '../navigation_provider.dart';
 
 class ViewPosts extends StatefulWidget {
   final String userId; // Replace with actual user ID

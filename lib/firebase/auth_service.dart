@@ -50,6 +50,7 @@ class AuthService {
       return null;
     }
   }
+
   // returns the user name of the signed in user
   Future<String?> getUserContact() async {
     User? user = await getSignedUser();

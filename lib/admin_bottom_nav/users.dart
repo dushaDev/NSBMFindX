@@ -52,7 +52,7 @@ class _UsersState extends State<Users> {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          setState((){});
+          setState(() {});
         },
         child: Column(
           children: [
@@ -161,7 +161,10 @@ class _UsersState extends State<Users> {
               ),
             );
           },
-          child: Icon(Icons.add,color: colorScheme.onSurface,),
+          child: Icon(
+            Icons.add,
+            color: colorScheme.onSurface,
+          ),
         ),
       ),
     );

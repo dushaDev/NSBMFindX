@@ -234,47 +234,56 @@ class _UserProfileSettingsState extends State<UserProfileSettings> {
                                                         .setUserRestriction(
                                                             mUser.id, false);
                                                     mUser.isRestricted = false;
-                                                    _badgeController.sink.add(true);
-                                                    _buttonController.sink.add(true);
+                                                    _badgeController.sink
+                                                        .add(true);
+                                                    _buttonController.sink
+                                                        .add(true);
                                                   } else {
                                                     _fireStoreService
                                                         .setUserRestriction(
                                                             mUser.id, true);
-                                                   mUser.isRestricted = true;
-                                                    _badgeController.sink.add(true);
-                                                    _buttonController.sink.add(true);
+                                                    mUser.isRestricted = true;
+                                                    _badgeController.sink
+                                                        .add(true);
+                                                    _buttonController.sink
+                                                        .add(true);
                                                   }
                                                 },
                                                 child: StreamBuilder(
-                                                  stream: _buttonController.stream,
-                                                  builder: (context, snapshot) {
-                                                    return Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment.center,
-                                                      children: [
-                                                        Icon(
-                                                          Icons
-                                                              .admin_panel_settings,
-                                                          color:
-                                                              _colorScheme.primary,
-                                                          size:
-                                                              20, // Adjust size to match your design
-                                                        ),
-                                                        const SizedBox(width: 8),
-                                                        Text(
-                                                          userRole == 'admin' &&
-                                                                  mUser.isRestricted
-                                                              ? 'Unrestrict'
-                                                              : 'Restrict',
-                                                          style: TextStyle(
+                                                    stream: _buttonController
+                                                        .stream,
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      return Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Icon(
+                                                            Icons
+                                                                .admin_panel_settings,
                                                             color: _colorScheme
                                                                 .primary,
+                                                            size:
+                                                                20, // Adjust size to match your design
                                                           ),
-                                                        ),
-                                                      ],
-                                                    );
-                                                  }
-                                                ),
+                                                          const SizedBox(
+                                                              width: 8),
+                                                          Text(
+                                                            userRole == 'admin' &&
+                                                                    mUser
+                                                                        .isRestricted
+                                                                ? 'Unrestrict'
+                                                                : 'Restrict',
+                                                            style: TextStyle(
+                                                              color:
+                                                                  _colorScheme
+                                                                      .primary,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      );
+                                                    }),
                                                 style: OutlinedButton.styleFrom(
                                                   padding: const EdgeInsets
                                                       .symmetric(
@@ -306,40 +315,45 @@ class _UserProfileSettingsState extends State<UserProfileSettings> {
                                                         mUser.isApproved = true;
                                                         _badgeController.sink
                                                             .add(true);
-                                                        _buttonController.sink.add(true);
+                                                        _buttonController.sink
+                                                            .add(true);
                                                       } else {
                                                         null;
                                                       }
                                                     },
                                                     child: StreamBuilder(
-                                                      stream: _buttonController.stream,
-                                                      builder: (context, snapshot) {
-                                                        return Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Icon(
-                                                              Icons
-                                                                  .admin_panel_settings,
-                                                              color: _colorScheme
-                                                                  .primary,
-                                                              size:
-                                                                  20, // Adjust size to match your design
-                                                            ),
-                                                            const SizedBox(
-                                                                width: 8),
-                                                            Text(
-                                                              'Approve User',
-                                                              style: TextStyle(
-                                                                color: _colorScheme
-                                                                    .primary,
+                                                        stream:
+                                                            _buttonController
+                                                                .stream,
+                                                        builder: (context,
+                                                            snapshot) {
+                                                          return Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Icon(
+                                                                Icons
+                                                                    .admin_panel_settings,
+                                                                color:
+                                                                    _colorScheme
+                                                                        .primary,
+                                                                size:
+                                                                    20, // Adjust size to match your design
                                                               ),
-                                                            ),
-                                                          ],
-                                                        );
-                                                      }
-                                                    ),
+                                                              const SizedBox(
+                                                                  width: 8),
+                                                              Text(
+                                                                'Approve User',
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: _colorScheme
+                                                                      .primary,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          );
+                                                        }),
                                                     style: OutlinedButton
                                                         .styleFrom(
                                                       padding: const EdgeInsets

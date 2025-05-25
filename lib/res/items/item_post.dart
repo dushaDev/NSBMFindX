@@ -1,7 +1,6 @@
 import 'package:find_x/firebase/models/lost_found_unified.dart';
 import 'package:find_x/res/font_profile.dart';
 import 'package:flutter/material.dart';
-
 import '../../post_details.dart';
 import '../read_date.dart';
 
@@ -101,7 +100,7 @@ class ItemPost extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'by ${item.userName ?? 'Anonymous'}',
+                      'by ${item.userName}',
                       style: TextStyle(
                         color: colorScheme.onSurfaceVariant,
                         fontSize: FontProfile.extraSmall,

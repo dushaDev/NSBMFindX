@@ -1,11 +1,7 @@
-import 'dart:io';
-
 import 'package:find_x/res/color_profile.dart';
-import 'package:find_x/firebase/use_fire_base_emulator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';

@@ -38,7 +38,8 @@ class FirebaseMsgService {
       print('Message data: ${message.data}');
 
       if (message.notification != null) {
-        print('Message also contained a notification: ${message.notification!.title} / ${message.notification!.body}');
+        print(
+            'Message also contained a notification: ${message.notification!.title} / ${message.notification!.body}');
         // Display a local notification (e.g., using flutter_local_notifications)
         // or update UI
       }
@@ -55,7 +56,8 @@ class FirebaseMsgService {
     // Handle initial message when app is launched from terminated state
     _firebaseMessaging.getInitialMessage().then((RemoteMessage? message) {
       if (message != null) {
-        print('App launched from terminated state with message: ${message.data}');
+        print(
+            'App launched from terminated state with message: ${message.data}');
         _handleMessageData(message.data);
       }
     });
@@ -64,7 +66,12 @@ class FirebaseMsgService {
   // Saves the FCM token to a subcollection under the user's document
   Future<void> _saveTokenToFirestore(String userId, String token) async {
     try {
-      await _firestore.collection('users').doc(userId).collection('deviceTokens').doc(token).set({
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('deviceTokens')
+          .doc(token)
+          .set({
         'token': token,
         'createdAt': FieldValue.serverTimestamp(),
       });

@@ -71,6 +71,7 @@ class DatabaseHelper {
     }
     return null;
   }
+
   // Retrieve a user by email
   Future<ModelUser?> getUserByEmail(String email) async {
     final db = await instance.database;
@@ -90,7 +91,8 @@ class DatabaseHelper {
   // Check if the users table is empty
   Future<bool> isUsersTableEmpty() async {
     final db = await instance.database;
-    final count = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM users'));
+    final count =
+        Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM users'));
     return count == 0;
   }
 
@@ -106,4 +108,3 @@ class DatabaseHelper {
     db.close();
   }
 }
-

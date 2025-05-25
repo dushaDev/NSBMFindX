@@ -29,5 +29,4 @@ Future<void> useFirebaseEmulator() async {
 
   // Connect to Cloud Functions emulator
   FirebaseFunctions.instance.useFunctionsEmulator(host, 5001);
-
 }
