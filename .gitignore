@@ -54,6 +54,15 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Android build artifacts and caches
+android/.gradle/
+android/.cxx/
+android/app/build/
+android/app/.cxx/
+android/app/src/main/assets/flutter_assets/
+android/app/intermediates/
+android/app/generated/
+
 # Flutter-specific ignores (usually already present)
 .fvm/
 build/
