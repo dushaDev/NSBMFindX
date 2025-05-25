@@ -15,7 +15,8 @@ Our goal is to create a more connected and supportive campus community by levera
 * **Report Lost Items:** Quickly and easily report lost items with essential details like category, detailed description, last known location, and date.
 * **Browse Found Items:** View a comprehensive list of items found and reported by other members of the NSBM community.
 * **Smart Matching (ML Integration):** Utilizes two Machine Learning models(Vision,Gemini) to intelligently match reported lost items with found items. 
-* The app employs Google's Vision AI and Gemini models to intelligently match items. They convert images and descriptions into vectors (numerical representations). By comparing these vectors, the system accurately finds highly similar lost and found items, significantly boosting recovery.
+The app employs Google's Vision AI and Gemini models to intelligently match items. They convert images and descriptions into vectors (numerical representations). 
+By comparing these vectors, the system accurately finds highly similar lost and found items, significantly boosting recovery.
 * **Real-time Notifications:** Get instant alerts when a potential match for your lost or found item is detected.
 * **User Profiles:** Manage your reported items and notification preferences.
 
