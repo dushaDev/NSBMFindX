@@ -2,6 +2,17 @@
 
 ---
 
+## Table of Contents
+* [About NSBM FindX](#-about-nsbm-findx)
+* [Features](#-features)
+* [Technologies Used](#-technologies-used)
+* [Screenshots](#-screenshots)
+* [Getting Started](#-getting-started)
+* [Contributing](#-contributing)
+* [Contact](#-contact)
+
+---
+
 ## 🎯 About NSBM FindX
 
 NSBM FindX is a mobile application specifically designed to help **students and staff at NSBM Green University** easily report and find lost items within the campus. Whether you've misplaced your keys, phone, or other personal belongings, NSBM FindX is here to streamline the process of reuniting you with your lost items.
@@ -12,13 +23,20 @@ Our goal is to create a more connected and supportive campus community by levera
 
 ## ✨ Features
 
-* **Report Lost Items:** Quickly and easily report lost items with essential details like category, detailed description, last known location, and date.
-* **Browse Found Items:** View a comprehensive list of items found and reported by other members of the NSBM community.
-* **Smart Matching (ML Integration):** Utilizes two Machine Learning models(Vision,Gemini) to intelligently match reported lost items with found items. 
-The app employs Google's Vision AI and Gemini models to intelligently match items. They convert images and descriptions into vectors (numerical representations). 
-By comparing these vectors, the system accurately finds highly similar lost and found items, significantly boosting recovery.
-* **Real-time Notifications:** Get instant alerts when a potential match for your lost or found item is detected.
-* **User Profiles:** Manage your reported items and notification preferences.
+* **Report Lost Items:** **Quickly and easily report lost items** with essential details like category, detailed description, last known location, and date.
+* **Browse Found Items:** **View a comprehensive list of items** found and reported by other members of the NSBM community.
+* **Smart Matching (ML Integration):** Utilizes two Machine Learning models (Vision, Gemini) to **intelligently match reported lost items with found items**. The app employs Google's Vision AI and Gemini models to intelligently match items. They **convert images and descriptions into vectors** (numerical representations). By comparing these vectors, the system **accurately finds highly similar lost and found items**, significantly boosting recovery.
+* **Real-time Notifications:** **Get instant alerts** when a potential match for your lost or found item is detected.
+* **User Profiles:** **Manage your reported items and notification preferences**.
+
+---
+
+## 💻 Technologies Used
+
+*   **Frontend:** Flutter (Dart)
+*   **Backend:** Firebase (Authentication, Firestore, Cloud Functions, Storage)
+*   **Machine Learning:** Google's Vision AI, Gemini, TensorFlow Lite
+*   **Version Control:** Git & GitHub
 
 ---
 
@@ -42,7 +60,7 @@ Dark and light mode supported for a better user experience.
     </td>
   </tr>
 </table>
-_Easily view recent updates about found and lost items._
+_Student dashboard displaying recent item listings and quick navigation._
 
 
 **2. Dashboard (Admin/Staff)**
@@ -60,7 +78,7 @@ _Easily view recent updates about found and lost items._
     </td>
   </tr>
 </table>
-_Easily view recent updates about found and lost items._
+_Admin panel showing system overview and management tools._
 
 **3. Item Details / Match View**
 <table>
@@ -88,7 +106,8 @@ This project is a Flutter application. To get a copy up and running on your loca
 ### Prerequisites
 * Flutter SDK installed (version 3.x.x recommended)
 * Firebase CLI installed and configured
-* Node.js and npm (for Cloud Functions)
+* Node.js installed
+* npm (Node Package Manager) installed (typically comes with Node.js)
 
 ### Installation
 1.  **Clone the repository:**
@@ -104,7 +123,8 @@ This project is a Flutter application. To get a copy up and running on your loca
 ### Running the App
 1.  **Configure Firebase:**
     * Follow the official Firebase Flutter setup guide to connect your project to a Firebase project (iOS, Android, Web). This typically involves creating a `firebase_options.dart` file.
-    * Deploy your Firebase Cloud Functions (if not already deployed).
+    *   **Important:** Ensure a `firebase_options.dart` file is generated and correctly configured in `lib/firebase/` as this is crucial for connecting your app to your Firebase project.
+    * Deploy your Firebase Cloud Functions (if not already deployed) (these functions handle backend tasks such as real-time notifications and potentially aspects of the ML matching process).
 2.  **Run on a device or emulator:**
     ```bash
     flutter run
