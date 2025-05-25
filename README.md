@@ -25,6 +25,22 @@ Our goal is to create a more connected and supportive campus community by levera
 Here's a glimpse of NSBM FindX in action:
 Dark and light mode supported for a better user experience.
 
+
+<table>
+  <tr>
+    <td>
+      <img src="screenshots/light/home.png" width="300">
+      <br>
+      _Caption for Screenshot 1_
+    </td>
+    <td>
+      <img src="screenshots/dark/home.png" width="300">
+      <br>
+      _Caption for Screenshot 2_
+    </td>
+  </tr>
+</table>
+
 **1. Home (Student)**
 *(Include a clear screenshot of your main item Browse screen)*
 ![Screenshot 1 - Home Screen](screenshots/light/home.png)
