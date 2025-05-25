@@ -35,7 +35,7 @@ Our goal is to create a more connected and supportive campus community by levera
 
 *   **Frontend:** Flutter (Dart)
 *   **Backend:** Firebase (Authentication, Firestore, Cloud Functions, Storage)
-*   **Machine Learning:** Google's Vision AI, Gemini, TensorFlow Lite
+*   **Machine Learning:** Google's Vision AI, Gemini (for text embeddings)
 *   **Version Control:** Git & GitHub
 
 ---
@@ -43,7 +43,7 @@ Our goal is to create a more connected and supportive campus community by levera
 ## 📸 Screenshots
 
 Here's a glimpse of NSBM FindX in action:
-Dark and light mode supported for a better user experience.
+Dark and light modes are supported for a better user experience.
 
 **1. Home (Student)**
 <table>
@@ -60,7 +60,7 @@ Dark and light mode supported for a better user experience.
     </td>
   </tr>
 </table>
-_Student dashboard displaying recent item listings and quick navigation._
+The student dashboard displays recent item listings and provides quick navigation.
 
 
 **2. Dashboard (Admin/Staff)**
@@ -78,9 +78,9 @@ _Student dashboard displaying recent item listings and quick navigation._
     </td>
   </tr>
 </table>
-_Admin panel showing system overview and management tools._
+Admin panel showing system overview and management tools.
 
-**3. Item Details / Match View**
+**3. Item Details**
 <table>
   <tr>
     <td>
@@ -95,7 +95,7 @@ _Admin panel showing system overview and management tools._
     </td>
   </tr>
 </table>
-_View details of items and potential matches._
+View details of items.
 
 ---
 
