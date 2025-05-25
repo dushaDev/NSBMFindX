@@ -32,12 +32,12 @@ Dark and light mode supported for a better user experience.
     <td>
       <img src="screenshots/light/home.png" width="250">
       <br>
-      _Caption for Screenshot 1_
+      Light mode
     </td>
     <td>
       <img src="screenshots/dark/home.png" width="250">
       <br>
-      _Caption for Screenshot 2_
+      Dark mode
     </td>
   </tr>
 </table>
@@ -51,12 +51,12 @@ _Easily view recent updates about found and lost items._
     <td>
       <img src="screenshots/light/dashboard.png" width="250">
       <br>
-      _Caption for Screenshot 1_
+     Light mode
     </td>
     <td>
       <img src="screenshots/dark/dashboard.png" width="250">
       <br>
-      _Caption for Screenshot 2_
+      Dark mode
     </td>
   </tr>
 </table>
@@ -69,12 +69,12 @@ _Easily view recent updates about found and lost items._
     <td>
       <img src="screenshots/light/details.png" width="250">
       <br>
-      _Caption for Screenshot 1_
+     Light mode
     </td>
     <td>
       <img src="screenshots/dark/post_details.png" width="250">
       <br>
-      _Caption for Screenshot 2_
+      Dark mode
     </td>
   </tr>
 </table>
