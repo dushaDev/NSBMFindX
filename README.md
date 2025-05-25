@@ -49,12 +49,12 @@ Dark and light modes are supported for a better user experience.
 <table>
   <tr>
     <td>
-      <img src="screenshots/light/home.png" width="250">
+      <img src="screenshots/light/home.png" width="220">
       <br>
       Light mode
     </td>
     <td>
-      <img src="screenshots/dark/home.png" width="250">
+      <img src="screenshots/dark/home.png" width="220">
       <br>
       Dark mode
     </td>
@@ -67,12 +67,12 @@ The student dashboard displays recent item listings and provides quick navigatio
 <table>
   <tr>
     <td>
-      <img src="screenshots/light/dashboard.png" width="250">
+      <img src="screenshots/light/dashboard.png" width="220">
       <br>
      Light mode
     </td>
     <td>
-      <img src="screenshots/dark/dashboard.png" width="250">
+      <img src="screenshots/dark/dashboard.png" width="220">
       <br>
       Dark mode
     </td>
@@ -84,12 +84,12 @@ Admin panel showing system overview and management tools.
 <table>
   <tr>
     <td>
-      <img src="screenshots/light/details.png" width="250">
+      <img src="screenshots/light/details.png" width="220">
       <br>
      Light mode
     </td>
     <td>
-      <img src="screenshots/dark/post_details.png" width="250">
+      <img src="screenshots/dark/post_details.png" width="220">
       <br>
       Dark mode
     </td>
