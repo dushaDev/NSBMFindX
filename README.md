@@ -25,39 +25,59 @@ Our goal is to create a more connected and supportive campus community by levera
 Here's a glimpse of NSBM FindX in action:
 Dark and light mode supported for a better user experience.
 
-
+**1. Home (Student)**
+*(Include a clear screenshot of your main item Browse screen)*
 <table>
   <tr>
     <td>
-      <img src="screenshots/light/home.png" width="300">
+      <img src="screenshots/light/home.png" width="250">
       <br>
       _Caption for Screenshot 1_
     </td>
     <td>
-      <img src="screenshots/dark/home.png" width="300">
+      <img src="screenshots/dark/home.png" width="250">
       <br>
       _Caption for Screenshot 2_
     </td>
   </tr>
 </table>
-
-**1. Home (Student)**
-*(Include a clear screenshot of your main item Browse screen)*
-![Screenshot 1 - Home Screen](screenshots/light/home.png)
-![Screenshot 2 - Home Screen](screenshots/dark/home.png)
 _Easily view recent updates about found and lost items._
 
 
 **1. Dashboard (Admin/Staff)**
 *(Include a clear screenshot of your main item Browse screen)*
-![Screenshot 3 - Home Screen](screenshots/light/dashboard.png)
-![Screenshot 4 - Home Screen](screenshots/dark/dashboard.png)
+<table>
+  <tr>
+    <td>
+      <img src="screenshots/light/dashboard.png" width="250">
+      <br>
+      _Caption for Screenshot 1_
+    </td>
+    <td>
+      <img src="screenshots/dark/dashboard.png" width="250">
+      <br>
+      _Caption for Screenshot 2_
+    </td>
+  </tr>
+</table>
 _Easily view recent updates about found and lost items._
 
 **4. Item Details / Match View**
 *(Include a screenshot of an item's detail page, especially if it shows match info)*
-![Screenshot 5 - Item Details](screenshots/light/details.png)
-![Screenshot 6 - Item Details](screenshots/dark/details.png)
+<table>
+  <tr>
+    <td>
+      <img src="screenshots/light/details.png" width="250">
+      <br>
+      _Caption for Screenshot 1_
+    </td>
+    <td>
+      <img src="screenshots/dark/post_details.png" width="250">
+      <br>
+      _Caption for Screenshot 2_
+    </td>
+  </tr>
+</table>
 _View details of items and potential matches._
 
 ---
